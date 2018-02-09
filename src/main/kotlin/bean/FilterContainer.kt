@@ -64,7 +64,7 @@ class FilterContainer {
                 if (uuid != null) {
                     bean.uuid = uuid
                 }
-                bean.enabled = false
+                bean.enabled = true
                 bean.title = list[0]
                 bean.condition = Integer.valueOf(list[1])
                 bean.msg = list[2]

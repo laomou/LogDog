@@ -74,6 +74,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         logger.debug("update")
         if (s is LogModel) {
             defaultModel.setData(s.getDatas())
+            defaultModel.setHighLight(s.highLight)
             defaultModel.fireTableDataChanged()
         }
     }
@@ -116,6 +117,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     inner class LogTableViewModel : AbstractTableModel() {
         private var arData = ArrayList<LogContainer>()
         private val colName = arrayOf("Line", "Message")
+        private var highLight = ""
 
         fun setData(data: ArrayList<LogContainer>) {
             arData.clear()
@@ -134,10 +136,6 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return arData[p0].getColor()
         }
 
-        fun getHighlight(p0: Int): String {
-            return arData[p0].getHighlight()
-        }
-
         override fun getColumnName(col: Int): String {
             return colName[col]
         }
@@ -149,6 +147,14 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                 return arData[p0].getData()
             }
             return ""
+        }
+
+        fun setHighLight(text: String) {
+            highLight = text
+        }
+
+        fun getHighLight(): String {
+            return highLight
         }
     }
 
@@ -166,7 +172,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             if (index != 1) {
                 return text
             }
-            val high = (model as LogTableViewModel).getHighlight(index)
+            val high = (model as LogTableViewModel).getHighLight()
             bChanged = false
             var strRet = remakeFind(text, high, "#00FF00", true)
             if (bChanged) {

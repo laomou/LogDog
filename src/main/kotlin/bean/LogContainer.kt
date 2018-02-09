@@ -4,7 +4,6 @@ class LogContainer {
     var valid = false
 
     var strMsg = ""
-    var strHighlight = ""
     var strColor = 0x00000000
 
     fun getData(): String {
@@ -17,9 +16,5 @@ class LogContainer {
 
     fun getColor(): Int {
         return strColor
-    }
-
-    fun getHighlight(): String {
-        return strHighlight
     }
 }

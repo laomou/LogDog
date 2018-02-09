@@ -51,14 +51,22 @@ class FilterModel : ObservableSubject<FilterContainer> {
         notifyAllObservers()
     }
 
-    fun getEnableFilter() : String {
-        var str = ""
-        for (data in datas) {
-            if (data.enabled) {
-                str += "${data.detail()},"
+    fun getEnableFilter(): String {
+        val str = StringBuilder()
+        datas.filter { it.enabled }.forEach { str.append("${it.detail()},") }
+        return str.toString()
+    }
+
+    fun getHighlight(): String {
+        val str = StringBuilder()
+        datas.filter { it.enabled }.forEach {
+            when (it.condition) {
+                1 -> {
+                    str.append(it.msg + ",")
+                }
             }
         }
-        return str
+        return str.toString()
     }
 
     fun checkFilter(logInfo: LogContainer): Boolean {
@@ -66,7 +74,6 @@ class FilterModel : ObservableSubject<FilterContainer> {
             if (data.enabled) {
                 when (data.condition) {
                     1 -> {
-                        logInfo.strHighlight = data.msg
                         val stk = StringTokenizer(data.msg, ",", false)
                         while (stk.hasMoreElements()) {
                             val token = stk.nextToken()

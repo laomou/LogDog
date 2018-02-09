@@ -180,7 +180,7 @@ class MainController {
                         if (!filterModel.hasFilter()) {
                             logModel.setData(arLogList)
                             logger.debug("updateData(no filter)")
-                            logModel.updateData()
+                            updateTableData()
                             nChangedFilter = STATUS_READY
                         }
 
@@ -206,7 +206,7 @@ class MainController {
                         if (nChangedFilter == STATUS_PARSING) {
                             nChangedFilter = STATUS_READY
                             logger.debug("updateData")
-                            logModel.updateData()
+                            updateTableData()
                         }
                     }
                 }
@@ -251,7 +251,7 @@ class MainController {
                             logModel.setData(arLogList)
                         }
                         logger.debug("updateData")
-                        logModel.updateData()
+                        updateTableData()
                     }
                 }
 
@@ -414,6 +414,11 @@ class MainController {
             logger.debug("filterLock->notify")
             filterLock.notify()
         }
+    }
+
+    private fun updateTableData() {
+        logModel.highLight = filterModel.getHighlight()
+        logModel.updateData()
     }
 
     private fun addLogInfo(loginfo: LogContainer) {

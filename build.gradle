@@ -36,5 +36,5 @@ compileTestKotlin {
 }
 
 jar {
-    manifest.attributes 'Main-Class' : 'AppKt'
+    manifest.attributes 'Main-Class': 'AppKt'
 }

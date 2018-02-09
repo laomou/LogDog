@@ -6,9 +6,9 @@ import interfces.Observer
 
 
 class LogModel : ObservableSubject<LogContainer> {
-
     private val observers = ArrayList<Observer<LogContainer>>()
     private var datas = ArrayList<LogContainer>()
+    var highLight = ""
 
 
     override fun registerObserver(o: Observer<LogContainer>) {
