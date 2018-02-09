@@ -73,6 +73,18 @@ class EventLogParser {
                     " [7: " -> log.strColor = COLOR_7
                 }
             }
+        }), logLevel("[1-7],", textLogLine, object : ColorFilter {
+            override fun filter(level: String) {
+                when (level) {
+                    "1," -> log.strColor = COLOR_1
+                    "2," -> log.strColor = COLOR_2
+                    "3," -> log.strColor = COLOR_3
+                    "4," -> log.strColor = COLOR_4
+                    "5," -> log.strColor = COLOR_5
+                    "6," -> log.strColor = COLOR_6
+                    "7," -> log.strColor = COLOR_7
+                }
+            }
         }))
         for (b in matched) {
             if (b) {

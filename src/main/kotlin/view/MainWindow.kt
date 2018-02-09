@@ -182,8 +182,7 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
     }
 
     fun setWindowTitle(text: String) {
-        val file = "$title File($text)"
-        title = file
+        title = text
     }
 
     private var customListener = object : CustomActionListener {

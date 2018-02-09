@@ -29,8 +29,11 @@ class FilterModel : ObservableSubject<FilterContainer> {
         datas.add(filterInfo)
     }
 
-    fun removeFilterInfo(filterInfo: FilterContainer) {
-        datas.remove(filterInfo)
+    fun removeFilterInfo(data: FilterContainer) {
+        val index = datas.indexOf(data)
+        if (index != -1) {
+            datas.removeAt(index)
+        }
     }
 
     fun editFilterInfo(data: FilterContainer) {

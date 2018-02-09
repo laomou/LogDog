@@ -269,11 +269,12 @@ class MainController {
             logger.debug("logCatThread -in-")
             try {
                 val cmd = "${logConfig.tool_path} ${cmdModel.getSelectedCmd()}"
+                logger.debug("logCatThread run-> $cmd")
                 logCatProcess = Runtime.getRuntime().exec(cmd)
 
                 strLogFileName = makeFilename()
 
-                mainWindow.setWindowTitle(strLogFileName)
+                mainWindow.setWindowTitle("LogDog File($strLogFileName)")
 
                 val br = BufferedReader(InputStreamReader(logCatProcess?.inputStream, "UTF-8"))
                 val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(LOG_PATH + File.separatorChar + strLogFileName), "UTF-8"))
@@ -308,7 +309,7 @@ class MainController {
             parseFile(it.path)
             titles += "${it.name},"
         }
-        mainWindow.setWindowTitle(titles)
+        mainWindow.setWindowTitle("LogDog File($titles")
     }
 
     private fun parseFiles(files: ArrayList<File>) {
@@ -317,7 +318,7 @@ class MainController {
             parseFile(it.path)
             titles += "${it.name},"
         }
-        mainWindow.setWindowTitle(titles)
+        mainWindow.setWindowTitle("LogDog File($titles")
     }
 
     private fun parseFile(fileName: String) {
@@ -446,6 +447,7 @@ class MainController {
     private fun saveFilterData() {
         val file = File("config.json")
         val gson = Gson()
+        logConfig.filter_rule = filterModel.getData()
         val contents = gson.toJson(logConfig)
         file.writeText(contents)
     }

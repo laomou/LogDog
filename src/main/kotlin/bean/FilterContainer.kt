@@ -51,14 +51,14 @@ class FilterContainer {
     }
 
     companion object {
-        const val FMTSTR = "Name|2|\\s[V|D|I|W|E|F]\\s"
+        const val FMTSTR = "Name;2;\\s[V|D|I|W|E|F]\\s"
 
         fun formatString(data: FilterContainer): String {
-            return String.format("%s|%s|%s", data.title, data.condition, data.msg)
+            return String.format("%s;%s;%s", data.title, data.condition, data.msg)
         }
 
         fun formatBean(data: String, uuid: String? = null): FilterContainer? {
-            val list = data.split("|")
+            val list = data.split(";")
             if (list.size == 3) {
                 val bean = FilterContainer()
                 if (uuid != null) {
