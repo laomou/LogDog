@@ -51,6 +51,16 @@ class FilterModel : ObservableSubject<FilterContainer> {
         notifyAllObservers()
     }
 
+    fun getEnableFilter() : String {
+        var str = ""
+        for (data in datas) {
+            if (data.enabled) {
+                str += "${data.detail()},"
+            }
+        }
+        return str
+    }
+
     fun checkFilter(logInfo: LogContainer): Boolean {
         for (data in datas) {
             if (data.enabled) {

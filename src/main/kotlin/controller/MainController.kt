@@ -167,14 +167,19 @@ class MainController {
                         nChangedFilter = STATUS_READY
 
                         logger.debug("filterLock->wait")
+                        mainWindow.setStatus("Idle")
                         filterLock.wait()
 
+                        val filter = filterModel.getEnableFilter()
+                        logger.debug("parsing $filter")
+                        mainWindow.setStatus("Parsing $filter")
                         nChangedFilter = STATUS_PARSING
 
                         logModel.cleanFilterData()
 
                         if (!filterModel.hasFilter()) {
                             logModel.setData(arLogList)
+                            logger.debug("updateData(no filter)")
                             logModel.updateData()
                             nChangedFilter = STATUS_READY
                         }
@@ -202,7 +207,6 @@ class MainController {
                             nChangedFilter = STATUS_READY
                             logger.debug("updateData")
                             logModel.updateData()
-                            mainWindow.setStatus("Complete")
                         }
                     }
                 }
@@ -224,8 +228,7 @@ class MainController {
                 val dis = DataInputStream(fis)
                 val br = BufferedReader(InputStreamReader(dis, "UTF-8"))
 
-                logModel.cleanFilterData()
-                mainWindow.setStatus("Parsing")
+                mainWindow.setStatus("Parsing $strLogFileName")
 
                 while (filterLoop) {
                     Thread.sleep(500)
@@ -247,6 +250,7 @@ class MainController {
                         if (!filterModel.hasFilter()) {
                             logModel.setData(arLogList)
                         }
+                        logger.debug("updateData")
                         logModel.updateData()
                     }
                 }
@@ -258,6 +262,7 @@ class MainController {
                 //e.printStackTrace()
                 logger.warn(e.toString())
             }
+            mainWindow.setStatus("Complete $strLogFileName")
             logger.debug("logFileReadThread -out-")
         })
         fileReadThread?.name = "fileReadThread"
@@ -309,7 +314,8 @@ class MainController {
             parseFile(it.path)
             titles += "${it.name},"
         }
-        mainWindow.setWindowTitle("LogDog File($titles")
+        mainWindow.setStatus("Parse complete")
+        mainWindow.setWindowTitle("LogDog File($titles)")
     }
 
     private fun parseFiles(files: ArrayList<File>) {
@@ -318,7 +324,8 @@ class MainController {
             parseFile(it.path)
             titles += "${it.name},"
         }
-        mainWindow.setWindowTitle("LogDog File($titles")
+        mainWindow.setStatus("Parse complete")
+        mainWindow.setWindowTitle("LogDog File($titles)")
     }
 
     private fun parseFile(fileName: String) {
@@ -345,6 +352,7 @@ class MainController {
     private fun cleanData() {
         arLogList.clear()
         logModel.cleanFilterData()
+        logModel.updateData()
     }
 
     private fun configAdbFile() {
@@ -370,8 +378,7 @@ class MainController {
 
     private fun startProcess() {
         logger.debug("startProcess")
-        arLogList.clear()
-        logModel.cleanFilterData()
+        cleanData()
         fileReadLoop = true
         logCatThread()
         mainWindow.setProcessBtn(true)

@@ -61,7 +61,8 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         }
 
         fun setData(data: ArrayList<CmdContainer>) {
-            this.arData = data
+            arData.clear()
+            arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)
         }
     }

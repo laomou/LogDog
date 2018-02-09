@@ -95,7 +95,8 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         }
 
         fun setData(data: ArrayList<FilterContainer>) {
-            this.arData = data
+            arData.clear()
+            arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)
         }
     }

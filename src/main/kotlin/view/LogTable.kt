@@ -118,7 +118,8 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         private val colName = arrayOf("Line", "Message")
 
         fun setData(data: ArrayList<LogContainer>) {
-            arData = data
+            arData.clear()
+            arData.addAll(data)
         }
 
         override fun getRowCount(): Int {
