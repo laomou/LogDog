@@ -119,11 +119,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         private val colName = arrayOf("Line", "Message")
         private var highLight = ""
 
+        @Synchronized
         fun setData(data: ArrayList<LogContainer>) {
             arData.clear()
             arData.addAll(data)
         }
 
+        @Synchronized
         override fun getRowCount(): Int {
             return arData.size
         }
@@ -132,6 +134,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return colName.size
         }
 
+        @Synchronized
         fun getLogColor(p0: Int): Int {
             return arData[p0].getColor()
         }
@@ -140,6 +143,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return colName[col]
         }
 
+        @Synchronized
         override fun getValueAt(p0: Int, p1: Int): Any {
             if (p1 == 0) {
                 return "" + (p0 + 1)
@@ -185,7 +189,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             if (strFind == null || strFind.isEmpty()) return strText
 
             var strText1 = strText
-            val stk = StringTokenizer(strFind, ",")
+            val stk = StringTokenizer(strFind, "|")
             var newText: String
             var strToken: String
 

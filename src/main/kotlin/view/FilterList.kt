@@ -1,5 +1,6 @@
 package view
 
+import bean.ConstCmd
 import bean.FilterContainer
 import interfces.*
 import model.FilterModel
@@ -17,20 +18,66 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
     private val defaultMode = DefaultFilterListModel()
     private var eventlisteners = EventListenerList()
 
+    private val popupEditMenu = JPopupMenu()
+
     init {
         model = defaultMode
         selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
         cellRenderer = DefaultCellRenderer()
+
+        val addItem = JMenuItem("Add")
+        addItem.addActionListener {
+            val str = JOptionPane.showInputDialog(null, "Add", FilterContainer.FMTSTR)
+            if (str != null) {
+                val data = FilterContainer.formatBean(str)
+                if (data != null) {
+                    updateFilterData(data, ConstCmd.CMD_ADD_FILTER)
+                }
+            }
+        }
+        popupEditMenu.add(addItem)
+        val editItem = JMenuItem("Edit")
+        editItem.addActionListener {
+            if (selectedValue != null) {
+                val str = JOptionPane.showInputDialog(null, "Edit", FilterContainer.formatString(selectedValue))
+                if (str != null) {
+                    val data = FilterContainer.formatBean(str, selectedValue.uuid)
+                    if (data != null) {
+                        updateFilterData(data, ConstCmd.CMD_EDIT_FILTER)
+                    }
+                }
+            }
+        }
+        popupEditMenu.add(editItem)
+        val removeItem = JMenuItem("Remove")
+        removeItem.addActionListener {
+            if (selectedValue != null) {
+                val str = JOptionPane.showInputDialog(null, "Edit", FilterContainer.formatString(selectedValue))
+                val data = FilterContainer.formatBean(str, selectedValue.uuid)
+                if (data != null) {
+                    updateFilterData(data, ConstCmd.CMD_DEL_FILTER)
+                }
+            }
+        }
+        popupEditMenu.add(removeItem)
     }
 
     private val mouseClick = object : MouseAdapter() {
-        override fun mouseClicked(p0: MouseEvent?) {
-            val index = locationToIndex(p0?.point)
-            val value = model.getElementAt(index)
-            value.toggle()
-            val rect = getCellBounds(index, index)
-            repaint(rect)
-            updateFilterData()
+        override fun mouseClicked(p0: MouseEvent) {
+            if (p0.button == MouseEvent.BUTTON1) {
+                if (selectedIndex != -1) {
+                    val index = locationToIndex(p0.point)
+                    val value = model.getElementAt(index)
+                    value.toggle()
+                    val rect = getCellBounds(index, index)
+                    repaint(rect)
+                    updateTableData()
+                }
+            } else if (p0.button == MouseEvent.BUTTON3) {
+                if (selectedIndex != -1) {
+                    popupEditMenu.show(p0.component, p0.x, p0.y)
+                }
+            }
         }
     }
 
@@ -54,8 +101,16 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         eventlisteners.remove(CustomActionListener::class.java, l)
     }
 
-    private fun updateFilterData() {
-        val event = CustomEvent(this, "CMD_RUN_FILTER")
+    private fun updateTableData() {
+        val event = CustomEvent(this, ConstCmd.CMD_RUN_FILTER)
+        for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+            listener.actionPerformed(event)
+        }
+    }
+
+    private fun updateFilterData(data: FilterContainer?, str: String) {
+        val event = CustomEvent(this, str)
+        event.objectValue = data
         for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
@@ -86,14 +141,18 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
 
     inner class DefaultFilterListModel : AbstractListModel<FilterContainer>() {
         private var arData = ArrayList<FilterContainer>()
+
+        @Synchronized
         override fun getElementAt(p0: Int): FilterContainer {
             return arData[p0]
         }
 
+        @Synchronized
         override fun getSize(): Int {
             return arData.size
         }
 
+        @Synchronized
         fun setData(data: ArrayList<FilterContainer>) {
             arData.clear()
             arData.addAll(data)

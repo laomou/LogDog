@@ -1,5 +1,6 @@
 package controller
 
+import bean.ConstCmd
 import bean.LogContainer
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -148,12 +149,12 @@ class MainController {
     private val customListener = object : CustomActionListener {
         override fun actionPerformed(event: CustomEvent) {
             when {
-                event.actionCommand == "CMD_OPEN_FILE" -> startOpenFile()
-                event.actionCommand == "CMD_RUN_LOGCAT" -> startProcess()
-                event.actionCommand == "CMD_STOP_LOGCAT" -> stopProcess()
-                event.actionCommand == "CMD_RUN_FILTER" -> runFilter()
-                event.actionCommand == "CMD_RUN_CLEAN" -> cleanData()
-                event.actionCommand == "CMD_CONFIG_ADB" -> configAdbFile()
+                event.actionCommand == ConstCmd.CMD_OPEN_FILE -> startOpenFile()
+                event.actionCommand == ConstCmd.CMD_RUN_LOGCAT -> startProcess()
+                event.actionCommand == ConstCmd.CMD_STOP_LOGCAT -> stopProcess()
+                event.actionCommand == ConstCmd.CMD_RUN_FILTER -> runFilter()
+                event.actionCommand == ConstCmd.CMD_RUN_CLEAN -> cleanData()
+                event.actionCommand == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
             }
         }
     }

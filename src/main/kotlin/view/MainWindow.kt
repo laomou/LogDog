@@ -1,5 +1,6 @@
 package view
 
+import bean.ConstCmd
 import bean.FilterContainer
 import interfces.CustomActionListener
 import interfces.CustomEvent
@@ -27,6 +28,8 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
     private var cmdComboBox = CmdComboBox()
 
     private var tfStatus = JTextField()
+
+    private var popup = JPopupMenu()
 
     private var btnRun: JButton? = null
     private var btnClean: JButton? = null
@@ -67,20 +70,20 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         btnClean?.margin = Insets(0, 0, 0, 0)
         btnClean?.isEnabled = false
         btnClean?.addActionListener {
-            updateButton("CMD_RUN_CLEAN")
+            updateButton(ConstCmd.CMD_RUN_CLEAN)
         }
         jpLog.add(btnClean)
         btnRun = JButton("Run")
         btnRun?.margin = Insets(0, 0, 0, 0)
         btnRun?.addActionListener {
-            updateButton("CMD_RUN_LOGCAT")
+            updateButton(ConstCmd.CMD_RUN_LOGCAT)
         }
         jpLog.add(btnRun)
         btnStop = JButton("Stop")
         btnStop?.margin = Insets(0, 0, 0, 0)
         btnStop?.isEnabled = false
         btnStop?.addActionListener {
-            updateButton("CMD_STOP_LOGCAT")
+            updateButton(ConstCmd.CMD_STOP_LOGCAT)
         }
         jpLog.add(btnStop)
         jpLogPanel.add(jpLog, BorderLayout.CENTER)
@@ -91,40 +94,6 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         jpFilterRoot.border = BorderFactory.createTitledBorder("Filter")
 
         filterList = FilterList()
-        val popup = JPopupMenu()
-        val addItem = JMenuItem("Add")
-        addItem.addActionListener {
-            val str = JOptionPane.showInputDialog(null, "Add", FilterContainer.FMTSTR)
-            val data = FilterContainer.formatBean(str)
-            if (data != null) {
-                filterModel.addFilterInfo(data)
-                filterModel.updateData()
-            }
-        }
-        popup.add(addItem)
-        val editItem = JMenuItem("Edit")
-        editItem.addActionListener {
-            val value = filterList.selectedValue
-            if (value != null) {
-                val str = JOptionPane.showInputDialog(null, "Edit", FilterContainer.formatString(value))
-                val data = FilterContainer.formatBean(str, value.uuid)
-                if (data != null) {
-                    filterModel.editFilterInfo(data)
-                    filterModel.updateData()
-                }
-            }
-        }
-        popup.add(editItem)
-        val removeItem = JMenuItem("Remove")
-        removeItem.addActionListener {
-            val value = filterList.selectedValue
-            if (value != null) {
-                filterModel.removeFilterInfo(value)
-            }
-            filterModel.updateData()
-        }
-        popup.add(removeItem)
-        filterList.componentPopupMenu = popup
         val scrollPane = JScrollPane(filterList)
         scrollPane.preferredSize = Dimension(100, 0)
         scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
@@ -190,9 +159,21 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         override fun actionPerformed(event: CustomEvent) {
             logger.debug("actionPerformed " + event.actionCommand)
             when (event.actionCommand) {
-                "CMD_SELECT_RUN" -> {
+                ConstCmd.CMD_SELECT_RUN -> {
                     val index = cmdComboBox.selectedIndex
                     cmdModel.selectedIndex = index
+                }
+                ConstCmd.CMD_ADD_FILTER -> {
+                    filterModel.addFilterInfo(event.objectValue as FilterContainer)
+                    updateFilterAndTable()
+                }
+                ConstCmd.CMD_DEL_FILTER -> {
+                    filterModel.removeFilterInfo(event.objectValue as FilterContainer)
+                    updateFilterAndTable()
+                }
+                ConstCmd.CMD_EDIT_FILTER -> {
+                    filterModel.editFilterInfo(event.objectValue as FilterContainer)
+                    updateFilterAndTable()
                 }
                 else -> {
                     updateButton(event.actionCommand)
@@ -226,5 +207,10 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
             btnStop?.isEnabled = false
             btnClean?.isEnabled = false
         }
+    }
+
+    private fun updateFilterAndTable() {
+        filterModel.updateData()
+        updateButton(ConstCmd.CMD_RUN_FILTER)
     }
 }

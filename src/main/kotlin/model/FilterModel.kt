@@ -62,7 +62,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
         datas.filter { it.enabled }.forEach {
             when (it.condition) {
                 1 -> {
-                    str.append(it.msg + ",")
+                    str.append(it.msg + "|")
                 }
             }
         }
@@ -73,8 +73,17 @@ class FilterModel : ObservableSubject<FilterContainer> {
         for (data in datas) {
             if (data.enabled) {
                 when (data.condition) {
+                    0 -> {
+                        val stk = StringTokenizer(data.msg, "|", false)
+                        while (stk.hasMoreElements()) {
+                            val token = stk.nextToken()
+                            if (token.toLowerCase() in logInfo.strMsg.toLowerCase()) {
+                                return false
+                            }
+                        }
+                    }
                     1 -> {
-                        val stk = StringTokenizer(data.msg, ",", false)
+                        val stk = StringTokenizer(data.msg, "|", false)
                         while (stk.hasMoreElements()) {
                             val token = stk.nextToken()
                             if (token.toLowerCase() in logInfo.strMsg.toLowerCase()) {

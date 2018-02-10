@@ -1,6 +1,7 @@
 package view
 
 import bean.CmdContainer
+import bean.ConstCmd
 import interfces.*
 import model.CmdModel
 import org.slf4j.LoggerFactory
@@ -19,7 +20,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
     }
 
     var actionListener = ActionListener {
-        val event = CustomEvent(this, "CMD_SELECT_RUN")
+        val event = CustomEvent(this, ConstCmd.CMD_SELECT_RUN)
         for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
@@ -52,14 +53,18 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
 
     inner class DefaultCmdModel : DefaultComboBoxModel<String>() {
         private var arData = ArrayList<CmdContainer>()
+
+        @Synchronized
         override fun getElementAt(p0: Int): String {
             return arData[p0].title
         }
 
+        @Synchronized
         override fun getSize(): Int {
             return arData.size
         }
 
+        @Synchronized
         fun setData(data: ArrayList<CmdContainer>) {
             arData.clear()
             arData.addAll(data)

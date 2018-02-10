@@ -61,6 +61,17 @@ class EventLogParser {
                     " F " -> log.strColor = COLOR_FATAL
                 }
             }
+        }), logLevel("\\s[VDEWIF]/", textLogLine, object : ColorFilter {
+            override fun filter(level: String) {
+                when (level) {
+                    " V/" -> log.strColor = COLOR_GUIDE
+                    " D/" -> log.strColor = COLOR_DEBUG
+                    " I/" -> log.strColor = COLOR_INFO
+                    " W/" -> log.strColor = COLOR_WARN
+                    " E/" -> log.strColor = COLOR_ERROR
+                    " F/" -> log.strColor = COLOR_FATAL
+                }
+            }
         }), logLevel("\\s\\[[1-7]:\\s", textLogLine, object : ColorFilter {
             override fun filter(level: String) {
                 when (level) {

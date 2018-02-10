@@ -1,5 +1,6 @@
 package view
 
+import bean.ConstCmd
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
@@ -31,13 +32,13 @@ class MainMenuBar : JMenuBar(), IView {
     private val actionListener = ActionListener {
         if (it.source == openItem) {
             logger.debug("openItem->click")
-            val action = CustomEvent(this, "CMD_OPEN_FILE")
+            val action = CustomEvent(this, ConstCmd.CMD_OPEN_FILE)
             for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
                 listener.actionPerformed(action)
             }
         } else if (it.source == adbItem) {
             logger.debug("settingsItem->click")
-            val action = CustomEvent(this, "CMD_CONFIG_ADB")
+            val action = CustomEvent(this, ConstCmd.CMD_CONFIG_ADB)
             for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
                 listener.actionPerformed(action)
             }

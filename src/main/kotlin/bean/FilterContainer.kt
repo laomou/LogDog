@@ -37,7 +37,9 @@ class FilterContainer {
 
     fun detail(): String {
         var str = ""
-        if (condition == 1) {
+        if (condition == 0) {
+            str += "Remove "
+        } else if (condition == 1) {
             str += "Contains "
         } else if (condition == 2) {
             str += "Matches "
