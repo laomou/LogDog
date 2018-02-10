@@ -280,6 +280,11 @@ class MainController {
 
                 strLogFileName = makeFilename()
 
+                val dir = File(LOG_PATH)
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
+
                 mainWindow.setWindowTitle("LogDog File($strLogFileName)")
 
                 val br = BufferedReader(InputStreamReader(logCatProcess?.inputStream, "UTF-8"))

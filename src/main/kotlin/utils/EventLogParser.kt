@@ -27,9 +27,7 @@ class EventLogParser {
         if (!textLogLine.isEmpty()) {
             log.valid = true
             log.strMsg = textLogLine
-            return processLogLine(log, textLogLine)
-        } else {
-            log.valid = false
+            return processLogLevel(log, textLogLine)
         }
         return log
     }
@@ -38,70 +36,76 @@ class EventLogParser {
         fun filter(level: String)
     }
 
-    private fun logLevel(regex: String, textLogLine: String, filter: ColorFilter): Boolean {
+    private fun logLevel(regex: String, textLogLine: String, filter: ColorFilter) {
         val pt = Pattern.compile(regex)
         val match = pt.matcher(textLogLine)
-        var matched = false
         while (match.find()) {
             filter.filter(match.group())
-            matched = true
         }
-        return matched
     }
 
-    private fun processLogLine(log: LogContainer, textLogLine: String): LogContainer {
-        val matched = arrayOf(logLevel("\\s[VDEWIF]\\s", textLogLine, object : ColorFilter {
-            override fun filter(level: String) {
-                when (level) {
-                    " V " -> log.strColor = COLOR_GUIDE
-                    " D " -> log.strColor = COLOR_DEBUG
-                    " I " -> log.strColor = COLOR_INFO
-                    " W " -> log.strColor = COLOR_WARN
-                    " E " -> log.strColor = COLOR_ERROR
-                    " F " -> log.strColor = COLOR_FATAL
+    private fun processLogLevel(log: LogContainer, textLogLine: String): LogContainer {
+        try {
+            logLevel("\\s[VDIWEF]\\s", textLogLine, object : ColorFilter {
+                override fun filter(level: String) {
+                    when (level) {
+                        " V " -> log.strColor = COLOR_GUIDE
+                        " D " -> log.strColor = COLOR_DEBUG
+                        " I " -> log.strColor = COLOR_INFO
+                        " W " -> log.strColor = COLOR_WARN
+                        " E " -> log.strColor = COLOR_ERROR
+                        " F " -> log.strColor = COLOR_FATAL
+                    }
+                    throw Exception("Done")
                 }
-            }
-        }), logLevel("\\s[VDEWIF]/", textLogLine, object : ColorFilter {
-            override fun filter(level: String) {
-                when (level) {
-                    " V/" -> log.strColor = COLOR_GUIDE
-                    " D/" -> log.strColor = COLOR_DEBUG
-                    " I/" -> log.strColor = COLOR_INFO
-                    " W/" -> log.strColor = COLOR_WARN
-                    " E/" -> log.strColor = COLOR_ERROR
-                    " F/" -> log.strColor = COLOR_FATAL
+            })
+
+            logLevel("\\s[VDIWEF]/", textLogLine, object : ColorFilter {
+                override fun filter(level: String) {
+                    when (level) {
+                        " V/" -> log.strColor = COLOR_GUIDE
+                        " D/" -> log.strColor = COLOR_DEBUG
+                        " I/" -> log.strColor = COLOR_INFO
+                        " W/" -> log.strColor = COLOR_WARN
+                        " E/" -> log.strColor = COLOR_ERROR
+                        " F/" -> log.strColor = COLOR_FATAL
+                    }
+                    throw Exception("Done")
                 }
-            }
-        }), logLevel("\\s\\[[1-7]:\\s", textLogLine, object : ColorFilter {
-            override fun filter(level: String) {
-                when (level) {
-                    " [1: " -> log.strColor = COLOR_1
-                    " [2: " -> log.strColor = COLOR_2
-                    " [3: " -> log.strColor = COLOR_3
-                    " [4: " -> log.strColor = COLOR_4
-                    " [5: " -> log.strColor = COLOR_5
-                    " [6: " -> log.strColor = COLOR_6
-                    " [7: " -> log.strColor = COLOR_7
+            })
+
+            logLevel("\\s\\[[1-7]:\\s", textLogLine, object : ColorFilter {
+                override fun filter(level: String) {
+                    when (level) {
+                        " [1: " -> log.strColor = COLOR_1
+                        " [2: " -> log.strColor = COLOR_2
+                        " [3: " -> log.strColor = COLOR_3
+                        " [4: " -> log.strColor = COLOR_4
+                        " [5: " -> log.strColor = COLOR_5
+                        " [6: " -> log.strColor = COLOR_6
+                        " [7: " -> log.strColor = COLOR_7
+                    }
+                    throw Exception("Done")
                 }
-            }
-        }), logLevel("[1-7],", textLogLine, object : ColorFilter {
-            override fun filter(level: String) {
-                when (level) {
-                    "1," -> log.strColor = COLOR_1
-                    "2," -> log.strColor = COLOR_2
-                    "3," -> log.strColor = COLOR_3
-                    "4," -> log.strColor = COLOR_4
-                    "5," -> log.strColor = COLOR_5
-                    "6," -> log.strColor = COLOR_6
-                    "7," -> log.strColor = COLOR_7
+            })
+
+            logLevel("[1-7],", textLogLine, object : ColorFilter {
+                override fun filter(level: String) {
+                    when (level) {
+                        "1," -> log.strColor = COLOR_1
+                        "2," -> log.strColor = COLOR_2
+                        "3," -> log.strColor = COLOR_3
+                        "4," -> log.strColor = COLOR_4
+                        "5," -> log.strColor = COLOR_5
+                        "6," -> log.strColor = COLOR_6
+                        "7," -> log.strColor = COLOR_7
+                    }
+                    throw Exception("Done")
                 }
-            }
-        }))
-        for (b in matched) {
-            if (b) {
-                break
-            }
+            })
+        } catch (e: Exception) {
         }
+
         return log
     }
 }
