@@ -23,7 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer
 
 class LogTable : JTable(), Observer<LogContainer>, IView {
     private val logger = LoggerFactory.getLogger(LogTable::class.java)
-    private val colWidth = intArrayOf(30, 600)
+    private val colWidth = intArrayOf(20, 600)
     private var defaultModel = LogTableViewModel()
 
     private var gotoItem: JMenuItem? = null
@@ -54,14 +54,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     private val gotoActionListener = ActionListener {
         val inputContent = JOptionPane.showInputDialog(null, "Go To", "1")
         if (inputContent != null) {
-            val line = Integer.valueOf(inputContent)
-            showRow(line - 1, true)
+            val line = defaultModel.getRearLine(inputContent)
+            showRow(line, true)
         }
     }
 
     override fun initListener() {
         logger.debug("initListener")
-
         gotoItem?.addActionListener(gotoActionListener)
     }
 
@@ -81,13 +80,12 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
     private fun showRow(row: Int, bCenter: Boolean) {
         val nLastSelectedIndex = selectedRow
-
         changeSelection(row, 0, false, false)
         var nVisible: Int
-        if (nLastSelectedIndex <= row || nLastSelectedIndex == -1) {
-            nVisible = row + getVisibleRowCount() / 2
+        nVisible = if (nLastSelectedIndex <= row || nLastSelectedIndex == -1) {
+            row + getVisibleRowCount() / 2
         } else {
-            nVisible = row - getVisibleRowCount() / 2
+            row - getVisibleRowCount() / 2
         }
         if (nVisible < 0) {
             nVisible = 0
@@ -136,7 +134,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
         @Synchronized
         fun getLogColor(p0: Int): Int {
-            return arData[p0].getColor()
+            return arData[p0].strColor
         }
 
         override fun getColumnName(col: Int): String {
@@ -145,12 +143,11 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
         @Synchronized
         override fun getValueAt(p0: Int, p1: Int): Any {
-            if (p1 == 0) {
-                return "" + (p0 + 1)
-            } else if (p1 == 1) {
-                return arData[p0].getData()
+            return when (p1) {
+                0 -> arData[p0].strLine
+                1 -> arData[p0].strMsg
+                else -> ""
             }
-            return ""
         }
 
         fun setHighLight(text: String) {
@@ -159,6 +156,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
         fun getHighLightStr(): String {
             return highLight
+        }
+
+        fun getRearLine(row: String): Int {
+            return arData
+                    .firstOrNull { it.strLine == row }
+                    ?.let { arData.indexOf(it) }
+                    ?: 0
         }
     }
 
@@ -191,7 +195,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         private fun remakeFind(strText: String, strFind: String, arColor: Array<String>, bUseSpan: Boolean): String {
             if (strFind.isEmpty()) return strText
 
-            var strText = strText
+            var strText1 = strText
             val stk = StringTokenizer(strFind, "|")
             var newText: String
             var strToken: String
@@ -202,7 +206,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                     nIndex = 0
                 strToken = stk.nextToken()
 
-                if (strText.toLowerCase().contains(strToken.toLowerCase())) {
+                if (strText1.toLowerCase().contains(strToken.toLowerCase())) {
                     newText = if (bUseSpan)
                         "<span style=\"background-color:${arColor[nIndex]}\"><b>"
                     else
@@ -212,19 +216,19 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                         "</b></span>"
                     else
                         "</b></font>"
-                    strText = strText.replace(strToken, newText)
+                    strText1 = strText1.replace(strToken, newText)
                     bChanged = true
                     nIndex++
                 }
             }
-            return strText
+            return strText1
         }
 
 
         private fun remakeFind(strText: String, strFind: String, strColor: String, bUseSpan: Boolean): String {
             if (strFind.isEmpty()) return strText
 
-            var strText = strText
+            var strText1 = strText
             val stk = StringTokenizer(strFind, "|")
             var newText: String
             var strToken: String
@@ -242,11 +246,11 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                         "</b></span>"
                     else
                         "</b></font>"
-                    strText = strText.replace(strToken, newText)
+                    strText1 = strText1.replace(strToken, newText)
                     bChanged = true
                 }
             }
-            return strText
+            return strText1
         }
     }
 }

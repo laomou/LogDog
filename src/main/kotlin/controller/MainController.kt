@@ -10,7 +10,7 @@ import model.CmdModel
 import model.FilterModel
 import model.LogModel
 import org.slf4j.LoggerFactory
-import utils.EventLogParser
+import utils.LogCatParser
 import utils.LogToolConfig
 import view.MainWindow
 import java.awt.Dimension
@@ -25,6 +25,7 @@ import java.util.*
 import javax.swing.JFrame
 import kotlin.collections.ArrayList
 
+
 class MainController {
 
     private val logger = LoggerFactory.getLogger(MainController::class.java)
@@ -33,7 +34,7 @@ class MainController {
 
     private var logConfig = LogToolConfig()
 
-    private val logParser = EventLogParser()
+    private val logParser = LogCatParser()
 
     private val filterLock = java.lang.Object()
     private val fileLock = java.lang.Object()
@@ -240,8 +241,10 @@ class MainController {
 
                     synchronized(fileLock) {
                         var strLine: String? = ""
+                        var nLine = arLogList.size + 1
                         while (let { strLine = br.readLine(); strLine != null }) {
                             val logInfo = logParser.parse(strLine!!)
+                            logInfo.strLine = "" + nLine++
                             addLogInfo(logInfo)
                             addFilterLogInfo(logInfo)
                         }
@@ -338,10 +341,12 @@ class MainController {
         logger.debug("parseFile: " + fileName)
         fileLoadThread = Thread(Runnable {
             val file = File(fileName)
+            var nIndex = 1
             logger.debug("parseFile start")
             mainWindow.setStatus("Parsing")
             file.forEachLine {
                 val logInfo = logParser.parse(it)
+                logInfo.strLine = "" + nIndex++
                 if (logInfo.valid) {
                     addLogInfo(logInfo)
                 }
