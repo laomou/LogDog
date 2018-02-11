@@ -157,7 +157,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             highLight = text
         }
 
-        fun getHighLight(): String {
+        fun getHighLightStr(): String {
             return highLight
         }
     }
@@ -176,19 +176,55 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             if (index != 1) {
                 return text
             }
-            val high = (model as LogTableViewModel).getHighLight()
+
+            val high = (model as LogTableViewModel).getHighLightStr()
             bChanged = false
-            var strRet = remakeFind(text, high, "#00FF00", true)
+            val arColor = arrayOf("#00FF00", "#EEEE00", "#EE9A49", "#8A2BE2", "#EE1289")
+            var strRet = remakeFind(text, high, arColor, true)
             if (bChanged) {
                 strRet = "<html><nobr>$strRet</nobr></html>"
             }
-            return strRet
+
+            return strRet.replace("\t", "    ")
         }
 
-        private fun remakeFind(strText: String, strFind: String?, strColor: String, bUseSpan: Boolean): String {
-            if (strFind == null || strFind.isEmpty()) return strText
+        private fun remakeFind(strText: String, strFind: String, arColor: Array<String>, bUseSpan: Boolean): String {
+            if (strFind.isEmpty()) return strText
 
-            var strText1 = strText
+            var strText = strText
+            val stk = StringTokenizer(strFind, "|")
+            var newText: String
+            var strToken: String
+            var nIndex = 0
+
+            while (stk.hasMoreElements()) {
+                if (nIndex >= arColor.size)
+                    nIndex = 0
+                strToken = stk.nextToken()
+
+                if (strText.toLowerCase().contains(strToken.toLowerCase())) {
+                    newText = if (bUseSpan)
+                        "<span style=\"background-color:${arColor[nIndex]}\"><b>"
+                    else
+                        "<font color=${arColor[nIndex]}><b>"
+                    newText += strToken
+                    newText += if (bUseSpan)
+                        "</b></span>"
+                    else
+                        "</b></font>"
+                    strText = strText.replace(strToken, newText)
+                    bChanged = true
+                    nIndex++
+                }
+            }
+            return strText
+        }
+
+
+        private fun remakeFind(strText: String, strFind: String, strColor: String, bUseSpan: Boolean): String {
+            if (strFind.isEmpty()) return strText
+
+            var strText = strText
             val stk = StringTokenizer(strFind, "|")
             var newText: String
             var strToken: String
@@ -196,7 +232,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             while (stk.hasMoreElements()) {
                 strToken = stk.nextToken()
 
-                if (strText1.toLowerCase().contains(strToken.toLowerCase())) {
+                if (strText.toLowerCase().contains(strToken.toLowerCase())) {
                     newText = if (bUseSpan)
                         "<span style=\"background-color:$strColor\"><b>"
                     else
@@ -206,11 +242,11 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                         "</b></span>"
                     else
                         "</b></font>"
-                    strText1 = strText.replace(strToken, newText)
+                    strText = strText.replace(strToken, newText)
                     bChanged = true
                 }
             }
-            return strText1
+            return strText
         }
     }
 }

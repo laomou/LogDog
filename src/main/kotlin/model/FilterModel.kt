@@ -86,22 +86,22 @@ class FilterModel : ObservableSubject<FilterContainer> {
                         val stk = StringTokenizer(data.msg, "|", false)
                         while (stk.hasMoreElements()) {
                             val token = stk.nextToken()
-                            if (token.toLowerCase() in logInfo.strMsg.toLowerCase()) {
-                                return true
+                            if (token.toLowerCase() !in logInfo.strMsg.toLowerCase()) {
+                                return false
                             }
                         }
                     }
                     2 -> {
                         val pattern = Pattern.compile(data.msg)
                         val matcher = pattern.matcher(logInfo.strMsg)
-                        if (matcher.find()) {
-                            return true
+                        if (!matcher.find()) {
+                            return false
                         }
                     }
                 }
             }
         }
-        return false
+        return true
     }
 
     fun hasFilter(): Boolean {
