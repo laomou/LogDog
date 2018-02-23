@@ -22,7 +22,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
 
     init {
         model = defaultMode
-        selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
+        selectionMode = ListSelectionModel.SINGLE_SELECTION
         cellRenderer = DefaultCellRenderer()
 
         val removeItem = JMenuItem("Remove")
@@ -40,10 +40,13 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
                 if (selectedIndex != -1) {
                     val index = locationToIndex(p0.point)
                     val value = model.getElementAt(index)
-                    value.toggle()
-                    val rect = getCellBounds(index, index)
-                    repaint(rect)
-                    updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
+                    if (p0.x < 25) {
+                        value.toggle()
+                        val rect = getCellBounds(index, index)
+                        repaint(rect)
+                    } else {
+                        updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
+                    }
                 }
             } else if (p0.button == MouseEvent.BUTTON3) {
                 if (selectedIndex != -1) {

@@ -30,9 +30,10 @@ class FilterEditPanel : JPanel(), IView {
     private val btnOk = JButton()
 
     private var strName = ""
-    private var strRegex = 0
+    private var iRegex = 0
     private var strText = ""
     private var strUuid = ""
+    private var bEnable = false
     private var newFilterInfo = true
 
     init {
@@ -81,6 +82,8 @@ class FilterEditPanel : JPanel(), IView {
         btnClean.addActionListener {
             tfName.text = ""
             tfText.text = ""
+            iRegex = 1
+            bEnable = true
             newFilterInfo = true
         }
 
@@ -125,16 +128,18 @@ class FilterEditPanel : JPanel(), IView {
     private fun formatNewFilterData(): FilterContainer {
         val data = FilterContainer()
         data.title = strName
-        data.regex = strRegex
+        data.regex = iRegex
         data.text = strText
+        data.enabled = bEnable
         return data
     }
 
     private fun formatFilterData(): FilterContainer {
         val data = FilterContainer(strUuid)
         data.title = strName
-        data.regex = strRegex
+        data.regex = iRegex
         data.text = strText
+        data.enabled = bEnable
         return data
     }
 
@@ -148,7 +153,7 @@ class FilterEditPanel : JPanel(), IView {
 
     private var itemListener = ItemListener {
         if (it.stateChange != ItemEvent.SELECTED) return@ItemListener
-        strRegex = cbRegex.selectedIndex
+        iRegex = cbRegex.selectedIndex
     }
 
     private var dlListener = object : DocumentListener {
@@ -194,12 +199,14 @@ class FilterEditPanel : JPanel(), IView {
         cbRegex.selectedIndex = filterInfo.regex
         tfText.text = filterInfo.text
         strUuid = filterInfo.uuid
+        bEnable = filterInfo.enabled
         newFilterInfo = false
     }
 
     fun cleanFilterInfo() {
         tfName.text = ""
         tfText.text = ""
+        bEnable = true
         newFilterInfo = true
     }
 }

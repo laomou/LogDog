@@ -321,7 +321,10 @@ class MainController {
         var titles = ""
         files.forEach {
             parseFile(it.path)
-            titles += "${it.name},"
+            if (!titles.isEmpty()) {
+                titles += ","
+            }
+            titles += it.name
         }
         mainWindow.setStatus("Parse complete")
         mainWindow.setWindowTitle("LogDog File($titles)")
@@ -331,7 +334,10 @@ class MainController {
         var titles = ""
         files.forEach {
             parseFile(it.path)
-            titles += "${it.name},"
+            if (!titles.isEmpty()) {
+                titles += ","
+            }
+            titles += it.name
         }
         mainWindow.setStatus("Parse complete")
         mainWindow.setWindowTitle("LogDog File($titles)")
