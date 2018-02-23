@@ -60,9 +60,9 @@ class FilterModel : ObservableSubject<FilterContainer> {
     fun getHighlight(): String {
         val str = StringBuilder()
         datas.filter { it.enabled }.forEach {
-            when (it.condition) {
+            when (it.regex) {
                 1 -> {
-                    str.append(it.msg + "|")
+                    str.append(it.text + "|")
                 }
             }
         }
@@ -72,9 +72,9 @@ class FilterModel : ObservableSubject<FilterContainer> {
     fun checkFilter(logInfo: LogContainer): Boolean {
         for (data in datas) {
             if (data.enabled) {
-                when (data.condition) {
+                when (data.regex) {
                     0 -> {
-                        val stk = StringTokenizer(data.msg, "|", false)
+                        val stk = StringTokenizer(data.text, "|", false)
                         while (stk.hasMoreElements()) {
                             val token = stk.nextToken()
                             if (token.toLowerCase() in logInfo.strMsg.toLowerCase()) {
@@ -83,7 +83,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
                         }
                     }
                     1 -> {
-                        val stk = StringTokenizer(data.msg, "|", false)
+                        val stk = StringTokenizer(data.text, "|", false)
                         while (stk.hasMoreElements()) {
                             val token = stk.nextToken()
                             if (token.toLowerCase() !in logInfo.strMsg.toLowerCase()) {
@@ -92,7 +92,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
                         }
                     }
                     2 -> {
-                        val pattern = Pattern.compile(data.msg)
+                        val pattern = Pattern.compile(data.text)
                         val matcher = pattern.matcher(logInfo.strMsg)
                         if (!matcher.find()) {
                             return false

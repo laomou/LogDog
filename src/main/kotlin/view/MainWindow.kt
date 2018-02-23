@@ -20,16 +20,15 @@ import javax.swing.event.EventListenerList
 class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
-    private var eventlisteners = EventListenerList()
+    private val eventlisteners = EventListenerList()
 
-    private var logTable = LogTable()
-    private var filterList = FilterList()
-    private var menuBar = MainMenuBar()
-    private var cmdComboBox = CmdComboBox()
+    private val logTable = LogTable()
+    private val filterList = FilterList()
+    private val filterEdit = FilterEditPanel()
+    private val menuBar = MainMenuBar()
+    private val cmdComboBox = CmdComboBox()
 
-    private var tfStatus = JTextField()
-
-    private var popup = JPopupMenu()
+    private val tfStatus = JTextField()
 
     private var btnRun: JButton? = null
     private var btnClean: JButton? = null
@@ -48,22 +47,22 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
     }
 
     private fun getMainTabPanel(): Component {
+        val rootPane = JPanel(BorderLayout())
         val scrollVBar = JScrollPane(logTable)
-        return scrollVBar
+        rootPane.add(scrollVBar, BorderLayout.CENTER)
+        return rootPane
     }
+
 
     private fun getLeftPanel(): Component {
         val rootPane = JPanel(BorderLayout())
 
-        val jpLogPanel = JPanel(BorderLayout())
-        jpLogPanel.border = BorderFactory.createTitledBorder("Device")
+        val jpDevicePanel = JPanel(BorderLayout())
+        jpDevicePanel.border = BorderFactory.createTitledBorder("Device")
 
         val jpCmd = JPanel()
-        //val btnDevice = JButton("OK")
-        //btnDevice.margin = Insets(0, 0, 0, 0)
         jpCmd.add(cmdComboBox)
-        //jpCmd.add(btnDevice)
-        jpLogPanel.add(jpCmd, BorderLayout.NORTH)
+        jpDevicePanel.add(jpCmd, BorderLayout.NORTH)
 
         val jpLog = JPanel()
         btnClean = JButton("Clean")
@@ -86,27 +85,31 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
             updateButton(ConstCmd.CMD_STOP_LOGCAT)
         }
         jpLog.add(btnStop)
-        jpLogPanel.add(jpLog, BorderLayout.CENTER)
+        jpDevicePanel.add(jpLog, BorderLayout.CENTER)
 
-        rootPane.add(jpLogPanel, BorderLayout.NORTH)
+        //add jpDevicePanel
+        rootPane.add(jpDevicePanel, BorderLayout.NORTH)
 
-        val jpFilterRoot = JPanel(BorderLayout())
-        jpFilterRoot.border = BorderFactory.createTitledBorder("Filter")
+        val jpFilterPanel = JPanel(BorderLayout())
+        jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
-        filterList = FilterList()
         val scrollPane = JScrollPane(filterList)
         scrollPane.preferredSize = Dimension(100, 0)
         scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
-        jpFilterRoot.add(scrollPane, BorderLayout.CENTER)
+        jpFilterPanel.add(scrollPane, BorderLayout.CENTER)
 
-        rootPane.add(jpFilterRoot, BorderLayout.CENTER)
+        // add jpFilterPanel
+        rootPane.add(jpFilterPanel, BorderLayout.CENTER)
+
+        //add jpEditPane
+        rootPane.add(filterEdit, BorderLayout.SOUTH)
 
         return rootPane
     }
 
     private fun getStatusPanel(): Component {
         val rootPane = JPanel(BorderLayout())
-        tfStatus = JTextField("ready")
+        tfStatus.text = "ready"
         tfStatus.isEditable = false
         rootPane.add(tfStatus)
         return rootPane
@@ -114,12 +117,16 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
 
     override fun initListener() {
         logger.debug("initListener")
+
         logModel.registerObserver(logTable)
         logTable.initListener()
 
         filterModel.registerObserver(filterList)
         filterList.addCustomActionListener(customListener)
         filterList.initListener()
+
+        filterEdit.addCustomActionListener(customListener)
+        filterEdit.initListener()
 
         cmdModel.registerObserver(cmdComboBox)
         cmdComboBox.addCustomActionListener(customListener)
@@ -131,12 +138,16 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
 
     override fun deinitListenr() {
         logger.debug("deinitListenr")
+
         logModel.removeObserver(logTable)
         logTable.deinitListenr()
 
         filterModel.removeObserver(filterList)
         filterList.removeCustomActionListener(customListener)
         filterList.deinitListenr()
+
+        filterEdit.removeCustomActionListener(customListener)
+        filterEdit.deinitListenr()
 
         cmdModel.removeObserver(cmdComboBox)
         cmdComboBox.removeCustomActionListener(customListener)
@@ -168,11 +179,16 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_DEL_FILTER -> {
+                    filterEdit.cleanFilterInfo()
                     filterModel.removeFilterInfo(event.objectValue as FilterContainer)
                     updateFilterAndTable()
                 }
-                ConstCmd.CMD_EDIT_FILTER -> {
+                ConstCmd.CMD_EDIT_FILTER_END -> {
                     filterModel.editFilterInfo(event.objectValue as FilterContainer)
+                    updateFilterAndTable()
+                }
+                ConstCmd.CMD_EDIT_FILTER_START -> {
+                    filterEdit.editFilterInfo(event.objectValue as FilterContainer)
                     updateFilterAndTable()
                 }
                 else -> {

@@ -25,38 +25,10 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         selectionMode = ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
         cellRenderer = DefaultCellRenderer()
 
-        val addItem = JMenuItem("Add")
-        addItem.addActionListener {
-            val str = JOptionPane.showInputDialog(null, "Add", FilterContainer.FMTSTR)
-            if (str != null) {
-                val data = FilterContainer.formatBean(str)
-                if (data != null) {
-                    updateFilterData(data, ConstCmd.CMD_ADD_FILTER)
-                }
-            }
-        }
-        popupEditMenu.add(addItem)
-        val editItem = JMenuItem("Edit")
-        editItem.addActionListener {
-            if (selectedValue != null) {
-                val str = JOptionPane.showInputDialog(null, "Edit", FilterContainer.formatString(selectedValue))
-                if (str != null) {
-                    val data = FilterContainer.formatBean(str, selectedValue.uuid)
-                    if (data != null) {
-                        updateFilterData(data, ConstCmd.CMD_EDIT_FILTER)
-                    }
-                }
-            }
-        }
-        popupEditMenu.add(editItem)
         val removeItem = JMenuItem("Remove")
         removeItem.addActionListener {
             if (selectedValue != null) {
-                val str = JOptionPane.showInputDialog(null, "Edit", FilterContainer.formatString(selectedValue))
-                val data = FilterContainer.formatBean(str, selectedValue.uuid)
-                if (data != null) {
-                    updateFilterData(data, ConstCmd.CMD_DEL_FILTER)
-                }
+                updateFilterData(selectedValue, ConstCmd.CMD_DEL_FILTER)
             }
         }
         popupEditMenu.add(removeItem)
@@ -71,7 +43,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
                     value.toggle()
                     val rect = getCellBounds(index, index)
                     repaint(rect)
-                    updateTableData()
+                    updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
                 }
             } else if (p0.button == MouseEvent.BUTTON3) {
                 if (selectedIndex != -1) {
