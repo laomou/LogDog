@@ -15,6 +15,14 @@ class FilterContainer(uuid: String? = null) {
         return nick()
     }
 
+    override fun hashCode(): Int {
+        var result = title.hashCode()
+        result = 31 * result + enabled.hashCode()
+        result = 31 * result + regex
+        result = 31 * result + text.hashCode()
+        return result
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other == null) {
             return false
@@ -37,12 +45,10 @@ class FilterContainer(uuid: String? = null) {
 
     fun detail(): String {
         var str = ""
-        if (regex == 0) {
-            str += "Remove "
-        } else if (regex == 1) {
-            str += "Contains "
-        } else if (regex == 2) {
-            str += "Matches "
+        when (regex) {
+            0 -> str += "Remove "
+            1 -> str += "Contains "
+            2 -> str += "Matches "
         }
         str += "\"$text\""
         return str
@@ -51,4 +57,5 @@ class FilterContainer(uuid: String? = null) {
     fun toggle() {
         enabled = !enabled
     }
+
 }

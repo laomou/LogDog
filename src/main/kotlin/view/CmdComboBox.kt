@@ -19,7 +19,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         model = defaultMode
     }
 
-    var actionListener = ActionListener {
+    private var actionListener = ActionListener {
         val event = CustomEvent(this, ConstCmd.CMD_SELECT_RUN)
         for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
@@ -38,8 +38,10 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
 
     override fun update(s: ObservableSubject<CmdContainer>) {
         if (s is CmdModel) {
-            defaultMode.setData(s.getDatas())
-            selectedIndex = 0
+            defaultMode.setData(s.getData())
+            if (!s.getData().isEmpty()) {
+                selectedIndex = 0
+            }
         }
     }
 

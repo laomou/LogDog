@@ -23,7 +23,7 @@ class CmdModel : ObservableSubject<CmdContainer> {
         }
     }
 
-    fun getDatas(): ArrayList<CmdContainer> {
+    fun getData(): ArrayList<CmdContainer> {
         return datas
     }
 

@@ -44,9 +44,9 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
                         value.toggle()
                         val rect = getCellBounds(index, index)
                         repaint(rect)
-                    } else {
-                        updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
+                        updateTableData()
                     }
+                    updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
                 }
             } else if (p0.button == MouseEvent.BUTTON3) {
                 if (selectedIndex != -1) {

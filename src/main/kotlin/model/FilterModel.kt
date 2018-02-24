@@ -53,7 +53,12 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     fun getEnableFilter(): String {
         val str = StringBuilder()
-        datas.filter { it.enabled }.forEach { str.append("${it.detail()},") }
+        datas.filter { it.enabled }.forEach {
+            if (!str.isEmpty()) {
+                str.append(",")
+            }
+            str.append(it.detail())
+        }
         return str.toString()
     }
 

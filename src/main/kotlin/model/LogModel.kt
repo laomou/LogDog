@@ -25,7 +25,7 @@ class LogModel : ObservableSubject<LogContainer> {
         }
     }
 
-    fun getDatas(): ArrayList<LogContainer> {
+    fun getData(): ArrayList<LogContainer> {
         return datas
     }
 
@@ -42,6 +42,10 @@ class LogModel : ObservableSubject<LogContainer> {
     }
 
     fun setData(data: ArrayList<LogContainer>) {
-        this.datas.addAll(data)
+        datas.addAll(data)
+    }
+
+    fun getDataSize(): Int {
+        return datas.size
     }
 }

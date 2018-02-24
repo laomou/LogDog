@@ -189,7 +189,6 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
                 }
                 ConstCmd.CMD_EDIT_FILTER_START -> {
                     filterEdit.editFilterInfo(event.objectValue as FilterContainer)
-                    updateFilterAndTable()
                 }
                 else -> {
                     updateButton(event.actionCommand)

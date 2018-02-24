@@ -27,7 +27,6 @@ import kotlin.collections.ArrayList
 
 
 class MainController {
-
     private val logger = LoggerFactory.getLogger(MainController::class.java)
 
     private val LOG_PATH = "log"
@@ -39,30 +38,30 @@ class MainController {
     private val filterLock = java.lang.Object()
     private val fileLock = java.lang.Object()
 
-    val STATUS_CHANGE = 1
-    val STATUS_PARSING = 2
-    val STATUS_READY = 4
+    private val STATUS_CHANGE = 1
+    private val STATUS_PARSING = 2
+    private val STATUS_READY = 4
     @Volatile
-    var nChangedFilter = STATUS_READY
+    private var nChangedFilter = STATUS_READY
 
-    var arLogList = ArrayList<LogContainer>()
+    private var arLogList = ArrayList<LogContainer>()
 
 
-    val logModel = LogModel()
-    val filterModel = FilterModel()
-    val cmdModel = CmdModel()
+    private val logModel = LogModel()
+    private val filterModel = FilterModel()
+    private val cmdModel = CmdModel()
 
-    var strLogFileName = ""
+    private var strLogFileName = ""
 
-    var logCatProcess: Process? = null
+    private var logCatProcess: Process? = null
 
-    var filterThread: Thread? = null
-    var logCatThread: Thread? = null
-    var fileReadThread: Thread? = null
-    var fileLoadThread: Thread? = null
+    private var filterThread: Thread? = null
+    private var logCatThread: Thread? = null
+    private var fileReadThread: Thread? = null
+    private var fileLoadThread: Thread? = null
 
-    var filterLoop = false
-    var fileReadLoop = false
+    private var filterLoop = false
+    private var fileReadLoop = false
 
     private val DEFAULT_WIDTH = 1200
     private val DEFAULT_HEIGHT = 720
@@ -70,7 +69,7 @@ class MainController {
     private val MIN_HEIGHT = 500
 
 
-    var mainWindow = MainWindow(logModel, filterModel, cmdModel)
+    private var mainWindow = MainWindow(logModel, filterModel, cmdModel)
 
 
     init {
@@ -187,7 +186,7 @@ class MainController {
                         }
 
                         val nRowCount = arLogList.size
-                        logger.debug("arLogList->size: " + nRowCount)
+                        logger.debug("arFullLogList->size: " + nRowCount)
 
                         for (nIndex in 0 until nRowCount) {
                             if (nIndex % 10000 == 0) {
@@ -203,7 +202,7 @@ class MainController {
                             addFilterLogInfo(logInfo)
                         }
 
-                        logger.debug("arFilterLogList->size: " + logModel.getDatas().size)
+                        logger.debug("arFilterLogList->size: " + logModel.getDataSize())
 
                         if (nChangedFilter == STATUS_PARSING) {
                             nChangedFilter = STATUS_READY
@@ -459,26 +458,37 @@ class MainController {
     }
 
     private fun loadFilterData() {
-        val file = File("config.json")
-        val contents = file.readText()
-        val gson = Gson()
-        val type = object : TypeToken<LogToolConfig>() {}.type
-        val config: LogToolConfig = gson.fromJson(contents, type)
-        logConfig.copy(config)
-        logConfig.filter_rule.forEach {
-            filterModel.addFilterInfo(it)
+        try {
+            val file = File("config.json")
+            val contents = file.readText()
+            val gson = Gson()
+            val type = object : TypeToken<LogToolConfig>() {}.type
+            val config: LogToolConfig = gson.fromJson(contents, type)
+            logConfig.copy(config)
+            logConfig.filter_rule.forEach {
+                filterModel.addFilterInfo(it)
+            }
+            logConfig.tool_cmd.forEach {
+                cmdModel.addCmdInfo(it)
+            }
+        } catch (e : FileNotFoundException) {
+            //e.printStackTrace()
+            logger.error("File(config.json) not found")
         }
-        logConfig.tool_cmd.forEach {
-            cmdModel.addCmdInfo(it)
-        }
+
     }
 
     private fun saveFilterData() {
-        val file = File("config.json")
-        val gson = Gson()
-        logConfig.filter_rule = filterModel.getData()
-        val contents = gson.toJson(logConfig)
-        file.writeText(contents)
+        try {
+            val file = File("config.json")
+            val gson = Gson()
+            logConfig.filter_rule = filterModel.getData()
+            val contents = gson.toJson(logConfig)
+            file.writeText(contents)
+        } catch (e : FileNotFoundException) {
+            //e.printStackTrace()
+            logger.error("File(config.json) not found")
+        }
     }
 
 }

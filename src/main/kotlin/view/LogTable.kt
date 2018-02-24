@@ -72,7 +72,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     override fun update(s: ObservableSubject<LogContainer>) {
         logger.debug("update")
         if (s is LogModel) {
-            defaultModel.setData(s.getDatas())
+            defaultModel.setData(s.getData())
             defaultModel.setHighLight(s.highLight)
             defaultModel.fireTableDataChanged()
         }

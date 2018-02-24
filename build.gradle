@@ -36,5 +36,10 @@ compileTestKotlin {
 }
 
 jar {
-    manifest.attributes 'Main-Class': 'AppKt'
+    from {
+        configurations.runtime.collect { zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': 'AppKt'
+    }
 }
