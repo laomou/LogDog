@@ -75,38 +75,36 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     fun checkFilter(logInfo: LogContainer): Boolean {
-        for (data in datas) {
-            if (data.enabled) {
-                when (data.regex) {
-                    0 -> {
-                        val stk = StringTokenizer(data.text, "|", false)
-                        while (stk.hasMoreElements()) {
-                            val token = stk.nextToken()
-                            if (token.toLowerCase() in logInfo.strMsg.toLowerCase()) {
-                                return false
-                            }
-                        }
-                    }
-                    1 -> {
-                        val stk = StringTokenizer(data.text, "|", false)
-                        while (stk.hasMoreElements()) {
-                            val token = stk.nextToken()
-                            if (token.toLowerCase() !in logInfo.strMsg.toLowerCase()) {
-                                return false
-                            }
-                        }
-                    }
-                    2 -> {
-                        val pattern = Pattern.compile(data.text)
-                        val matcher = pattern.matcher(logInfo.strMsg)
-                        if (!matcher.find()) {
+        datas.filter { it.enabled }.forEach {
+            when (it.regex) {
+                0 -> {
+                    val stk = StringTokenizer(it.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
                             return false
                         }
                     }
                 }
+                1 -> {
+                    val stk = StringTokenizer(it.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            return true
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(it.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (matcher.find()) {
+                        return true
+                    }
+                }
             }
         }
-        return true
+        return false
     }
 
     fun hasFilter(): Boolean {

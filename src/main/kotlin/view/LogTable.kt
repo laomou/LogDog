@@ -206,7 +206,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                     nIndex = 0
                 strToken = stk.nextToken()
 
-                if (strText1.toLowerCase().contains(strToken.toLowerCase())) {
+                if (strText1.contains(strToken, true)) {
                     newText = if (bUseSpan)
                         "<span style=\"background-color:${arColor[nIndex]}\"><b>"
                     else
@@ -236,7 +236,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             while (stk.hasMoreElements()) {
                 strToken = stk.nextToken()
 
-                if (strText.toLowerCase().contains(strToken.toLowerCase())) {
+                if (strText.contains(strToken, true)) {
                     newText = if (bUseSpan)
                         "<span style=\"background-color:$strColor\"><b>"
                     else

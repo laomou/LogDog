@@ -73,6 +73,7 @@ class FilterEditPanel : JPanel(), IView {
             }
             if (newFilterInfo) {
                 updateFilterData(formatNewFilterData(), ConstCmd.CMD_ADD_FILTER)
+                newFilterInfo = false
             } else {
                 updateFilterData(formatFilterData(), ConstCmd.CMD_EDIT_FILTER_END)
             }
