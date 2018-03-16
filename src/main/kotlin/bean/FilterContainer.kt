@@ -4,7 +4,6 @@ import java.util.*
 
 
 class FilterContainer(uuid: String? = null) {
-    var title: String = ""
     var enabled = false
     var regex = -1
     var text = ""
@@ -12,14 +11,13 @@ class FilterContainer(uuid: String? = null) {
     var uuid = uuid ?: UUID.randomUUID().toString()
 
     override fun toString(): String {
-        return nick()
+        return detail()
     }
 
     override fun hashCode(): Int {
-        var result = title.hashCode()
+        var result = text.hashCode()
         result = 31 * result + enabled.hashCode()
         result = 31 * result + regex
-        result = 31 * result + text.hashCode()
         return result
     }
 
@@ -37,10 +35,6 @@ class FilterContainer(uuid: String? = null) {
             return true
         }
         return false
-    }
-
-    private fun nick(): String {
-        return title
     }
 
     fun detail(): String {

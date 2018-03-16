@@ -10,6 +10,7 @@ import java.util.regex.Pattern
 class FilterModel : ObservableSubject<FilterContainer> {
     private val observers = ArrayList<Observer<FilterContainer>>()
     private val datas = ArrayList<FilterContainer>()
+    private var filterType = true
 
     override fun registerObserver(o: Observer<FilterContainer>) {
         observers.add(o)
@@ -53,6 +54,11 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     fun getEnableFilter(): String {
         val str = StringBuilder()
+        if (filterType) {
+            str.append("filterType: Or")
+        } else {
+            str.append("filterType: And")
+        }
         datas.filter { it.enabled }.forEach {
             if (!str.isEmpty()) {
                 str.append(",")
@@ -74,7 +80,48 @@ class FilterModel : ObservableSubject<FilterContainer> {
         return str.toString()
     }
 
-    fun checkFilter(logInfo: LogContainer): Boolean {
+    fun setFilterOr(enable: Boolean) {
+        filterType = enable
+    }
+
+    fun isFilterOr() : Boolean {
+        return filterType
+    }
+
+    fun checkAndFilter(logInfo: LogContainer): Boolean {
+        datas.filter { it.enabled }.forEach {
+            when (it.regex) {
+                0 -> {
+                    val stk = StringTokenizer(it.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            return false
+                        }
+                    }
+                }
+                1 -> {
+                    val stk = StringTokenizer(it.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (!logInfo.strMsg.contains(token, true)) {
+                            return false
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(it.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (!matcher.find()) {
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    fun checkOrFilter(logInfo: LogContainer): Boolean {
         datas.filter { it.enabled }.forEach {
             when (it.regex) {
                 0 -> {

@@ -66,12 +66,12 @@ class FilterPanel : JPanel(), IView {
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        logger.debug("addCustomActionListener " + l)
+        logger.debug("addCustomActionListener $l")
         eventlisteners.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        logger.debug("removeCustomActionListener " + l)
+        logger.debug("removeCustomActionListener $l")
         eventlisteners.remove(CustomActionListener::class.java, l)
     }
 

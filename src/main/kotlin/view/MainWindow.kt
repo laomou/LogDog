@@ -34,6 +34,8 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
     private var btnClean: JButton? = null
     private var btnStop: JButton? = null
 
+    private var btnFilterType: JToggleButton? = null
+
     private val logModel = lModel
     private val filterModel = fModel
     private val cmdModel = cModel
@@ -93,8 +95,23 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         val jpFilterPanel = JPanel(BorderLayout())
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
+        val jpFilterType = JPanel()
+        btnFilterType = JToggleButton("Now filter type: Or")
+        btnFilterType?.addChangeListener {
+            if (btnFilterType!!.isSelected) {
+                btnFilterType?.text = "Now filter type: And"
+                filterModel.setFilterOr(false)
+            } else {
+                btnFilterType?.text = "Now filter type: Or"
+                filterModel.setFilterOr(true)
+            }
+            updateFilterAndTable()
+        }
+        jpFilterType.add(btnFilterType)
+        jpFilterPanel.add(jpFilterType, BorderLayout.NORTH)
+
         val scrollPane = JScrollPane(filterList)
-        scrollPane.preferredSize = Dimension(100, 0)
+        scrollPane.preferredSize = Dimension(200, 0)
         scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
         jpFilterPanel.add(scrollPane, BorderLayout.CENTER)
 

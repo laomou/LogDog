@@ -8,7 +8,6 @@ import interfces.IView
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.GridLayout
-import java.awt.Insets
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
 import javax.swing.*
@@ -21,7 +20,6 @@ class FilterEditPanel : JPanel(), IView {
     private val logger = LoggerFactory.getLogger(FilterEditPanel::class.java)
     private var eventlisteners = EventListenerList()
 
-    private val tfName = JTextField()
     private val cbRegex = JComboBox<String>()
     private val tfText = JTextField()
 
@@ -29,7 +27,6 @@ class FilterEditPanel : JPanel(), IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
-    private var strName = ""
     private var iRegex = 0
     private var strText = ""
     private var strUuid = ""
@@ -39,14 +36,8 @@ class FilterEditPanel : JPanel(), IView {
     init {
         layout = BorderLayout()
 
-        val jpEditPane = JPanel(GridLayout(4, 1))
+        val jpEditPane = JPanel(GridLayout(3, 1))
         jpEditPane.border = BorderFactory.createTitledBorder("Filter Edit")
-
-        val jpShow = JPanel(BorderLayout())
-        val jlShow = JLabel()
-        jlShow.text = "Name :"
-        jpShow.add(jlShow, BorderLayout.WEST)
-        jpShow.add(tfName, BorderLayout.CENTER)
 
         val jpReg = JPanel(BorderLayout())
         val jlRegex = JLabel()
@@ -65,9 +56,6 @@ class FilterEditPanel : JPanel(), IView {
 
         btnOk.text = " OK "
         btnOk.addActionListener {
-            if (strName.isEmpty()) {
-                return@addActionListener
-            }
             if (strText.isEmpty()) {
                 return@addActionListener
             }
@@ -81,7 +69,6 @@ class FilterEditPanel : JPanel(), IView {
 
         btnClean.text = "Clean"
         btnClean.addActionListener {
-            tfName.text = ""
             tfText.text = ""
             iRegex = 1
             bEnable = true
@@ -92,7 +79,6 @@ class FilterEditPanel : JPanel(), IView {
         jpBtn.add(btnClean, BorderLayout.WEST)
         jpBtn.add(btnOk, BorderLayout.EAST)
 
-        jpEditPane.add(jpShow)
         jpEditPane.add(jpReg)
         jpEditPane.add(jpText)
         jpEditPane.add(jpBtn)
@@ -102,7 +88,6 @@ class FilterEditPanel : JPanel(), IView {
 
     override fun initListener() {
         logger.debug("initListener")
-        tfName.document.addDocumentListener(dlListener)
         tfText.document.addDocumentListener(dlListener)
 
         cbRegex.addItemListener(itemListener)
@@ -110,25 +95,23 @@ class FilterEditPanel : JPanel(), IView {
 
     override fun deinitListenr() {
         logger.debug("deinitListenr")
-        tfName.document.removeDocumentListener(dlListener)
         tfText.document.removeDocumentListener(dlListener)
 
         cbRegex.removeItemListener(itemListener)
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        logger.debug("addCustomActionListener " + l)
+        logger.debug("addCustomActionListener $l")
         eventlisteners.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        logger.debug("removeCustomActionListener " + l)
+        logger.debug("removeCustomActionListener $l")
         eventlisteners.remove(CustomActionListener::class.java, l)
     }
 
     private fun formatNewFilterData(): FilterContainer {
         val data = FilterContainer()
-        data.title = strName
         data.regex = iRegex
         data.text = strText
         data.enabled = bEnable
@@ -137,7 +120,6 @@ class FilterEditPanel : JPanel(), IView {
 
     private fun formatFilterData(): FilterContainer {
         val data = FilterContainer(strUuid)
-        data.title = strName
         data.regex = iRegex
         data.text = strText
         data.enabled = bEnable
@@ -161,9 +143,6 @@ class FilterEditPanel : JPanel(), IView {
         override fun changedUpdate(p0: DocumentEvent) {
             val text = p0.document.getText(0, p0.document.length)
             when (p0.document) {
-                tfName.document -> {
-                    strName = text
-                }
                 tfText.document -> {
                     strText = text
                 }
@@ -173,9 +152,6 @@ class FilterEditPanel : JPanel(), IView {
         override fun insertUpdate(p0: DocumentEvent) {
             val text = p0.document.getText(0, p0.document.length)
             when (p0.document) {
-                tfName.document -> {
-                    strName = text
-                }
                 tfText.document -> {
                     strText = text
                 }
@@ -185,9 +161,6 @@ class FilterEditPanel : JPanel(), IView {
         override fun removeUpdate(p0: DocumentEvent) {
             val text = p0.document.getText(0, p0.document.length)
             when (p0.document) {
-                tfName.document -> {
-                    strName = text
-                }
                 tfText.document -> {
                     strText = text
                 }
@@ -196,7 +169,6 @@ class FilterEditPanel : JPanel(), IView {
     }
 
     fun editFilterInfo(filterInfo: FilterContainer) {
-        tfName.text = filterInfo.title
         cbRegex.selectedIndex = filterInfo.regex
         tfText.text = filterInfo.text
         strUuid = filterInfo.uuid
@@ -205,7 +177,6 @@ class FilterEditPanel : JPanel(), IView {
     }
 
     fun cleanFilterInfo() {
-        tfName.text = ""
         tfText.text = ""
         bEnable = true
         newFilterInfo = true

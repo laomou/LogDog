@@ -42,6 +42,7 @@ class LogModel : ObservableSubject<LogContainer> {
     }
 
     fun setData(data: ArrayList<LogContainer>) {
+        datas.clear()
         datas.addAll(data)
     }
 

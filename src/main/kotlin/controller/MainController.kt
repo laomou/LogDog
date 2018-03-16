@@ -343,7 +343,7 @@ class MainController {
     }
 
     private fun parseFile(fileName: String) {
-        logger.debug("parseFile: " + fileName)
+        logger.debug("parseFile: $fileName")
         fileLoadThread = Thread(Runnable {
             val file = File(fileName)
             var nIndex = 1
@@ -445,8 +445,14 @@ class MainController {
 
     private fun addFilterLogInfo(loginfo: LogContainer) {
         synchronized(filterLock) {
-            if (filterModel.checkFilter(loginfo)) {
-                logModel.addLogInfo(loginfo)
+            if (filterModel.isFilterOr()) {
+                if (filterModel.checkOrFilter(loginfo)) {
+                    logModel.addLogInfo(loginfo)
+                }
+            } else {
+                if (filterModel.checkAndFilter(loginfo)) {
+                    logModel.addLogInfo(loginfo)
+                }
             }
         }
     }
