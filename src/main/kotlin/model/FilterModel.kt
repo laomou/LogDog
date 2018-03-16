@@ -151,7 +151,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
                 }
             }
         }
-        return false
+        return true
     }
 
     fun hasFilter(): Boolean {
