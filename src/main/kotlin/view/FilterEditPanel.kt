@@ -43,7 +43,6 @@ class FilterEditPanel : JPanel(), IView {
         val jlRegex = JLabel()
         jlRegex.text = "Regex:"
         jpReg.add(jlRegex, BorderLayout.WEST)
-        cbRegex.addItem("Remove")
         cbRegex.addItem("Contains")
         cbRegex.addItem("Matches")
         jpReg.add(cbRegex, BorderLayout.CENTER)
@@ -61,10 +60,10 @@ class FilterEditPanel : JPanel(), IView {
             }
             if (newFilterInfo) {
                 updateFilterData(formatNewFilterData(), ConstCmd.CMD_ADD_FILTER)
-                newFilterInfo = false
             } else {
                 updateFilterData(formatFilterData(), ConstCmd.CMD_EDIT_FILTER_END)
             }
+            newFilterInfo = true
         }
 
         btnClean.text = "Clean"

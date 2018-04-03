@@ -40,9 +40,8 @@ class FilterContainer(uuid: String? = null) {
     fun detail(): String {
         var str = ""
         when (regex) {
-            0 -> str += "Remove "
-            1 -> str += "Contains "
-            2 -> str += "Matches "
+            0 -> str += "C "
+            1 -> str += "M "
         }
         str += "\"$text\""
         return str

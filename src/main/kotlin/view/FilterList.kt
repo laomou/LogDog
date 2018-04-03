@@ -3,11 +3,13 @@ package view
 import bean.ConstCmd
 import bean.FilterContainer
 import interfces.*
+import interfces.Observer
 import model.FilterModel
 import org.slf4j.LoggerFactory
 import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.util.*
 import javax.swing.*
 import javax.swing.event.EventListenerList
 
@@ -31,25 +33,28 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
                 updateFilterData(selectedValue, ConstCmd.CMD_DEL_FILTER)
             }
         }
+        val editItem = JMenuItem("Edit")
+        editItem.addActionListener {
+            if (selectedValue != null) {
+                updateFilterData(selectedValue, ConstCmd.CMD_EDIT_FILTER_START)
+            }
+        }
         popupEditMenu.add(removeItem)
+        popupEditMenu.add(editItem)
     }
 
     private val mouseClick = object : MouseAdapter() {
         override fun mouseClicked(p0: MouseEvent) {
             if (p0.button == MouseEvent.BUTTON1) {
-                if (selectedIndex != -1) {
+                if (selectedValue != null) {
+                    selectedValue.toggle()
                     val index = locationToIndex(p0.point)
-                    val value = model.getElementAt(index)
-                    if (p0.x < 25) {
-                        value.toggle()
-                        val rect = getCellBounds(index, index)
-                        repaint(rect)
-                        updateTableData()
-                    }
-                    updateFilterData(value, ConstCmd.CMD_EDIT_FILTER_START)
+                    val rect = getCellBounds(index, index)
+                    repaint(rect)
+                    updateTableData()
                 }
             } else if (p0.button == MouseEvent.BUTTON3) {
-                if (selectedIndex != -1) {
+                if (selectedValue != null) {
                     popupEditMenu.show(p0.component, p0.x, p0.y)
                 }
             }

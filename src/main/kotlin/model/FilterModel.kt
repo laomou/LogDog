@@ -95,21 +95,12 @@ class FilterModel : ObservableSubject<FilterContainer> {
                     val stk = StringTokenizer(it.text, "|", false)
                     while (stk.hasMoreElements()) {
                         val token = stk.nextToken()
-                        if (logInfo.strMsg.contains(token, true)) {
-                            return false
-                        }
-                    }
-                }
-                1 -> {
-                    val stk = StringTokenizer(it.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
                         if (!logInfo.strMsg.contains(token, true)) {
                             return false
                         }
                     }
                 }
-                2 -> {
+                1 -> {
                     val pattern = Pattern.compile(it.text)
                     val matcher = pattern.matcher(logInfo.strMsg)
                     if (!matcher.find()) {
@@ -129,20 +120,11 @@ class FilterModel : ObservableSubject<FilterContainer> {
                     while (stk.hasMoreElements()) {
                         val token = stk.nextToken()
                         if (logInfo.strMsg.contains(token, true)) {
-                            return false
-                        }
-                    }
-                }
-                1 -> {
-                    val stk = StringTokenizer(it.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
-                        if (logInfo.strMsg.contains(token, true)) {
                             return true
                         }
                     }
                 }
-                2 -> {
+                1 -> {
                     val pattern = Pattern.compile(it.text)
                     val matcher = pattern.matcher(logInfo.strMsg)
                     if (matcher.find()) {
@@ -151,7 +133,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
                 }
             }
         }
-        return true
+        return false
     }
 
     fun hasFilter(): Boolean {
