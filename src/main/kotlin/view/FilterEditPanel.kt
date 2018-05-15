@@ -49,7 +49,7 @@ class FilterEditPanel : JPanel(), IView {
 
         val jpText = JPanel(BorderLayout())
         val jlText = JLabel()
-        jlText.text = "Text :"
+        jlText.text = "Text   :"
         jpText.add(jlText, BorderLayout.WEST)
         jpText.add(tfText, BorderLayout.CENTER)
 

@@ -81,36 +81,6 @@ class LogCatParser {
                     throw Exception("Done")
                 }
             })
-
-            logLevel("\\s\\[[1-7]:\\s", strText, object : LogFilter {
-                override fun colorFilter(level: String) {
-                    when (level) {
-                        " [1: " -> logInfo.strColor = COLOR_1
-                        " [2: " -> logInfo.strColor = COLOR_2
-                        " [3: " -> logInfo.strColor = COLOR_3
-                        " [4: " -> logInfo.strColor = COLOR_4
-                        " [5: " -> logInfo.strColor = COLOR_5
-                        " [6: " -> logInfo.strColor = COLOR_6
-                        " [7: " -> logInfo.strColor = COLOR_7
-                    }
-                    throw Exception("Done")
-                }
-            })
-
-            logLevel("[1-7],", strText, object : LogFilter {
-                override fun colorFilter(level: String) {
-                    when (level) {
-                        "1," -> logInfo.strColor = COLOR_1
-                        "2," -> logInfo.strColor = COLOR_2
-                        "3," -> logInfo.strColor = COLOR_3
-                        "4," -> logInfo.strColor = COLOR_4
-                        "5," -> logInfo.strColor = COLOR_5
-                        "6," -> logInfo.strColor = COLOR_6
-                        "7," -> logInfo.strColor = COLOR_7
-                    }
-                    throw Exception("Done")
-                }
-            })
         } catch (e: Exception) {
         }
 

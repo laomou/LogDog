@@ -73,7 +73,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         logger.debug("update")
         if (s is LogModel) {
             defaultModel.setData(s.getData())
-            defaultModel.setHighLight(s.highLight)
+            defaultModel.setHighLightStr(s.getHighLightStr())
             defaultModel.fireTableDataChanged()
         }
     }
@@ -150,7 +150,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             }
         }
 
-        fun setHighLight(text: String) {
+        fun setHighLightStr(text: String) {
             highLight = text
         }
 

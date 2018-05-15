@@ -68,11 +68,11 @@ class FilterModel : ObservableSubject<FilterContainer> {
         return str.toString()
     }
 
-    fun getHighlight(): String {
+    fun getHighlightStr(): String {
         val str = StringBuilder()
         datas.filter { it.enabled }.forEach {
             when (it.regex) {
-                1 -> {
+                0 -> {
                     str.append(it.text + "|")
                 }
             }

@@ -161,7 +161,7 @@ class MainController {
 
     private fun logFilterParseThread() {
         filterThread = Thread(Runnable {
-            logger.debug("logFilterParseThread -int-")
+            logger.debug("in")
             try {
                 while (filterLoop) {
                     synchronized(filterLock) {
@@ -215,7 +215,7 @@ class MainController {
                 //e.printStackTrace()
                 logger.warn(e.toString())
             }
-            logger.debug("logFilterParseThread -out-")
+            logger.debug("exit")
         })
         filterThread?.name = "filterThread"
         filterThread?.start()
@@ -223,7 +223,7 @@ class MainController {
 
     private fun logFileReadThread() {
         fileReadThread = Thread(Runnable {
-            logger.debug("logFileReadThread -int-")
+            logger.debug("in")
             try {
                 val fis = FileInputStream(LOG_PATH + File.separatorChar + strLogFileName)
                 val dis = DataInputStream(fis)
@@ -266,7 +266,7 @@ class MainController {
                 logger.warn(e.toString())
             }
             mainWindow.setStatus("Complete $strLogFileName")
-            logger.debug("logFileReadThread -out-")
+            logger.debug("exit")
         })
         fileReadThread?.name = "fileReadThread"
         fileReadThread?.start()
@@ -274,10 +274,10 @@ class MainController {
 
     private fun logCatThread() {
         logCatThread = Thread(Runnable {
-            logger.debug("logCatThread -in-")
+            logger.debug("in")
             try {
                 val cmd = "${logConfig.tool_path} ${cmdModel.getSelectedCmd()}"
-                logger.debug("logCatThread run-> $cmd")
+                logger.debug("cmd run: $cmd")
                 logCatProcess = Runtime.getRuntime().exec(cmd)
 
                 strLogFileName = makeFilename()
@@ -309,7 +309,7 @@ class MainController {
                 //e.printStackTrace()
                 logger.warn(e.toString())
             }
-            logger.debug("logCatThread -out-")
+            logger.debug("exit")
             stopProcess()
         })
         logCatThread?.name = "logCatThread"
@@ -433,7 +433,7 @@ class MainController {
     }
 
     private fun updateTableData() {
-        logModel.highLight = filterModel.getHighlight()
+        logModel.setHighLightStr(filterModel.getHighlightStr())
         logModel.updateData()
     }
 

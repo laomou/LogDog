@@ -14,33 +14,39 @@ import javax.swing.event.EventListenerList
 
 class MainMenuBar : JMenuBar(), IView {
     private val logger = LoggerFactory.getLogger(MainMenuBar::class.java)
-
     private var eventlisteners = EventListenerList()
-
-    val fileMenu = JMenu("File")
-    val helpMenus = JMenu("Help")
-    val openItem = JMenuItem("Open")
-    val adbItem = JMenuItem("Log Tool")
+    private val fileMenu = JMenu("File")
+    private val helpMenus = JMenu("Help")
+    private val openItem = JMenuItem("Open")
+    private val adbItem = JMenuItem("Log Tool")
+    private val aboutItem = JMenuItem("About")
 
     init {
         fileMenu.add(openItem)
         fileMenu.add(adbItem)
         add(fileMenu)
+        helpMenus.add(aboutItem)
         add(helpMenus)
     }
 
     private val actionListener = ActionListener {
-        if (it.source == openItem) {
-            logger.debug("openItem->click")
-            val action = CustomEvent(this, ConstCmd.CMD_OPEN_FILE)
-            for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
-                listener.actionPerformed(action)
+        when {
+            it.source == openItem -> {
+                logger.debug("openItem->click")
+                val action = CustomEvent(this, ConstCmd.CMD_OPEN_FILE)
+                for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+                    listener.actionPerformed(action)
+                }
             }
-        } else if (it.source == adbItem) {
-            logger.debug("settingsItem->click")
-            val action = CustomEvent(this, ConstCmd.CMD_CONFIG_ADB)
-            for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
-                listener.actionPerformed(action)
+            it.source == adbItem -> {
+                logger.debug("adbItem->click")
+                val action = CustomEvent(this, ConstCmd.CMD_CONFIG_ADB)
+                for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+                    listener.actionPerformed(action)
+                }
+            }
+            it.source == aboutItem -> {
+                logger.debug("aboutItem->click")
             }
         }
     }

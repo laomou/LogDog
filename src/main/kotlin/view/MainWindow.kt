@@ -55,7 +55,6 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         return rootPane
     }
 
-
     private fun getLeftPanel(): Component {
         val rootPane = JPanel(BorderLayout())
 

@@ -8,8 +8,7 @@ import interfces.Observer
 class LogModel : ObservableSubject<LogContainer> {
     private val observers = ArrayList<Observer<LogContainer>>()
     private var datas = ArrayList<LogContainer>()
-    var highLight = ""
-
+    private var highLight = ""
 
     override fun registerObserver(o: Observer<LogContainer>) {
         observers.add(o)
@@ -48,5 +47,13 @@ class LogModel : ObservableSubject<LogContainer> {
 
     fun getDataSize(): Int {
         return datas.size
+    }
+
+    fun setHighLightStr(text: String) {
+        highLight = text
+    }
+
+    fun getHighLightStr(): String {
+        return highLight
     }
 }

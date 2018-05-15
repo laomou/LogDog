@@ -27,20 +27,22 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
         cellRenderer = DefaultCellRenderer()
 
-        val removeItem = JMenuItem("Remove")
-        removeItem.addActionListener {
-            if (selectedValue != null) {
-                updateFilterData(selectedValue, ConstCmd.CMD_DEL_FILTER)
-            }
-        }
         val editItem = JMenuItem("Edit")
         editItem.addActionListener {
             if (selectedValue != null) {
                 updateFilterData(selectedValue, ConstCmd.CMD_EDIT_FILTER_START)
             }
         }
-        popupEditMenu.add(removeItem)
+
+        val removeItem = JMenuItem("Remove")
+        removeItem.addActionListener {
+            if (selectedValue != null) {
+                updateFilterData(selectedValue, ConstCmd.CMD_DEL_FILTER)
+            }
+        }
+
         popupEditMenu.add(editItem)
+        popupEditMenu.add(removeItem)
     }
 
     private val mouseClick = object : MouseAdapter() {
