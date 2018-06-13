@@ -38,6 +38,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         removeItem.addActionListener {
             if (selectedValue != null) {
                 updateFilterData(selectedValue, ConstCmd.CMD_DEL_FILTER)
+                clearSelection()
             }
         }
 

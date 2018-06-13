@@ -69,7 +69,7 @@ class FilterEditPanel : JPanel(), IView {
         btnClean.text = "Clean"
         btnClean.addActionListener {
             tfText.text = ""
-            iRegex = 1
+            iRegex = 0
             bEnable = true
             newFilterInfo = true
         }
