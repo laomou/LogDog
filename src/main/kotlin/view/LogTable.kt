@@ -189,7 +189,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                 strRet = "<html><nobr>$strRet</nobr></html>"
             }
 
-            return strRet.replace("\t", "    ")
+            return strRet
         }
 
         private fun remakeFind(strText: String, strFind: String, arColor: Array<String>, bUseSpan: Boolean): String {
@@ -219,35 +219,6 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                     strText1 = strText1.replace(strToken, newText)
                     bChanged = true
                     nIndex++
-                }
-            }
-            return strText1
-        }
-
-
-        private fun remakeFind(strText: String, strFind: String, strColor: String, bUseSpan: Boolean): String {
-            if (strFind.isEmpty()) return strText
-
-            var strText1 = strText
-            val stk = StringTokenizer(strFind, "|")
-            var newText: String
-            var strToken: String
-
-            while (stk.hasMoreElements()) {
-                strToken = stk.nextToken()
-
-                if (strText.contains(strToken, true)) {
-                    newText = if (bUseSpan)
-                        "<span style=\"background-color:$strColor\"><b>"
-                    else
-                        "<font color=$strColor><b>"
-                    newText += strToken
-                    newText += if (bUseSpan)
-                        "</b></span>"
-                    else
-                        "</b></font>"
-                    strText1 = strText1.replace(strToken, newText)
-                    bChanged = true
                 }
             }
             return strText1

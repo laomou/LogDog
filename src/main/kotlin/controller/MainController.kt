@@ -445,14 +445,16 @@ class MainController {
 
     private fun addFilterLogInfo(loginfo: LogContainer) {
         synchronized(filterLock) {
-            if (filterModel.isFilterOr()) {
+            if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
                 if (filterModel.checkOrFilter(loginfo)) {
                     logModel.addLogInfo(loginfo)
                 }
-            } else {
+            } else if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_AND) {
                 if (filterModel.checkAndFilter(loginfo)) {
                     logModel.addLogInfo(loginfo)
                 }
+            } else {
+                logModel.addLogInfo(loginfo)
             }
         }
     }

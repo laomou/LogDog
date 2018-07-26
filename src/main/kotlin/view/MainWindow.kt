@@ -34,7 +34,7 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
     private var btnClean: JButton? = null
     private var btnStop: JButton? = null
 
-    private var btnFilterType: JToggleButton? = null
+    private var btnFilterType: JButton? = null
 
     private val logModel = lModel
     private val filterModel = fModel
@@ -95,14 +95,13 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
         val jpFilterType = JPanel()
-        btnFilterType = JToggleButton("Now filter type: Or")
-        btnFilterType?.addChangeListener {
-            if (btnFilterType!!.isSelected) {
-                btnFilterType?.text = "Now filter type: And"
-                filterModel.setFilterOr(false)
-            } else {
-                btnFilterType?.text = "Now filter type: Or"
-                filterModel.setFilterOr(true)
+        btnFilterType = JButton("Filter type: HighLight")
+        btnFilterType?.addActionListener {
+            filterModel.toggleFilterType()
+            btnFilterType?.text = when (filterModel.getFilterType()) {
+                FilterModel.TYPE_FILTER_OR -> "Filter type: Or"
+                FilterModel.TYPE_FILTER_AND -> "Filter type: And"
+                else -> "Filter type: HighLight"
             }
             updateFilterAndTable()
         }

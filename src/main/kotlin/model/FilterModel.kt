@@ -10,7 +10,13 @@ import java.util.regex.Pattern
 class FilterModel : ObservableSubject<FilterContainer> {
     private val observers = ArrayList<Observer<FilterContainer>>()
     private val datas = ArrayList<FilterContainer>()
-    private var filterType = true
+    private var filterType = TYPE_FILTER_HIGHLIGHT
+
+    companion object {
+        val TYPE_FILTER_HIGHLIGHT = 0
+        val TYPE_FILTER_OR = 1
+        val TYPE_FILTER_AND = 2
+    }
 
     override fun registerObserver(o: Observer<FilterContainer>) {
         observers.add(o)
@@ -54,10 +60,10 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     fun getEnableFilter(): String {
         val str = StringBuilder()
-        if (filterType) {
-            str.append("filterType: Or")
-        } else {
-            str.append("filterType: And")
+        when (filterType) {
+            TYPE_FILTER_OR -> str.append("filterType: Or")
+            TYPE_FILTER_AND -> str.append("filterType: And")
+            else -> str.append("filterType: HighLight")
         }
         datas.filter { it.enabled }.forEach {
             if (!str.isEmpty()) {
@@ -80,12 +86,19 @@ class FilterModel : ObservableSubject<FilterContainer> {
         return str.toString()
     }
 
-    fun setFilterOr(enable: Boolean) {
-        filterType = enable
+    fun setFilterType(type: Int) {
+        filterType = type
     }
 
-    fun isFilterOr() : Boolean {
+    fun getFilterType() : Int {
         return filterType
+    }
+
+    fun toggleFilterType() {
+        if (filterType > TYPE_FILTER_AND) {
+            filterType = TYPE_FILTER_HIGHLIGHT
+        }
+        filterType++
     }
 
     fun checkAndFilter(logInfo: LogContainer): Boolean {
