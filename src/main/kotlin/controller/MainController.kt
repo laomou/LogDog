@@ -3,6 +3,7 @@ package controller
 import bean.ConstCmd
 import bean.LogContainer
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import interfces.CustomActionListener
 import interfces.CustomEvent
@@ -241,7 +242,7 @@ class MainController {
                     synchronized(fileLock) {
                         var strLine: String? = ""
                         var nLine = arLogList.size + 1
-                        while (let { strLine = br.readLine(); strLine != null }) {
+                        while ({ strLine = br.readLine(); strLine }() != null) {
                             val logInfo = logParser.parse(strLine!!)
                             logInfo.strLine = "" + nLine++
                             addLogInfo(logInfo)
@@ -295,7 +296,7 @@ class MainController {
                 logFileReadThread()
 
                 var strLine: String? = ""
-                while (let { strLine = br.readLine(); strLine != null }) {
+                while ({ strLine = br.readLine(); strLine }() != null) {
                     synchronized(fileLock) {
                         bw.write(strLine)
                         bw.write("\r\n")
@@ -489,7 +490,7 @@ class MainController {
     private fun saveFilterData() {
         try {
             val file = File("config.json")
-            val gson = Gson()
+            val gson = GsonBuilder().setPrettyPrinting().create()
             logConfig.filter_rule = filterModel.getData()
             val contents = gson.toJson(logConfig)
             file.writeText(contents)
