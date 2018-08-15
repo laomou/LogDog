@@ -3,7 +3,7 @@ package bean
 class LogContainer {
     var valid = false
 
-    var strLine = ""
+    var strLine = 0
     var strDate = ""
     var strTime = ""
     var strLogLV = ""

@@ -244,7 +244,7 @@ class MainController {
                         var nLine = arLogList.size + 1
                         while ({ strLine = br.readLine(); strLine }() != null) {
                             val logInfo = logParser.parse(strLine!!)
-                            logInfo.strLine = "" + nLine++
+                            logInfo.strLine = nLine++
                             addLogInfo(logInfo)
                             addFilterLogInfo(logInfo)
                         }
@@ -352,7 +352,7 @@ class MainController {
             mainWindow.setStatus("Parsing")
             file.forEachLine {
                 val logInfo = logParser.parse(it)
-                logInfo.strLine = "" + nIndex++
+                logInfo.strLine = nIndex++
                 if (logInfo.valid) {
                     addLogInfo(logInfo)
                 }

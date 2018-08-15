@@ -12,11 +12,9 @@ import java.awt.Dimension
 import java.awt.Rectangle
 import java.awt.event.ActionListener
 import java.util.*
-import javax.swing.JMenuItem
-import javax.swing.JOptionPane
-import javax.swing.JPopupMenu
-import javax.swing.JTable
+import javax.swing.*
 import javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
+import javax.swing.event.ListSelectionListener
 import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
 
@@ -26,7 +24,11 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     private val colWidth = intArrayOf(20, 600)
     private var defaultModel = LogTableViewModel()
 
-    private var gotoItem: JMenuItem? = null
+    private var realLineNumber = 1
+    private var recordLineNumber = 1
+
+    private var gotoItem: JMenuItem
+    private var recLineItem: JMenuItem
 
     init {
         model = defaultModel
@@ -47,26 +49,46 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         }
         val popup = JPopupMenu()
         gotoItem = JMenuItem("Go To")
+        recLineItem = JMenuItem("Record Line")
         popup.add(gotoItem)
+        popup.add(recLineItem)
         componentPopupMenu = popup
     }
 
     private val gotoActionListener = ActionListener {
-        val inputContent = JOptionPane.showInputDialog(null, "Go To", "1")
+        val inputContent = JOptionPane.showInputDialog(this, "Go To", recordLineNumber)
         if (inputContent != null) {
-            val line = defaultModel.getRearLine(inputContent)
+            val line = defaultModel.findRearLineByIndex(inputContent)
             showRow(line, true)
+        }
+    }
+
+    private val recLineActionListener = ActionListener {
+        recordLineNumber = realLineNumber
+        logger.debug("record line number: $recordLineNumber")
+    }
+
+    private val listSelectionListener = ListSelectionListener {
+        val lsm = it.source as ListSelectionModel
+        if (!lsm.isSelectionEmpty) {
+            val index = lsm.minSelectionIndex
+            realLineNumber = defaultModel.findIndexByRearLine(index)
+            logger.debug("select line number: $realLineNumber")
         }
     }
 
     override fun initListener() {
         logger.debug("initListener")
-        gotoItem?.addActionListener(gotoActionListener)
+        gotoItem.addActionListener(gotoActionListener)
+        recLineItem.addActionListener(recLineActionListener)
+        selectionModel.addListSelectionListener(listSelectionListener)
     }
 
     override fun deinitListenr() {
         logger.debug("deinitListenr")
-        gotoItem?.removeActionListener(gotoActionListener)
+        gotoItem.removeActionListener(gotoActionListener)
+        recLineItem.removeActionListener(recLineActionListener)
+        selectionModel.removeListSelectionListener(listSelectionListener)
     }
 
     override fun update(s: ObservableSubject<LogContainer>) {
@@ -144,7 +166,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         @Synchronized
         override fun getValueAt(p0: Int, p1: Int): Any {
             return when (p1) {
-                0 -> arData[p0].strLine
+                0 -> "${arData[p0].strLine}"
                 1 -> arData[p0].strMsg
                 else -> ""
             }
@@ -158,11 +180,20 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return highLight
         }
 
-        fun getRearLine(row: String): Int {
-            return arData
-                    .firstOrNull { it.strLine == row }
-                    ?.let { arData.indexOf(it) }
-                    ?: 0
+        fun findRearLineByIndex(row: String): Int {
+            for ((index, log) in arData.withIndex()) {
+                if ("${log.strLine}" == row) {
+                    return index
+                }
+            }
+            return 1
+        }
+
+        fun findIndexByRearLine(index: Int): Int {
+            if (index >= 0 && index < arData.size) {
+                return arData[index].strLine
+            }
+            return 1
         }
     }
 
