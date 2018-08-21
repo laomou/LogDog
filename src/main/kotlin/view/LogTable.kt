@@ -199,6 +199,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
     inner class LogCellRenderer : DefaultTableCellRenderer() {
         private var bChanged = false
+        private val arColor = arrayOf("#00FF00", "#EEEE00", "#EE9A49", "#8A2BE2", "#EE1289")
         override fun getTableCellRendererComponent(p0: JTable?, p1: Any?, p2: Boolean, p3: Boolean, p4: Int, p5: Int): Component {
             val data = remakeData(p5, p1 as String)
             val component = super.getTableCellRendererComponent(p0, data, p2, p3, p4, p5)
@@ -214,10 +215,9 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
             val high = (model as LogTableViewModel).getHighLightStr()
             bChanged = false
-            val arColor = arrayOf("#00FF00", "#EEEE00", "#EE9A49", "#8A2BE2", "#EE1289")
             var strRet = remakeFind(text, high, arColor, true)
             if (bChanged) {
-                strRet = "<html><nobr>$strRet</nobr></html>"
+                strRet = "<html><nobr>$strRet</nobr></html>".replace(" ", "&nbsp;")
             }
 
             return strRet
@@ -233,10 +233,10 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             var nIndex = 0
 
             while (stk.hasMoreElements()) {
-                if (nIndex >= arColor.size)
+                if (nIndex >= arColor.size) {
                     nIndex = 0
+                }
                 strToken = stk.nextToken()
-
                 if (strText1.contains(strToken, true)) {
                     newText = if (bUseSpan)
                         "<span style=\"background-color:${arColor[nIndex]}\"><b>"
