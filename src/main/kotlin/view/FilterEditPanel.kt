@@ -29,7 +29,7 @@ class FilterEditPanel : JPanel(), IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
-    private var strColor = "#0000FF"
+    private var strColor = "#00FF00"
     private var strText = ""
     private var strUuid = ""
     private var bEnable = false
@@ -195,7 +195,7 @@ class FilterEditPanel : JPanel(), IView {
 
     fun cleanFilterInfo() {
         tfText.text = ""
-        strColor = "#0000FF"
+        strColor = "#00FF00"
         bEnable = true
         newFilterInfo = true
     }

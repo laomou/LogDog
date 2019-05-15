@@ -6,7 +6,7 @@ import java.util.*
 class FilterContainer(uuid: String? = null) {
     var enabled = false
     var text = ""
-    var color = "#000000"
+    var color = "#00FF00"
 
     var uuid = uuid ?: UUID.randomUUID().toString()
 
