@@ -1,11 +1,11 @@
 package model
 
+import bean.FilterColor
 import bean.FilterContainer
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
 import java.util.*
-import java.util.regex.Pattern
 
 class FilterModel : ObservableSubject<FilterContainer> {
     private val observers = ArrayList<Observer<FilterContainer>>()
@@ -13,9 +13,8 @@ class FilterModel : ObservableSubject<FilterContainer> {
     private var filterType = TYPE_FILTER_HIGHLIGHT
 
     companion object {
-        val TYPE_FILTER_HIGHLIGHT = 0
-        val TYPE_FILTER_OR = 1
-        val TYPE_FILTER_AND = 2
+        const val TYPE_FILTER_HIGHLIGHT = 0
+        const val TYPE_FILTER_OR = 1
     }
 
     override fun registerObserver(o: Observer<FilterContainer>) {
@@ -62,8 +61,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
         val str = StringBuilder()
         when (filterType) {
             TYPE_FILTER_OR -> str.append("filterType: Or")
-            TYPE_FILTER_AND -> str.append("filterType: And")
-            else -> str.append("filterType: HighLight")
+            else -> str.append("filterType: HL")
         }
         datas.filter { it.enabled }.forEach {
             if (!str.isEmpty()) {
@@ -74,75 +72,36 @@ class FilterModel : ObservableSubject<FilterContainer> {
         return str.toString()
     }
 
-    fun getHighlightStr(): String {
-        val str = StringBuilder()
+    fun getFilerColors(): List<FilterColor> {
+        val list = arrayListOf<FilterColor>()
         datas.filter { it.enabled }.forEach {
-            when (it.regex) {
-                0 -> {
-                    str.append(it.text + "|")
-                }
-            }
+            val filterColor = FilterColor()
+            filterColor.hightLight = it.text + "|"
+            filterColor.color = it.color
+            list.add(filterColor)
         }
-        return str.toString()
+        return list
     }
 
-    fun setFilterType(type: Int) {
-        filterType = type
-    }
-
-    fun getFilterType() : Int {
+    fun getFilterType(): Int {
         return filterType
     }
 
     fun toggleFilterType() {
-        if (filterType > TYPE_FILTER_AND) {
-            filterType = TYPE_FILTER_HIGHLIGHT
+        filterType = if (filterType == TYPE_FILTER_HIGHLIGHT) {
+            TYPE_FILTER_OR
+        } else {
+            TYPE_FILTER_HIGHLIGHT
         }
-        filterType++
-    }
-
-    fun checkAndFilter(logInfo: LogContainer): Boolean {
-        datas.filter { it.enabled }.forEach {
-            when (it.regex) {
-                0 -> {
-                    val stk = StringTokenizer(it.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
-                        if (!logInfo.strMsg.contains(token, true)) {
-                            return false
-                        }
-                    }
-                }
-                1 -> {
-                    val pattern = Pattern.compile(it.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (!matcher.find()) {
-                        return false
-                    }
-                }
-            }
-        }
-        return true
     }
 
     fun checkOrFilter(logInfo: LogContainer): Boolean {
         datas.filter { it.enabled }.forEach {
-            when (it.regex) {
-                0 -> {
-                    val stk = StringTokenizer(it.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
-                        if (logInfo.strMsg.contains(token, true)) {
-                            return true
-                        }
-                    }
-                }
-                1 -> {
-                    val pattern = Pattern.compile(it.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (matcher.find()) {
-                        return true
-                    }
+            val stk = StringTokenizer(it.text, "|", false)
+            while (stk.hasMoreElements()) {
+                val token = stk.nextToken()
+                if (logInfo.strMsg.contains(token, true)) {
+                    return true
                 }
             }
         }

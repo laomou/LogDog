@@ -7,6 +7,8 @@ import interfces.CustomEvent
 import interfces.IView
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Component
 import java.awt.GridLayout
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
@@ -27,7 +29,7 @@ class FilterEditPanel : JPanel(), IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
-    private var iRegex = 0
+    private var strColor = "#0000FF"
     private var strText = ""
     private var strUuid = ""
     private var bEnable = false
@@ -41,15 +43,31 @@ class FilterEditPanel : JPanel(), IView {
 
         val jpReg = JPanel(BorderLayout())
         val jlRegex = JLabel()
-        jlRegex.text = "Regex:"
+        jlRegex.text = "Color :"
         jpReg.add(jlRegex, BorderLayout.WEST)
-        cbRegex.addItem("Contains")
-        cbRegex.addItem("Matches")
+        cbRegex.addItem("#00FF00")
+        cbRegex.addItem("#EEEE00")
+        cbRegex.addItem("#EE9A49")
+        cbRegex.addItem("#8A2BE2")
+        cbRegex.addItem("#EE1289")
+        cbRegex.renderer = object : DefaultListCellRenderer() {
+            override fun getListCellRendererComponent(p0: JList<*>?, p1: Any?, p2: Int, p3: Boolean, p4: Boolean): Component {
+                val c = super.getListCellRendererComponent(p0, p1, p2, p3, p4)
+                if (p3) {
+                    c.foreground = Color.RED
+                } else {
+                    c.foreground = Color.BLACK
+                }
+                c.background = Color.decode(p1.toString())
+                return c
+            }
+        }
+
         jpReg.add(cbRegex, BorderLayout.CENTER)
 
         val jpText = JPanel(BorderLayout())
         val jlText = JLabel()
-        jlText.text = "Text   :"
+        jlText.text = "Text  :"
         jpText.add(jlText, BorderLayout.WEST)
         jpText.add(tfText, BorderLayout.CENTER)
 
@@ -69,7 +87,6 @@ class FilterEditPanel : JPanel(), IView {
         btnClean.text = "Clean"
         btnClean.addActionListener {
             tfText.text = ""
-            iRegex = 0
             bEnable = true
             newFilterInfo = true
         }
@@ -111,17 +128,17 @@ class FilterEditPanel : JPanel(), IView {
 
     private fun formatNewFilterData(): FilterContainer {
         val data = FilterContainer()
-        data.regex = iRegex
         data.text = strText
         data.enabled = bEnable
+        data.color = strColor
         return data
     }
 
     private fun formatFilterData(): FilterContainer {
         val data = FilterContainer(strUuid)
-        data.regex = iRegex
         data.text = strText
         data.enabled = bEnable
+        data.color = strColor
         return data
     }
 
@@ -135,7 +152,8 @@ class FilterEditPanel : JPanel(), IView {
 
     private var itemListener = ItemListener {
         if (it.stateChange != ItemEvent.SELECTED) return@ItemListener
-        iRegex = cbRegex.selectedIndex
+        strColor = it.item.toString()
+        cbRegex.foreground = Color.decode(strColor)
     }
 
     private var dlListener = object : DocumentListener {
@@ -168,15 +186,16 @@ class FilterEditPanel : JPanel(), IView {
     }
 
     fun editFilterInfo(filterInfo: FilterContainer) {
-        cbRegex.selectedIndex = filterInfo.regex
         tfText.text = filterInfo.text
         strUuid = filterInfo.uuid
         bEnable = filterInfo.enabled
+        strColor = filterInfo.color
         newFilterInfo = false
     }
 
     fun cleanFilterInfo() {
         tfText.text = ""
+        strColor = "#0000FF"
         bEnable = true
         newFilterInfo = true
     }

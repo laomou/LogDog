@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import model.CmdModel
+import model.DisplayLogModel
 import model.FilterModel
 import model.LogModel
 import org.slf4j.LoggerFactory
@@ -45,10 +46,8 @@ class MainController {
     @Volatile
     private var nChangedFilter = STATUS_READY
 
-    private var arLogList = ArrayList<LogContainer>()
-
-
     private val logModel = LogModel()
+    private val displayLogMode = DisplayLogModel()
     private val filterModel = FilterModel()
     private val cmdModel = CmdModel()
 
@@ -70,7 +69,7 @@ class MainController {
     private val MIN_HEIGHT = 500
 
 
-    private var mainWindow = MainWindow(logModel, filterModel, cmdModel)
+    private var mainWindow = MainWindow(displayLogMode, filterModel, cmdModel)
 
 
     init {
@@ -177,17 +176,17 @@ class MainController {
                         mainWindow.setStatus("Parsing $filter")
                         nChangedFilter = STATUS_PARSING
 
-                        logModel.cleanFilterData()
+                        displayLogMode.cleanData()
 
                         if (!filterModel.hasFilter()) {
-                            logModel.setData(arLogList)
+                            displayLogMode.setData(logModel.getData())
                             logger.debug("updateData(no filter)")
                             updateTableData()
                             nChangedFilter = STATUS_READY
                         }
 
-                        val nRowCount = arLogList.size
-                        logger.debug("arFullLogList->size: " + nRowCount)
+                        val nRowCount = logModel.getDataSize()
+                        logger.debug("arFullLogList->size: $nRowCount")
 
                         for (nIndex in 0 until nRowCount) {
                             if (nIndex % 10000 == 0) {
@@ -198,12 +197,12 @@ class MainController {
                                 break
                             }
 
-                            val logInfo = arLogList[nIndex]
+                            val logInfo = logModel.getItemData(nIndex)
 
                             addFilterLogInfo(logInfo)
                         }
 
-                        logger.debug("arFilterLogList->size: " + logModel.getDataSize())
+                        logger.debug("arFilterLogList->size: " + displayLogMode.getDataSize())
 
                         if (nChangedFilter == STATUS_PARSING) {
                             nChangedFilter = STATUS_READY
@@ -241,7 +240,7 @@ class MainController {
 
                     synchronized(fileLock) {
                         var strLine: String? = ""
-                        var nLine = arLogList.size + 1
+                        var nLine = logModel.getDataSize() + 1
                         while ({ strLine = br.readLine(); strLine }() != null) {
                             val logInfo = logParser.parse(strLine!!)
                             logInfo.strLine = nLine++
@@ -252,7 +251,7 @@ class MainController {
 
                     synchronized(filterLock) {
                         if (!filterModel.hasFilter()) {
-                            logModel.setData(arLogList)
+                            displayLogMode.setData(logModel.getData())
                         }
                         logger.debug("updateData")
                         updateTableData()
@@ -357,7 +356,7 @@ class MainController {
                     addLogInfo(logInfo)
                 }
             }
-            logger.debug("parseFile->size: " + arLogList.size)
+            logger.debug("parseFile->size: " + logModel.getDataSize())
             runFilter()
             mainWindow.setStatus("Parse complete")
             logger.debug("parseFile end")
@@ -367,9 +366,9 @@ class MainController {
     }
 
     private fun cleanData() {
-        arLogList.clear()
-        logModel.cleanFilterData()
-        logModel.updateData()
+        logModel.cleanData()
+        displayLogMode.cleanData()
+        displayLogMode.updateData()
     }
 
     private fun configAdbFile() {
@@ -434,28 +433,24 @@ class MainController {
     }
 
     private fun updateTableData() {
-        logModel.setHighLightStr(filterModel.getHighlightStr())
-        logModel.updateData()
+        displayLogMode.setFilterColors(filterModel.getFilerColors())
+        displayLogMode.updateData()
     }
 
-    private fun addLogInfo(loginfo: LogContainer) {
+    private fun addLogInfo(logInfo: LogContainer) {
         synchronized(filterLock) {
-            arLogList.add(loginfo)
+            logModel.addLogInfo(logInfo)
         }
     }
 
-    private fun addFilterLogInfo(loginfo: LogContainer) {
+    private fun addFilterLogInfo(logInfo: LogContainer) {
         synchronized(filterLock) {
             if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
-                if (filterModel.checkOrFilter(loginfo)) {
-                    logModel.addLogInfo(loginfo)
-                }
-            } else if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_AND) {
-                if (filterModel.checkAndFilter(loginfo)) {
-                    logModel.addLogInfo(loginfo)
+                if (filterModel.checkOrFilter(logInfo)) {
+                    displayLogMode.addLogInfo(logInfo)
                 }
             } else {
-                logModel.addLogInfo(loginfo)
+                displayLogMode.addLogInfo(logInfo)
             }
         }
     }
@@ -480,7 +475,7 @@ class MainController {
             logConfig.tool_cmd.forEach {
                 cmdModel.addCmdInfo(it)
             }
-        } catch (e : FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             //e.printStackTrace()
             logger.error("File(config.json) not found")
         }
@@ -494,7 +489,7 @@ class MainController {
             logConfig.filter_rule = filterModel.getData()
             val contents = gson.toJson(logConfig)
             file.writeText(contents)
-        } catch (e : FileNotFoundException) {
+        } catch (e: FileNotFoundException) {
             //e.printStackTrace()
             logger.error("File(config.json) not found")
         }

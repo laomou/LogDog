@@ -1,14 +1,15 @@
 package model
 
+import bean.FilterColor
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
 
 
-class LogModel : ObservableSubject<LogContainer> {
+class DisplayLogModel : ObservableSubject<LogContainer> {
     private val observers = ArrayList<Observer<LogContainer>>()
     private var datas = ArrayList<LogContainer>()
-    private var highLight = ""
+    private var filterColors = ArrayList<FilterColor>()
 
     override fun registerObserver(o: Observer<LogContainer>) {
         observers.add(o)
@@ -24,36 +25,37 @@ class LogModel : ObservableSubject<LogContainer> {
         }
     }
 
-    fun getData(): ArrayList<LogContainer> {
+    fun getData(): List<LogContainer> {
         return datas
     }
 
-    fun addLogInfo(loginfo: LogContainer) {
-        datas.add(loginfo)
+    fun addLogInfo(logInfo: LogContainer) {
+        datas.add(logInfo)
     }
 
     fun updateData() {
         notifyAllObservers()
     }
 
-    fun cleanFilterData() {
+    fun cleanData() {
         datas.clear()
     }
 
-    fun setData(data: ArrayList<LogContainer>) {
+    fun setData(data: List<LogContainer>) {
         datas.clear()
         datas.addAll(data)
+    }
+
+    fun getFilterColors(): List<FilterColor> {
+        return filterColors
     }
 
     fun getDataSize(): Int {
         return datas.size
     }
 
-    fun setHighLightStr(text: String) {
-        highLight = text
-    }
-
-    fun getHighLightStr(): String {
-        return highLight
+    fun setFilterColors(colorList: List<FilterColor>) {
+        filterColors.clear()
+        filterColors.addAll(colorList)
     }
 }

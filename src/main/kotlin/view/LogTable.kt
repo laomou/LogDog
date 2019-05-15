@@ -1,10 +1,11 @@
 package view
 
+import bean.FilterColor
 import bean.LogContainer
 import interfces.IView
 import interfces.ObservableSubject
 import interfces.Observer
-import model.LogModel
+import model.DisplayLogModel
 import org.slf4j.LoggerFactory
 import java.awt.Color
 import java.awt.Component
@@ -93,9 +94,9 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
     override fun update(s: ObservableSubject<LogContainer>) {
         logger.debug("update")
-        if (s is LogModel) {
+        if (s is DisplayLogModel) {
             defaultModel.setData(s.getData())
-            defaultModel.setHighLightStr(s.getHighLightStr())
+            defaultModel.setFilterColors(s.getFilterColors())
             defaultModel.fireTableDataChanged()
         }
     }
@@ -136,13 +137,24 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
     inner class LogTableViewModel : AbstractTableModel() {
         private var arData = ArrayList<LogContainer>()
+        private var colorData = ArrayList<FilterColor>()
         private val colName = arrayOf("Line", "Message")
-        private var highLight = ""
 
         @Synchronized
-        fun setData(data: ArrayList<LogContainer>) {
+        fun setData(data: List<LogContainer>) {
             arData.clear()
             arData.addAll(data)
+        }
+
+        @Synchronized
+        fun setFilterColors(data: List<FilterColor>) {
+            colorData.clear()
+            colorData.addAll(data)
+        }
+
+        @Synchronized
+        fun getFilterColors(): List<FilterColor> {
+            return colorData
         }
 
         @Synchronized
@@ -172,14 +184,6 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             }
         }
 
-        fun setHighLightStr(text: String) {
-            highLight = text
-        }
-
-        fun getHighLightStr(): String {
-            return highLight
-        }
-
         fun findRearLineByIndex(row: String): Int {
             for ((index, log) in arData.withIndex()) {
                 if ("${log.strLine}" == row) {
@@ -199,7 +203,6 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
 
     inner class LogCellRenderer : DefaultTableCellRenderer() {
         private var bChanged = false
-        private val arColor = arrayOf("#00FF00", "#EEEE00", "#EE9A49", "#8A2BE2", "#EE1289")
         override fun getTableCellRendererComponent(p0: JTable?, p1: Any?, p2: Boolean, p3: Boolean, p4: Int, p5: Int): Component {
             val data = remakeData(p5, p1 as String)
             val component = super.getTableCellRendererComponent(p0, data, p2, p3, p4, p5)
@@ -213,9 +216,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                 return text
             }
 
-            val high = (model as LogTableViewModel).getHighLightStr()
+            val arColor = (model as LogTableViewModel).getFilterColors()
             bChanged = false
-            var strRet = remakeFind(text, high, arColor, true)
+            val hightLight = StringBuffer()
+            arColor.forEach {
+                hightLight.append(it.hightLight)
+            }
+            var strRet = remakeFind(hightLight.toString(), text, arColor, true)
             if (bChanged) {
                 strRet = "<html><nobr>$strRet</nobr></html>".replace(" ", "&nbsp;")
             }
@@ -223,25 +230,22 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return strRet
         }
 
-        private fun remakeFind(strText: String, strFind: String, arColor: Array<String>, bUseSpan: Boolean): String {
+        private fun remakeFind(strFind: String, strText: String, arColor: List<FilterColor>, bUseSpan: Boolean): String {
             if (strFind.isEmpty()) return strText
 
             var strText1 = strText
             val stk = StringTokenizer(strFind, "|")
             var newText: String
             var strToken: String
-            var nIndex = 0
 
             while (stk.hasMoreElements()) {
-                if (nIndex >= arColor.size) {
-                    nIndex = 0
-                }
                 strToken = stk.nextToken()
                 if (strText1.contains(strToken, true)) {
+                    val nIndex = arColor.indexOfFirst { it.hightLight.contains(strToken) }
                     newText = if (bUseSpan)
-                        "<span style=\"background-color:${arColor[nIndex]}\"><b>"
+                        "<span style=\"background-color:${arColor[nIndex].color}\"><b>"
                     else
-                        "<font color=${arColor[nIndex]}><b>"
+                        "<font color=${{ arColor[nIndex].color }}><b>"
                     newText += strToken
                     newText += if (bUseSpan)
                         "</b></span>"
@@ -249,7 +253,6 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
                         "</b></font>"
                     strText1 = strText1.replace(strToken, newText)
                     bChanged = true
-                    nIndex++
                 }
             }
             return strText1

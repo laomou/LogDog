@@ -6,6 +6,7 @@ import interfces.*
 import interfces.Observer
 import model.FilterModel
 import org.slf4j.LoggerFactory
+import java.awt.Color
 import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -112,10 +113,10 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
             isSelected = p1.enabled
             if (p3) {
                 background = p0.selectionBackground
-                foreground = p0.selectionForeground
+                foreground = Color.decode(p1.color)
             } else {
                 background = p0.background
-                foreground = p0.foreground
+                foreground = Color.decode(p1.color)
             }
             toolTipText = p1.detail()
             return this

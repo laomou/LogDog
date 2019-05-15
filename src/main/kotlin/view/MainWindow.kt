@@ -6,8 +6,8 @@ import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
 import model.CmdModel
+import model.DisplayLogModel
 import model.FilterModel
-import model.LogModel
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
 import java.awt.Component
@@ -17,7 +17,7 @@ import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
-class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFrame(), IView {
+class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
     private val eventlisteners = EventListenerList()
@@ -95,13 +95,12 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
         val jpFilterType = JPanel()
-        btnFilterType = JButton("Filter type: HighLight")
+        btnFilterType = JButton("Filter type: HL")
         btnFilterType?.addActionListener {
             filterModel.toggleFilterType()
             btnFilterType?.text = when (filterModel.getFilterType()) {
                 FilterModel.TYPE_FILTER_OR -> "Filter type: Or"
-                FilterModel.TYPE_FILTER_AND -> "Filter type: And"
-                else -> "Filter type: HighLight"
+                else -> "Filter type: HL"
             }
             updateFilterAndTable()
         }
@@ -137,6 +136,7 @@ class MainWindow(lModel: LogModel, fModel: FilterModel, cModel: CmdModel) : JFra
         logTable.initListener()
 
         filterModel.registerObserver(filterList)
+
         filterList.addCustomActionListener(customListener)
         filterList.initListener()
 

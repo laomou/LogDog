@@ -5,8 +5,8 @@ import java.util.*
 
 class FilterContainer(uuid: String? = null) {
     var enabled = false
-    var regex = -1
     var text = ""
+    var color = "#000000"
 
     var uuid = uuid ?: UUID.randomUUID().toString()
 
@@ -17,7 +17,6 @@ class FilterContainer(uuid: String? = null) {
     override fun hashCode(): Int {
         var result = text.hashCode()
         result = 31 * result + enabled.hashCode()
-        result = 31 * result + regex
         return result
     }
 
@@ -38,13 +37,7 @@ class FilterContainer(uuid: String? = null) {
     }
 
     fun detail(): String {
-        var str = ""
-        when (regex) {
-            0 -> str += "C "
-            1 -> str += "M "
-        }
-        str += "\"$text\""
-        return str
+        return text
     }
 
     fun toggle() {
