@@ -222,7 +222,7 @@ class MainController {
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                //e.printStackTrace()
                 logger.warn(e.toString())
             }
             logger.debug("exit")
@@ -373,6 +373,7 @@ class MainController {
 
     private fun cleanData() {
         filterModel.cleanLines()
+        filterModel.updateData()
         displayLogMode.cleanData()
         displayLogMode.updateData()
     }
@@ -469,7 +470,6 @@ class MainController {
             } else {
                 logInfo.show = true
             }
-            logger.debug("line ${logInfo.strLine} ${logInfo.show}")
         }
     }
 

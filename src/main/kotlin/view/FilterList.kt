@@ -49,14 +49,18 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
 
     private val mouseClick = object : MouseAdapter() {
         override fun mouseClicked(p0: MouseEvent) {
+            val index = locationToIndex(p0.point)
+            val downMask = MouseEvent.BUTTON3_DOWN_MASK
+            if (p0.modifiersEx and downMask != downMask) {
+                selectedIndex = index
+            }
             if (p0.button == MouseEvent.BUTTON1) {
                 if (selectedValue != null) {
                     selectedValue.toggle()
-                    val index = locationToIndex(p0.point)
-                    val rect = getCellBounds(index, index)
-                    repaint(rect)
-                    updateFilterData(selectedValue, ConstCmd.CMD_ENABLE_FILTER)
                 }
+                val rect = getCellBounds(index, index)
+                repaint(rect)
+                updateFilterData(selectedValue, ConstCmd.CMD_ENABLE_FILTER)
             } else if (p0.button == MouseEvent.BUTTON3) {
                 if (selectedValue != null) {
                     popupEditMenu.show(p0.component, p0.x, p0.y)

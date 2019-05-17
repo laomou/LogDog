@@ -8,8 +8,8 @@ import interfces.Observer
 import java.util.*
 
 class FilterModel : ObservableSubject<FilterContainer> {
-    private val observers = ArrayList<Observer<FilterContainer>>()
-    private val datas = LinkedList<FilterContainer>()
+    private val observers = arrayListOf<Observer<FilterContainer>>()
+    private val datas = arrayListOf<FilterContainer>()
     private var filterType = TYPE_FILTER_OR
 
     companion object {

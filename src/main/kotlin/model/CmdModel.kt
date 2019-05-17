@@ -5,8 +5,8 @@ import interfces.ObservableSubject
 import interfces.Observer
 
 class CmdModel : ObservableSubject<CmdContainer> {
-    private val observers = ArrayList<Observer<CmdContainer>>()
-    private val datas = ArrayList<CmdContainer>()
+    private val observers = arrayListOf<Observer<CmdContainer>>()
+    private val datas = arrayListOf<CmdContainer>()
     var selectedIndex = 0
 
     override fun registerObserver(o: Observer<CmdContainer>) {

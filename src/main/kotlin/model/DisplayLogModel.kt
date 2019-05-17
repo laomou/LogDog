@@ -1,14 +1,14 @@
 package model
 
+import bean.Default
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
-import java.util.*
 
 
 class DisplayLogModel : ObservableSubject<LogContainer> {
-    private val observers = ArrayList<Observer<LogContainer>>()
-    private var datas = LinkedList<LogContainer>()
+    private val observers = arrayListOf<Observer<LogContainer>>()
+    private var datas = arrayListOf<LogContainer>()
     private var reset = false
 
     override fun registerObserver(o: Observer<LogContainer>) {
@@ -39,6 +39,7 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
     fun showData() {
         datas.forEach {
             it.show = true
+            it.filterColor = Default.DEFAULT_BG_COLOR
         }
         reset = true
     }
