@@ -48,6 +48,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         contentPane.add(getMainTabPanel(), BorderLayout.CENTER)
     }
 
+    fun loadConfigData() {
+        filterEdit.loadItemData()
+    }
+
     private fun getMainTabPanel(): Component {
         val rootPane = JPanel(BorderLayout())
         val scrollVBar = JScrollPane(logTable)
@@ -95,12 +99,12 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
         val jpFilterType = JPanel()
-        btnFilterType = JButton("Filter type: HL")
+        btnFilterType = JButton("Filter type:  Or  ")
         btnFilterType?.addActionListener {
             filterModel.toggleFilterType()
             btnFilterType?.text = when (filterModel.getFilterType()) {
-                FilterModel.TYPE_FILTER_OR -> "Filter type: Or"
-                else -> "Filter type: HL"
+                FilterModel.TYPE_FILTER_OR -> "Filter type: Or  "
+                else -> "Filter type: None"
             }
             updateFilterAndTable()
         }
@@ -108,7 +112,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         jpFilterPanel.add(jpFilterType, BorderLayout.NORTH)
 
         val scrollPane = JScrollPane(filterList)
-        scrollPane.preferredSize = Dimension(200, 0)
+        scrollPane.preferredSize = Dimension(300, 0)
         scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
         jpFilterPanel.add(scrollPane, BorderLayout.CENTER)
 
@@ -204,6 +208,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
                 }
                 ConstCmd.CMD_EDIT_FILTER_START -> {
                     filterEdit.editFilterInfo(event.objectValue as FilterContainer)
+                }
+                ConstCmd.CMD_ENABLE_FILTER -> {
+                    filterModel.enableFilterInfo(event.objectValue as FilterContainer)
+                    updateFilterAndTable()
                 }
                 else -> {
                     updateButton(event.actionCommand)

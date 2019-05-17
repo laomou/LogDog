@@ -1,15 +1,15 @@
 package model
 
-import bean.FilterColor
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
+import java.util.*
 
 
 class DisplayLogModel : ObservableSubject<LogContainer> {
     private val observers = ArrayList<Observer<LogContainer>>()
-    private var datas = ArrayList<LogContainer>()
-    private var filterColors = ArrayList<FilterColor>()
+    private var datas = LinkedList<LogContainer>()
+    private var reset = false
 
     override fun registerObserver(o: Observer<LogContainer>) {
         observers.add(o)
@@ -25,10 +25,35 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
         }
     }
 
+    @Synchronized
+    fun tryShowData() {
+        if (reset) {
+            datas.forEach {
+                it.show = false
+            }
+            reset = false
+        }
+    }
+
+    @Synchronized
+    fun showData() {
+        datas.forEach {
+            it.show = true
+        }
+        reset = true
+    }
+
+    @Synchronized
     fun getData(): List<LogContainer> {
         return datas
     }
 
+    @Synchronized
+    fun getDisplayData(): List<LogContainer> {
+        return datas.filter { it.show }
+    }
+
+    @Synchronized
     fun addLogInfo(logInfo: LogContainer) {
         datas.add(logInfo)
     }
@@ -37,25 +62,21 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
         notifyAllObservers()
     }
 
+    @Synchronized
     fun cleanData() {
+        datas.forEach {
+            it.filters.clear()
+        }
         datas.clear()
     }
 
-    fun setData(data: List<LogContainer>) {
-        datas.clear()
-        datas.addAll(data)
+    @Synchronized
+    fun getItemData(index: Int): LogContainer {
+        return datas[index]
     }
 
-    fun getFilterColors(): List<FilterColor> {
-        return filterColors
-    }
-
+    @Synchronized
     fun getDataSize(): Int {
         return datas.size
-    }
-
-    fun setFilterColors(colorList: List<FilterColor>) {
-        filterColors.clear()
-        filterColors.addAll(colorList)
     }
 }

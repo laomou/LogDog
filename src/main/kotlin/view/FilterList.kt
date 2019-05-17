@@ -55,7 +55,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
                     val index = locationToIndex(p0.point)
                     val rect = getCellBounds(index, index)
                     repaint(rect)
-                    updateTableData()
+                    updateFilterData(selectedValue, ConstCmd.CMD_ENABLE_FILTER)
                 }
             } else if (p0.button == MouseEvent.BUTTON3) {
                 if (selectedValue != null) {
@@ -85,13 +85,6 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         eventlisteners.remove(CustomActionListener::class.java, l)
     }
 
-    private fun updateTableData() {
-        val event = CustomEvent(this, ConstCmd.CMD_RUN_FILTER)
-        for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
-            listener.actionPerformed(event)
-        }
-    }
-
     private fun updateFilterData(data: FilterContainer?, str: String) {
         val event = CustomEvent(this, str)
         event.objectValue = data
@@ -112,11 +105,11 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
             text = p1.toString()
             isSelected = p1.enabled
             if (p3) {
-                background = p0.selectionBackground
-                foreground = Color.decode(p1.color)
+                foreground = Color.RED
+                background = Color.decode(p1.color)
             } else {
-                background = p0.background
-                foreground = Color.decode(p1.color)
+                foreground = Color.BLACK
+                background = Color.decode(p1.color)
             }
             toolTipText = p1.detail()
             return this
@@ -124,7 +117,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
     }
 
     inner class DefaultFilterListModel : AbstractListModel<FilterContainer>() {
-        private var arData = ArrayList<FilterContainer>()
+        private var arData = LinkedList<FilterContainer>()
 
         @Synchronized
         override fun getElementAt(p0: Int): FilterContainer {
@@ -137,7 +130,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         }
 
         @Synchronized
-        fun setData(data: ArrayList<FilterContainer>) {
+        fun setData(data: List<FilterContainer>) {
             arData.clear()
             arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)

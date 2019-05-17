@@ -2,13 +2,13 @@ package bean
 
 import java.util.*
 
-
 class FilterContainer(uuid: String? = null) {
     var enabled = false
+    var state = -1
     var text = ""
-    var color = "#00FF00"
-
-    var uuid = uuid ?: UUID.randomUUID().toString()
+    var color = Default.DEFAULT_BG_COLOR
+    var uuid = uuid ?: UID.getNewUID()
+    var lines = LinkedList<Int>()
 
     override fun toString(): String {
         return detail()
@@ -37,7 +37,7 @@ class FilterContainer(uuid: String? = null) {
     }
 
     fun detail(): String {
-        return text
+        return "$text (${lines.size})"
     }
 
     fun toggle() {

@@ -5,29 +5,6 @@ import java.util.regex.Pattern
 
 
 class LogCatParser {
-    val COLOR_GUIDE = 0x00000000
-    val COLOR_DEBUG = 0x000000AA
-    val COLOR_ERROR = 0x00FF0000
-    val COLOR_FATAL = 0x00FF0000
-    val COLOR_INFO = 0x00009A00
-    val COLOR_WARN = 0x00FF9A00
-
-    val COLOR_0 = 0x00000000
-    val COLOR_1 = 0x00000000
-    val COLOR_2 = 0x00000000
-    val COLOR_3 = COLOR_ERROR
-    val COLOR_4 = COLOR_WARN
-    val COLOR_5 = 0x00000000
-    val COLOR_6 = COLOR_INFO
-    val COLOR_7 = COLOR_DEBUG
-    val COLOR_8 = COLOR_ERROR
-
-    val TOKEN_KERNEL = "<>[]"
-    val TOKEN_SPACE = " "
-    val TOKEN_SLASH = "/"
-    val TOKEN = "/()"
-    val TOKEN_PID = "/() "
-    val TOKEN_MESSAGE = "'"
 
     fun parse(textLogLine: String): LogContainer {
         val log = LogContainer()
@@ -85,5 +62,14 @@ class LogCatParser {
         }
 
         return logInfo
+    }
+
+    companion object {
+        const val COLOR_GUIDE = "#000000"
+        const val COLOR_DEBUG = "#0000AA"
+        const val COLOR_ERROR = "#FF0000"
+        const val COLOR_FATAL = "#FF0000"
+        const val COLOR_INFO = "#009A00"
+        const val COLOR_WARN = "#FF9A00"
     }
 }

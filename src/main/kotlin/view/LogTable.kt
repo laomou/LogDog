@@ -1,6 +1,5 @@
 package view
 
-import bean.FilterColor
 import bean.LogContainer
 import interfces.IView
 import interfces.ObservableSubject
@@ -93,10 +92,8 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     }
 
     override fun update(s: ObservableSubject<LogContainer>) {
-        logger.debug("update")
         if (s is DisplayLogModel) {
-            defaultModel.setData(s.getData())
-            defaultModel.setFilterColors(s.getFilterColors())
+            defaultModel.setData(s.getDisplayData())
             defaultModel.fireTableDataChanged()
         }
     }
@@ -136,25 +133,14 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     }
 
     inner class LogTableViewModel : AbstractTableModel() {
-        private var arData = ArrayList<LogContainer>()
-        private var colorData = ArrayList<FilterColor>()
+        private var arData = arrayListOf<LogContainer>()
         private val colName = arrayOf("Line", "Message")
 
         @Synchronized
         fun setData(data: List<LogContainer>) {
             arData.clear()
             arData.addAll(data)
-        }
-
-        @Synchronized
-        fun setFilterColors(data: List<FilterColor>) {
-            colorData.clear()
-            colorData.addAll(data)
-        }
-
-        @Synchronized
-        fun getFilterColors(): List<FilterColor> {
-            return colorData
+            logger.debug("update size: ${data.size}")
         }
 
         @Synchronized
@@ -167,8 +153,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         }
 
         @Synchronized
-        fun getLogColor(p0: Int): Int {
+        fun getLogColor(p0: Int): String {
             return arData[p0].strColor
+        }
+
+        @Synchronized
+        fun getFilterColor(p0: Int): String {
+            return arData[p0].filterColor
         }
 
         override fun getColumnName(col: Int): String {
@@ -202,60 +193,13 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     }
 
     inner class LogCellRenderer : DefaultTableCellRenderer() {
-        private var bChanged = false
         override fun getTableCellRendererComponent(p0: JTable?, p1: Any?, p2: Boolean, p3: Boolean, p4: Int, p5: Int): Component {
-            val data = remakeData(p5, p1 as String)
-            val component = super.getTableCellRendererComponent(p0, data, p2, p3, p4, p5)
-            val strColor = (model as LogTableViewModel).getLogColor(p4)
-            component.foreground = Color(strColor)
+            val component = super.getTableCellRendererComponent(p0, p1, p2, p3, p4, p5)
+            val logColor = (model as LogTableViewModel).getLogColor(p4)
+            component.foreground = Color.decode(logColor)
+            val bgColor = (model as LogTableViewModel).getFilterColor(p4)
+            component.background = Color.decode(bgColor)
             return component
-        }
-
-        private fun remakeData(index: Int, text: String): String {
-            if (index != 1) {
-                return text
-            }
-
-            val arColor = (model as LogTableViewModel).getFilterColors()
-            bChanged = false
-            val hightLight = StringBuffer()
-            arColor.forEach {
-                hightLight.append(it.hightLight)
-            }
-            var strRet = remakeFind(hightLight.toString(), text, arColor, true)
-            if (bChanged) {
-                strRet = "<html><nobr>$strRet</nobr></html>".replace(" ", "&nbsp;")
-            }
-
-            return strRet
-        }
-
-        private fun remakeFind(strFind: String, strText: String, arColor: List<FilterColor>, bUseSpan: Boolean): String {
-            if (strFind.isEmpty()) return strText
-
-            var strText1 = strText
-            val stk = StringTokenizer(strFind, "|")
-            var newText: String
-            var strToken: String
-
-            while (stk.hasMoreElements()) {
-                strToken = stk.nextToken()
-                if (strText1.contains(strToken, true)) {
-                    val nIndex = arColor.indexOfFirst { it.hightLight.contains(strToken) }
-                    newText = if (bUseSpan)
-                        "<span style=\"background-color:${arColor[nIndex].color}\"><b>"
-                    else
-                        "<font color=${{ arColor[nIndex].color }}><b>"
-                    newText += strToken
-                    newText += if (bUseSpan)
-                        "</b></span>"
-                    else
-                        "</b></font>"
-                    strText1 = strText1.replace(strToken, newText)
-                    bChanged = true
-                }
-            }
-            return strText1
         }
     }
 }

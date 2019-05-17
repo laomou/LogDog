@@ -1,9 +1,11 @@
 package bean
 
+
 class ConstCmd {
 
     companion object {
         const val CMD_SELECT_RUN = "CMD_SELECT_RUN"
+        const val CMD_ENABLE_FILTER = "CMD_ENABLE_FILTER"
         const val CMD_ADD_FILTER = "CMD_ADD_FILTER"
         const val CMD_DEL_FILTER = "CMD_DEL_FILTER"
         const val CMD_EDIT_FILTER_START = "CMD_EDIT_FILTER_START"

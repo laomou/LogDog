@@ -1,7 +1,6 @@
 package controller
 
-import bean.ConstCmd
-import bean.LogContainer
+import bean.*
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -10,7 +9,6 @@ import interfces.CustomEvent
 import model.CmdModel
 import model.DisplayLogModel
 import model.FilterModel
-import model.LogModel
 import org.slf4j.LoggerFactory
 import utils.LogCatParser
 import utils.LogToolConfig
@@ -33,7 +31,7 @@ class MainController {
 
     private val LOG_PATH = "log"
 
-    private var logConfig = LogToolConfig()
+    private var logConfig = LogToolConfig.instance()
 
     private val logParser = LogCatParser()
 
@@ -46,7 +44,6 @@ class MainController {
     @Volatile
     private var nChangedFilter = STATUS_READY
 
-    private val logModel = LogModel()
     private val displayLogMode = DisplayLogModel()
     private val filterModel = FilterModel()
     private val cmdModel = CmdModel()
@@ -91,7 +88,7 @@ class MainController {
             override fun windowClosing(p0: WindowEvent?) {
                 logger.debug("windowClosing")
                 deinitListenr()
-                saveFilterData()
+                saveConfigData()
             }
         })
         DropTarget(mainWindow, DnDConstants.ACTION_COPY_OR_MOVE, object : DropTargetListener {
@@ -141,7 +138,8 @@ class MainController {
         mainWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         mainWindow.isVisible = true
         iniListener()
-        loadFilterData()
+        loadConfigData()
+        mainWindow.loadConfigData()
         filterModel.updateData()
         cmdModel.updateData()
     }
@@ -171,48 +169,60 @@ class MainController {
                         mainWindow.setStatus("Idle")
                         filterLock.wait()
 
-                        val filter = filterModel.getEnableFilter()
+                        val filter = filterModel.getEnableFilterString()
                         logger.debug("parsing $filter")
                         mainWindow.setStatus("Parsing $filter")
                         nChangedFilter = STATUS_PARSING
 
-                        displayLogMode.cleanData()
-
                         if (!filterModel.hasFilter()) {
-                            displayLogMode.setData(logModel.getData())
                             logger.debug("updateData(no filter)")
+                            displayLogMode.showData()
                             updateTableData()
                             nChangedFilter = STATUS_READY
-                        }
+                        } else {
+                            if (filterModel.hasNewFilter()) {
+                                val newFilters = filterModel.getEnableNewFilters()
+                                logger.debug("new filter changeFilter->size: ${newFilters.size}")
 
-                        val nRowCount = logModel.getDataSize()
-                        logger.debug("arFullLogList->size: $nRowCount")
-
-                        for (nIndex in 0 until nRowCount) {
-                            if (nIndex % 10000 == 0) {
-                                Thread.sleep(1)
+                                newFilters.forEach {
+                                    logger.debug("id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
+                                    val newData = displayLogMode.getData()
+                                    newData.forEach { it1 ->
+                                        filterModel.updateLineInfo(it, it1)
+                                    }
+                                }
                             }
 
-                            if (nChangedFilter == STATUS_CHANGE) {
-                                break
+                            displayLogMode.tryShowData()
+
+                            val newFilters = filterModel.getChangesFilters()
+                            logger.debug("changes filter changeFilter->size: ${newFilters.size}")
+
+                            newFilters.forEach {
+                                logger.debug("id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
+                                val lines = it.lines
+                                lines.forEach { it1 ->
+                                    val logInfo = displayLogMode.getItemData(it1 - 1)
+                                    logInfo.filters.forEach { it2 ->
+                                        val f = filterModel.findItemDataByUUID(it2)
+                                        f?.run {
+                                            reMarkByFilter(this, logInfo)
+                                        }
+                                    }
+                                }
+                                it.state = -1
                             }
-
-                            val logInfo = logModel.getItemData(nIndex)
-
-                            addFilterLogInfo(logInfo)
                         }
-
-                        logger.debug("arFilterLogList->size: " + displayLogMode.getDataSize())
 
                         if (nChangedFilter == STATUS_PARSING) {
                             nChangedFilter = STATUS_READY
-                            logger.debug("updateData")
+                            logger.debug("filter done updateData")
                             updateTableData()
                         }
                     }
                 }
             } catch (e: Exception) {
-                //e.printStackTrace()
+                e.printStackTrace()
                 logger.warn(e.toString())
             }
             logger.debug("exit")
@@ -240,20 +250,16 @@ class MainController {
 
                     synchronized(fileLock) {
                         var strLine: String? = ""
-                        var nLine = logModel.getDataSize() + 1
+                        var nLine = displayLogMode.getDataSize() + 1
                         while ({ strLine = br.readLine(); strLine }() != null) {
                             val logInfo = logParser.parse(strLine!!)
                             logInfo.strLine = nLine++
-                            addLogInfo(logInfo)
                             addFilterLogInfo(logInfo)
                         }
                     }
 
                     synchronized(filterLock) {
-                        if (!filterModel.hasFilter()) {
-                            displayLogMode.setData(logModel.getData())
-                        }
-                        logger.debug("updateData")
+                        logger.debug("updateData(read file)")
                         updateTableData()
                     }
                 }
@@ -353,10 +359,10 @@ class MainController {
                 val logInfo = logParser.parse(it)
                 logInfo.strLine = nIndex++
                 if (logInfo.valid) {
-                    addLogInfo(logInfo)
+                    addFilterLogInfo(logInfo)
                 }
             }
-            logger.debug("parseFile->size: " + logModel.getDataSize())
+            logger.debug("parseFile->size: " + displayLogMode.getDataSize())
             runFilter()
             mainWindow.setStatus("Parse complete")
             logger.debug("parseFile end")
@@ -366,7 +372,7 @@ class MainController {
     }
 
     private fun cleanData() {
-        logModel.cleanData()
+        filterModel.cleanLines()
         displayLogMode.cleanData()
         displayLogMode.updateData()
     }
@@ -433,25 +439,37 @@ class MainController {
     }
 
     private fun updateTableData() {
-        displayLogMode.setFilterColors(filterModel.getFilerColors())
+        filterModel.updateData()
         displayLogMode.updateData()
-    }
-
-    private fun addLogInfo(logInfo: LogContainer) {
-        synchronized(filterLock) {
-            logModel.addLogInfo(logInfo)
-        }
     }
 
     private fun addFilterLogInfo(logInfo: LogContainer) {
         synchronized(filterLock) {
+            displayLogMode.addLogInfo(logInfo)
+            filterModel.updateLineInfo(logInfo)
+            logInfo.show = false
             if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
-                if (filterModel.checkOrFilter(logInfo)) {
-                    displayLogMode.addLogInfo(logInfo)
+                if (filterModel.hasFilter()) {
+                    logInfo.show = filterModel.checkEnableOrFilter(logInfo)
+                    logInfo.filterColor = filterModel.findFilersColor(logInfo.strMsg)
+                } else {
+                    logInfo.show = true
                 }
             } else {
-                displayLogMode.addLogInfo(logInfo)
+                logInfo.show = true
             }
+        }
+    }
+
+    private fun reMarkByFilter(filterInfo: FilterContainer, logInfo: LogContainer) {
+        synchronized(filterLock) {
+            if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
+                logInfo.show = filterInfo.enabled
+                filterModel.updateShowInfo(filterInfo, logInfo)
+            } else {
+                logInfo.show = true
+            }
+            logger.debug("line ${logInfo.strLine} ${logInfo.show}")
         }
     }
 
@@ -461,32 +479,38 @@ class MainController {
         return "LogDog_" + format.format(now) + ".txt"
     }
 
-    private fun loadFilterData() {
+    private fun loadConfigData() {
         try {
             val file = File("config.json")
             val contents = file.readText()
             val gson = Gson()
             val type = object : TypeToken<LogToolConfig>() {}.type
             val config: LogToolConfig = gson.fromJson(contents, type)
-            logConfig.copy(config)
+            logConfig.load(config)
             logConfig.filter_rule.forEach {
-                filterModel.addFilterInfo(it)
+                filterModel.loadFilterInfo(it)
             }
             logConfig.tool_cmd.forEach {
                 cmdModel.addCmdInfo(it)
             }
+            if (logConfig.custom_color.isEmpty()) {
+                logConfig.custom_color.add(Default.DEFAULT_BG_COLOR)
+            }
+            UID.setUID(logConfig.uuid)
         } catch (e: FileNotFoundException) {
             //e.printStackTrace()
             logger.error("File(config.json) not found")
         }
-
     }
 
-    private fun saveFilterData() {
+    private fun saveConfigData() {
         try {
             val file = File("config.json")
             val gson = GsonBuilder().setPrettyPrinting().create()
-            logConfig.filter_rule = filterModel.getData()
+            filterModel.cleanLines()
+            logConfig.filter_rule.clear()
+            logConfig.filter_rule.addAll(filterModel.getData())
+            logConfig.uuid = UID.getUID()
             val contents = gson.toJson(logConfig)
             file.writeText(contents)
         } catch (e: FileNotFoundException) {

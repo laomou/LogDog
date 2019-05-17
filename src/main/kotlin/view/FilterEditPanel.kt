@@ -1,11 +1,13 @@
 package view
 
 import bean.ConstCmd
+import bean.Default
 import bean.FilterContainer
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
 import org.slf4j.LoggerFactory
+import utils.LogToolConfig
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -29,10 +31,10 @@ class FilterEditPanel : JPanel(), IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
-    private var strColor = "#00FF00"
+    private var strColor = Default.DEFAULT_BG_COLOR
     private var strText = ""
     private var strUuid = ""
-    private var bEnable = false
+    private var bEnable = true
     private var newFilterInfo = true
 
     init {
@@ -45,11 +47,6 @@ class FilterEditPanel : JPanel(), IView {
         val jlRegex = JLabel()
         jlRegex.text = "Color :"
         jpReg.add(jlRegex, BorderLayout.WEST)
-        cbRegex.addItem("#00FF00")
-        cbRegex.addItem("#EEEE00")
-        cbRegex.addItem("#EE9A49")
-        cbRegex.addItem("#8A2BE2")
-        cbRegex.addItem("#EE1289")
         cbRegex.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(p0: JList<*>?, p1: Any?, p2: Int, p3: Boolean, p4: Boolean): Component {
                 val c = super.getListCellRendererComponent(p0, p1, p2, p3, p4)
@@ -100,6 +97,12 @@ class FilterEditPanel : JPanel(), IView {
         jpEditPane.add(jpBtn)
 
         add(jpEditPane, BorderLayout.CENTER)
+    }
+
+    fun loadItemData() {
+        LogToolConfig.instance().custom_color.forEach {
+            cbRegex.addItem(it)
+        }
     }
 
     override fun initListener() {
@@ -195,7 +198,7 @@ class FilterEditPanel : JPanel(), IView {
 
     fun cleanFilterInfo() {
         tfText.text = ""
-        strColor = "#00FF00"
+        strColor = Default.DEFAULT_BG_COLOR
         bEnable = true
         newFilterInfo = true
     }
