@@ -17,8 +17,8 @@ class MainMenuBar : JMenuBar(), IView {
     private var eventlisteners = EventListenerList()
     private val fileMenu = JMenu("File")
     private val helpMenus = JMenu("Help")
-    private val openItem = JMenuItem("Open")
-    private val adbItem = JMenuItem("Log Tool")
+    private val openItem = JMenuItem("Open...")
+    private val adbItem = JMenuItem("Log Tool Path")
     private val aboutItem = JMenuItem("About")
 
     init {

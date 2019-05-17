@@ -1,5 +1,6 @@
 package bean
 
+import utils.DefaultConfig
 import java.util.*
 
 class LogContainer {
@@ -7,7 +8,7 @@ class LogContainer {
     var strLine = 0
     var strMsg = ""
     var strColor = "#000000"
-    var filterColor = Default.DEFAULT_BG_COLOR
+    var filterColor = DefaultConfig.DEFAULT_BG_COLOR
     var show = false
     var filters = LinkedList<String>()
 

@@ -4,11 +4,11 @@ import bean.LogContainer
 import java.util.regex.Pattern
 
 
-class LogCatParser {
+class AndroidLogCatParser {
 
     fun parse(textLogLine: String): LogContainer {
         val log = LogContainer()
-        if (!textLogLine.isEmpty()) {
+        if (textLogLine.isNotEmpty()) {
             log.valid = true
             log.strMsg = textLogLine
             return processLogLevel(log, textLogLine)
@@ -31,7 +31,6 @@ class LogCatParser {
     private fun processLogLevel(logInfo: LogContainer, strText: String): LogContainer {
         try {
             logLevel("\\s[VDIWEF]\\s", strText, object : LogFilter {
-
                 override fun colorFilter(level: String) {
                     when (level) {
                         " V " -> logInfo.strColor = COLOR_GUIDE

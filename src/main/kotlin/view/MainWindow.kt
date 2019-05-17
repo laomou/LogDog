@@ -187,34 +187,34 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
     private var customListener = object : CustomActionListener {
 
         override fun actionPerformed(event: CustomEvent) {
-            logger.debug("actionPerformed " + event.actionCommand)
-            when (event.actionCommand) {
+            logger.debug("actionPerformed " + event.action)
+            when (event.action) {
                 ConstCmd.CMD_SELECT_RUN -> {
                     val index = cmdComboBox.selectedIndex
                     cmdModel.selectedIndex = index
                 }
                 ConstCmd.CMD_ADD_FILTER -> {
-                    filterModel.addFilterInfo(event.objectValue as FilterContainer)
+                    filterModel.addFilterInfo(event.obj as FilterContainer)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_DEL_FILTER -> {
                     filterEdit.cleanFilterInfo()
-                    filterModel.removeFilterInfo(event.objectValue as FilterContainer)
+                    filterModel.removeFilterInfo(event.obj as FilterContainer)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_EDIT_FILTER_END -> {
-                    filterModel.editFilterInfo(event.objectValue as FilterContainer)
+                    filterModel.editFilterInfo(event.obj as FilterContainer)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_EDIT_FILTER_START -> {
-                    filterEdit.editFilterInfo(event.objectValue as FilterContainer)
+                    filterEdit.editFilterInfo(event.obj as FilterContainer)
                 }
                 ConstCmd.CMD_ENABLE_FILTER -> {
-                    filterModel.enableFilterInfo(event.objectValue as FilterContainer)
+                    filterModel.enableFilterInfo(event.obj as FilterContainer)
                     updateFilterAndTable()
                 }
                 else -> {
-                    updateButton(event.actionCommand)
+                    updateButton(event.action)
                 }
             }
         }

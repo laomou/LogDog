@@ -10,8 +10,14 @@ import model.CmdModel
 import model.DisplayLogModel
 import model.FilterModel
 import org.slf4j.LoggerFactory
-import utils.LogCatParser
-import utils.LogToolConfig
+import utils.DefaultConfig
+import utils.DefaultConfig.DEFAULT_HEIGHT
+import utils.DefaultConfig.DEFAULT_LOG_PATH
+import utils.DefaultConfig.DEFAULT_WIDTH
+import utils.DefaultConfig.MIN_HEIGHT
+import utils.DefaultConfig.MIN_WIDTH
+import utils.AndroidLogCatParser
+import utils.LogDogConfig
 import view.MainWindow
 import java.awt.Dimension
 import java.awt.FileDialog
@@ -28,12 +34,9 @@ import kotlin.collections.ArrayList
 
 class MainController {
     private val logger = LoggerFactory.getLogger(MainController::class.java)
+    private var logConfig = LogDogConfig.instance()
 
-    private val LOG_PATH = "log"
-
-    private var logConfig = LogToolConfig.instance()
-
-    private val logParser = LogCatParser()
+    private val logParser = AndroidLogCatParser()
 
     private val filterLock = java.lang.Object()
     private val fileLock = java.lang.Object()
@@ -60,18 +63,13 @@ class MainController {
     private var filterLoop = false
     private var fileReadLoop = false
 
-    private val DEFAULT_WIDTH = 1200
-    private val DEFAULT_HEIGHT = 720
-    private val MIN_WIDTH = 1100
-    private val MIN_HEIGHT = 500
-
 
     private var mainWindow = MainWindow(displayLogMode, filterModel, cmdModel)
 
 
     init {
         logger.debug("init")
-        mainWindow.title = "LogDog"
+        mainWindow.title = DefaultConfig.TITLE
         mainWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         mainWindow.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         mainWindow.extendedState = JFrame.MAXIMIZED_BOTH
@@ -147,12 +145,12 @@ class MainController {
     private val customListener = object : CustomActionListener {
         override fun actionPerformed(event: CustomEvent) {
             when {
-                event.actionCommand == ConstCmd.CMD_OPEN_FILE -> startOpenFile()
-                event.actionCommand == ConstCmd.CMD_RUN_LOGCAT -> startProcess()
-                event.actionCommand == ConstCmd.CMD_STOP_LOGCAT -> stopProcess()
-                event.actionCommand == ConstCmd.CMD_RUN_FILTER -> runFilter()
-                event.actionCommand == ConstCmd.CMD_RUN_CLEAN -> cleanData()
-                event.actionCommand == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
+                event.action == ConstCmd.CMD_OPEN_FILE -> startOpenFile()
+                event.action == ConstCmd.CMD_RUN_LOGCAT -> startProcess()
+                event.action == ConstCmd.CMD_STOP_LOGCAT -> stopProcess()
+                event.action == ConstCmd.CMD_RUN_FILTER -> runFilter()
+                event.action == ConstCmd.CMD_RUN_CLEAN -> cleanData()
+                event.action == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
             }
         }
     }
@@ -235,7 +233,7 @@ class MainController {
         fileReadThread = Thread(Runnable {
             logger.debug("in")
             try {
-                val fis = FileInputStream(LOG_PATH + File.separatorChar + strLogFileName)
+                val fis = FileInputStream(DEFAULT_LOG_PATH + File.separatorChar + strLogFileName)
                 val dis = DataInputStream(fis)
                 val br = BufferedReader(InputStreamReader(dis, "UTF-8"))
 
@@ -288,7 +286,7 @@ class MainController {
 
                 strLogFileName = makeFilename()
 
-                val dir = File(LOG_PATH)
+                val dir = File(DEFAULT_LOG_PATH)
                 if (!dir.exists()) {
                     dir.mkdirs()
                 }
@@ -296,7 +294,7 @@ class MainController {
                 mainWindow.setWindowTitle("LogDog File($strLogFileName)")
 
                 val br = BufferedReader(InputStreamReader(logCatProcess?.inputStream, "UTF-8"))
-                val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(LOG_PATH + File.separatorChar + strLogFileName), "UTF-8"))
+                val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(DEFAULT_LOG_PATH + File.separatorChar + strLogFileName), "UTF-8"))
 
                 logFileReadThread()
 
@@ -484,8 +482,8 @@ class MainController {
             val file = File("config.json")
             val contents = file.readText()
             val gson = Gson()
-            val type = object : TypeToken<LogToolConfig>() {}.type
-            val config: LogToolConfig = gson.fromJson(contents, type)
+            val type = object : TypeToken<LogDogConfig>() {}.type
+            val config: LogDogConfig = gson.fromJson(contents, type)
             logConfig.load(config)
             logConfig.filter_rule.forEach {
                 filterModel.loadFilterInfo(it)
@@ -494,7 +492,7 @@ class MainController {
                 cmdModel.addCmdInfo(it)
             }
             if (logConfig.custom_color.isEmpty()) {
-                logConfig.custom_color.add(Default.DEFAULT_BG_COLOR)
+                logConfig.custom_color.add(DefaultConfig.DEFAULT_BG_COLOR)
             }
             UID.setUID(logConfig.uuid)
         } catch (e: FileNotFoundException) {
@@ -507,9 +505,7 @@ class MainController {
         try {
             val file = File("config.json")
             val gson = GsonBuilder().setPrettyPrinting().create()
-            filterModel.cleanLines()
-            logConfig.filter_rule.clear()
-            logConfig.filter_rule.addAll(filterModel.getData())
+            logConfig.preSave(filterModel.getData())
             logConfig.uuid = UID.getUID()
             val contents = gson.toJson(logConfig)
             file.writeText(contents)

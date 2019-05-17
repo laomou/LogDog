@@ -1,6 +1,6 @@
 package model
 
-import bean.Default
+import utils.DefaultConfig
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
@@ -39,7 +39,7 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
     fun showData() {
         datas.forEach {
             it.show = true
-            it.filterColor = Default.DEFAULT_BG_COLOR
+            it.filterColor = DefaultConfig.DEFAULT_BG_COLOR
         }
         reset = true
     }

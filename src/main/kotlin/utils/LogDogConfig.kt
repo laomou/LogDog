@@ -4,14 +4,14 @@ import bean.CmdContainer
 import bean.FilterContainer
 import bean.UID
 
-class LogToolConfig private constructor() {
+class LogDogConfig private constructor() {
     var tool_path = ""
     var tool_cmd = arrayListOf<CmdContainer>()
     var filter_rule = arrayListOf<FilterContainer>()
     var custom_color = arrayListOf<String>()
     var uuid = UID.getUID()
 
-    fun load(config: LogToolConfig) {
+    fun load(config: LogDogConfig) {
         tool_cmd.addAll(config.tool_cmd)
         tool_path = config.tool_path
         filter_rule.addAll(config.filter_rule)
@@ -19,10 +19,16 @@ class LogToolConfig private constructor() {
         uuid = config.uuid
     }
 
-    companion object {
-        private val instance = LogToolConfig()
+    fun preSave(filter: List<FilterContainer>) {
+        filter.forEach { it.lines.clear() }
+        filter_rule.clear()
+        filter_rule.addAll(filter)
+    }
 
-        fun instance(): LogToolConfig {
+    companion object {
+        private val instance = LogDogConfig()
+
+        fun instance(): LogDogConfig {
             return instance
         }
     }

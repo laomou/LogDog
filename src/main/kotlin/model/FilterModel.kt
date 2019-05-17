@@ -1,6 +1,6 @@
 package model
 
-import bean.Default
+import utils.DefaultConfig
 import bean.FilterContainer
 import bean.LogContainer
 import interfces.ObservableSubject
@@ -124,7 +124,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
                 }
             }
         }
-        return Default.DEFAULT_BG_COLOR
+        return DefaultConfig.DEFAULT_BG_COLOR
     }
 
     fun getFilterType(): Int {

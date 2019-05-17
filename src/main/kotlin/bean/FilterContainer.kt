@@ -1,12 +1,13 @@
 package bean
 
+import utils.DefaultConfig
 import java.util.*
 
 class FilterContainer(uuid: String? = null) {
     var enabled = false
     var state = -1
     var text = ""
-    var color = Default.DEFAULT_BG_COLOR
+    var color = DefaultConfig.DEFAULT_BG_COLOR
     var uuid = uuid ?: UID.getNewUID()
     var lines = LinkedList<Int>()
 

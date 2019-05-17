@@ -1,13 +1,13 @@
 package view
 
 import bean.ConstCmd
-import bean.Default
+import utils.DefaultConfig
 import bean.FilterContainer
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
 import org.slf4j.LoggerFactory
-import utils.LogToolConfig
+import utils.LogDogConfig
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -31,7 +31,7 @@ class FilterEditPanel : JPanel(), IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
-    private var strColor = Default.DEFAULT_BG_COLOR
+    private var strColor = DefaultConfig.DEFAULT_BG_COLOR
     private var strText = ""
     private var strUuid = ""
     private var bEnable = true
@@ -100,7 +100,7 @@ class FilterEditPanel : JPanel(), IView {
     }
 
     fun loadItemData() {
-        LogToolConfig.instance().custom_color.forEach {
+        LogDogConfig.instance().custom_color.forEach {
             cbRegex.addItem(it)
         }
     }
@@ -146,8 +146,7 @@ class FilterEditPanel : JPanel(), IView {
     }
 
     private fun updateFilterData(data: FilterContainer?, str: String) {
-        val event = CustomEvent(this, str)
-        event.objectValue = data
+        val event = CustomEvent(this, str, data)
         for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
@@ -198,7 +197,7 @@ class FilterEditPanel : JPanel(), IView {
 
     fun cleanFilterInfo() {
         tfText.text = ""
-        strColor = Default.DEFAULT_BG_COLOR
+        strColor = DefaultConfig.DEFAULT_BG_COLOR
         bEnable = true
         newFilterInfo = true
     }

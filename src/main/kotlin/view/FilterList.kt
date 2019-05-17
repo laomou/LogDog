@@ -90,8 +90,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
     }
 
     private fun updateFilterData(data: FilterContainer?, str: String) {
-        val event = CustomEvent(this, str)
-        event.objectValue = data
+        val event = CustomEvent(this, str, data)
         for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
