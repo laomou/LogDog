@@ -1,11 +1,12 @@
 package model
 
-import utils.DefaultConfig
 import bean.FilterContainer
 import bean.LogContainer
 import interfces.ObservableSubject
 import interfces.Observer
+import utils.DefaultConfig
 import java.util.*
+import java.util.regex.Pattern
 
 class FilterModel : ObservableSubject<FilterContainer> {
     private val observers = arrayListOf<Observer<FilterContainer>>()
@@ -90,7 +91,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
             else -> str.append("filterType: HL")
         }
         datas.filter { it.enabled }.forEach {
-            if (!str.isEmpty()) {
+            if (str.isNotEmpty()) {
                 str.append(",")
             }
             str.append(it.detail())
@@ -116,11 +117,25 @@ class FilterModel : ObservableSubject<FilterContainer> {
     @Synchronized
     fun findFilersColor(line: String): String {
         datas.filter { it.enabled }.forEach { it1 ->
-            val stk = StringTokenizer(it1.text, "|", false)
-            while (stk.hasMoreElements()) {
-                val token = stk.nextToken()
-                if (line.contains(token, true)) {
-                    return it1.color
+            when (it1.type) {
+                1 -> {
+                    val stk = StringTokenizer(it1.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (line.contains(token, true)) {
+                            return it1.color
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(it1.text)
+                    val matcher = pattern.matcher(line)
+                    if (matcher.matches()) {
+                        return it1.color
+                    }
+                }
+                else -> {
+                    return DefaultConfig.DEFAULT_BG_COLOR
                 }
             }
         }
@@ -142,11 +157,25 @@ class FilterModel : ObservableSubject<FilterContainer> {
     @Synchronized
     fun checkEnableOrFilter(logInfo: LogContainer): Boolean {
         datas.filter { it.enabled }.forEach { it1 ->
-            val stk = StringTokenizer(it1.text, "|", false)
-            while (stk.hasMoreElements()) {
-                val token = stk.nextToken()
-                if (logInfo.strMsg.contains(token, true)) {
-                    return true
+            when (it1.type) {
+                1 -> {
+                    val stk = StringTokenizer(it1.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            return true
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(it1.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (matcher.matches()) {
+                        return true
+                    }
+                }
+                else -> {
+                    return false
                 }
             }
         }
@@ -156,12 +185,24 @@ class FilterModel : ObservableSubject<FilterContainer> {
     @Synchronized
     fun updateLineInfo(logInfo: LogContainer) {
         datas.forEach {
-            val stk = StringTokenizer(it.text, "|", false)
-            while (stk.hasMoreElements()) {
-                val token = stk.nextToken()
-                if (logInfo.strMsg.contains(token, true)) {
-                    it.lines.add(logInfo.strLine)
-                    logInfo.filters.add(it.uuid)
+            when (it.type) {
+                1 -> {
+                    val stk = StringTokenizer(it.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            it.lines.add(logInfo.strLine)
+                            logInfo.filters.add(it.uuid)
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(it.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (matcher.matches()) {
+                        it.lines.add(logInfo.strLine)
+                        logInfo.filters.add(it.uuid)
+                    }
                 }
             }
         }
@@ -170,12 +211,24 @@ class FilterModel : ObservableSubject<FilterContainer> {
     @Synchronized
     fun updateLineInfo(filterInfo: FilterContainer, logInfo: LogContainer) {
         if (filterInfo.enabled) {
-            val stk = StringTokenizer(filterInfo.text, "|", false)
-            while (stk.hasMoreElements()) {
-                val token = stk.nextToken()
-                if (logInfo.strMsg.contains(token, true)) {
-                    filterInfo.lines.add(logInfo.strLine)
-                    logInfo.filters.add(filterInfo.uuid)
+            when (filterInfo.type) {
+                1 -> {
+                    val stk = StringTokenizer(filterInfo.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            filterInfo.lines.add(logInfo.strLine)
+                            logInfo.filters.add(filterInfo.uuid)
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(filterInfo.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (matcher.matches()) {
+                        filterInfo.lines.add(logInfo.strLine)
+                        logInfo.filters.add(filterInfo.uuid)
+                    }
                 }
             }
         }
@@ -183,13 +236,24 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     fun updateShowInfo(filterInfo: FilterContainer, logInfo: LogContainer) {
         if (filterInfo.enabled) {
-            val stk = StringTokenizer(filterInfo.text, "|", false)
-            while (stk.hasMoreElements()) {
-                val token = stk.nextToken()
-                if (logInfo.strMsg.contains(token, true)) {
-                    logInfo.filterColor = filterInfo.color
-                    logInfo.show = true
-                    break
+            when (filterInfo.type) {
+                1 -> {
+                    val stk = StringTokenizer(filterInfo.text, "|", false)
+                    while (stk.hasMoreElements()) {
+                        val token = stk.nextToken()
+                        if (logInfo.strMsg.contains(token, true)) {
+                            logInfo.filterColor = filterInfo.color
+                            logInfo.show = true
+                        }
+                    }
+                }
+                2 -> {
+                    val pattern = Pattern.compile(filterInfo.text)
+                    val matcher = pattern.matcher(logInfo.strMsg)
+                    if (matcher.matches()) {
+                        logInfo.filterColor = filterInfo.color
+                        logInfo.show = true
+                    }
                 }
             }
         }
@@ -204,7 +268,6 @@ class FilterModel : ObservableSubject<FilterContainer> {
     fun hasFilter(): Boolean {
         return !datas.none { it.enabled }
     }
-
 
     @Synchronized
     fun hasNewFilter(): Boolean {

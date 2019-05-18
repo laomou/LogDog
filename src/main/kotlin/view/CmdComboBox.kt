@@ -13,7 +13,7 @@ import javax.swing.event.EventListenerList
 class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
     private val logger = LoggerFactory.getLogger(FilterList::class.java)
     private val defaultMode = DefaultCmdModel()
-    private var eventlisteners = EventListenerList()
+    private var eventListener = EventListenerList()
 
     init {
         model = defaultMode
@@ -21,27 +21,24 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
 
     private var actionListener = ActionListener {
         val event = CustomEvent(this, ConstCmd.CMD_SELECT_RUN)
-        for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+        for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
         logger.debug("addCustomActionListener $l")
-        eventlisteners.add(CustomActionListener::class.java, l)
+        eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
         logger.debug("removeCustomActionListener $l")
-        eventlisteners.remove(CustomActionListener::class.java, l)
+        eventListener.remove(CustomActionListener::class.java, l)
     }
 
     override fun update(s: ObservableSubject<CmdContainer>) {
         if (s is CmdModel) {
             defaultMode.setData(s.getData())
-            if (!s.getData().isEmpty()) {
-                selectedIndex = 0
-            }
         }
     }
 

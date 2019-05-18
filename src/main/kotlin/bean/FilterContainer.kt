@@ -5,7 +5,10 @@ import java.util.*
 
 class FilterContainer(uuid: String? = null) {
     var enabled = false
+    // 1 new 2 edit 3 enable
     var state = -1
+    // 1 contains 2 regex
+    var type = -1
     var text = ""
     var color = DefaultConfig.DEFAULT_BG_COLOR
     var uuid = uuid ?: UID.getNewUID()
@@ -38,7 +41,17 @@ class FilterContainer(uuid: String? = null) {
     }
 
     fun detail(): String {
-        return "$text (${lines.size})"
+        return when (type) {
+            1 -> {
+                "C $text (${lines.size})"
+            }
+            2 -> {
+                "M $text (${lines.size})"
+            }
+            else -> {
+                "$text (${lines.size})"
+            }
+        }
     }
 
     fun toggle() {

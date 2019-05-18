@@ -20,7 +20,7 @@ import javax.swing.event.EventListenerList
 class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
-    private val eventlisteners = EventListenerList()
+    private val eventListener = EventListenerList()
 
     private val logTable = LogTable()
     private val filterList = FilterList()
@@ -46,10 +46,6 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         contentPane.add(getStatusPanel(), BorderLayout.SOUTH)
         contentPane.add(getLeftPanel(), BorderLayout.WEST)
         contentPane.add(getMainTabPanel(), BorderLayout.CENTER)
-    }
-
-    fun loadConfigData() {
-        filterEdit.loadItemData()
     }
 
     private fun getMainTabPanel(): Component {
@@ -99,11 +95,11 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
         val jpFilterType = JPanel()
-        btnFilterType = JButton("Filter type:  Or  ")
+        btnFilterType = JButton("Filter type:  Or")
         btnFilterType?.addActionListener {
             filterModel.toggleFilterType()
             btnFilterType?.text = when (filterModel.getFilterType()) {
-                FilterModel.TYPE_FILTER_OR -> "Filter type: Or  "
+                FilterModel.TYPE_FILTER_OR -> "Filter type: Or"
                 else -> "Filter type: None"
             }
             updateFilterAndTable()
@@ -184,6 +180,15 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         title = text
     }
 
+    fun setDefaultUI() {
+        if (cmdModel.getData().isNotEmpty()) {
+            cmdComboBox.selectedIndex = 0
+        }
+        if (filterModel.getData().isNotEmpty()) {
+            filterEdit.loadItemData()
+        }
+    }
+
     private var customListener = object : CustomActionListener {
 
         override fun actionPerformed(event: CustomEvent) {
@@ -221,16 +226,16 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        eventlisteners.add(CustomActionListener::class.java, l)
+        eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        eventlisteners.remove(CustomActionListener::class.java, l)
+        eventListener.remove(CustomActionListener::class.java, l)
     }
 
     private fun updateButton(cmd: String) {
         val action = CustomEvent(this, cmd)
-        for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+        for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(action)
         }
     }

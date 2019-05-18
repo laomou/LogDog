@@ -19,7 +19,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
     private val logger = LoggerFactory.getLogger(FilterList::class.java)
 
     private val defaultMode = DefaultFilterListModel()
-    private var eventlisteners = EventListenerList()
+    private var eventListener = EventListenerList()
 
     private val popupEditMenu = JPopupMenu()
 
@@ -81,17 +81,17 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
 
     fun addCustomActionListener(l: CustomActionListener) {
         logger.debug("addCustomActionListener $l")
-        eventlisteners.add(CustomActionListener::class.java, l)
+        eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
         logger.debug("removeCustomActionListener $l")
-        eventlisteners.remove(CustomActionListener::class.java, l)
+        eventListener.remove(CustomActionListener::class.java, l)
     }
 
     private fun updateFilterData(data: FilterContainer?, str: String) {
         val event = CustomEvent(this, str, data)
-        for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+        for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
     }

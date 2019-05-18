@@ -22,6 +22,7 @@
     {
       "enabled": false,
       "state": -1,
+      "type": 1,
       "text": "aaaa",
       "color": "#FFFFFF",
       "uuid": "10023",
@@ -30,6 +31,7 @@
     {
       "enabled": false,
       "state": -1,
+      "type": 1,
       "text": "bbbb",
       "color": "#FFFFFF",
       "uuid": "10024",

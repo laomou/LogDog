@@ -14,7 +14,7 @@ import javax.swing.event.EventListenerList
 
 class MainMenuBar : JMenuBar(), IView {
     private val logger = LoggerFactory.getLogger(MainMenuBar::class.java)
-    private var eventlisteners = EventListenerList()
+    private var eventListener = EventListenerList()
     private val fileMenu = JMenu("File")
     private val helpMenus = JMenu("Help")
     private val openItem = JMenuItem("Open...")
@@ -34,14 +34,14 @@ class MainMenuBar : JMenuBar(), IView {
             it.source == openItem -> {
                 logger.debug("openItem->click")
                 val action = CustomEvent(this, ConstCmd.CMD_OPEN_FILE)
-                for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+                for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
                     listener.actionPerformed(action)
                 }
             }
             it.source == adbItem -> {
                 logger.debug("adbItem->click")
                 val action = CustomEvent(this, ConstCmd.CMD_CONFIG_ADB)
-                for (listener in eventlisteners.getListeners(CustomActionListener::class.java)) {
+                for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
                     listener.actionPerformed(action)
                 }
             }
@@ -65,11 +65,11 @@ class MainMenuBar : JMenuBar(), IView {
 
     fun addCustomActionListener(l: CustomActionListener) {
         logger.debug("addCustomActionListener $l")
-        eventlisteners.add(CustomActionListener::class.java, l)
+        eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
         logger.debug("removeCustomActionListener $l")
-        eventlisteners.remove(CustomActionListener::class.java, l)
+        eventListener.remove(CustomActionListener::class.java, l)
     }
 }

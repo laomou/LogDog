@@ -38,12 +38,9 @@ class MainController {
 
     private val logParser = AndroidLogCatParser()
 
-    private val filterLock = java.lang.Object()
-    private val fileLock = java.lang.Object()
+    private val filterLock = Object()
+    private val fileLock = Object()
 
-    private val STATUS_CHANGE = 1
-    private val STATUS_PARSING = 2
-    private val STATUS_READY = 4
     @Volatile
     private var nChangedFilter = STATUS_READY
 
@@ -63,9 +60,13 @@ class MainController {
     private var filterLoop = false
     private var fileReadLoop = false
 
-
     private var mainWindow = MainWindow(displayLogMode, filterModel, cmdModel)
 
+    companion object {
+        private const val STATUS_CHANGE = 1
+        private const val STATUS_PARSING = 2
+        private const val STATUS_READY = 4
+    }
 
     init {
         logger.debug("init")
@@ -85,7 +86,7 @@ class MainController {
         mainWindow.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(p0: WindowEvent?) {
                 logger.debug("windowClosing")
-                deinitListenr()
+                deinitListener()
                 saveConfigData()
             }
         })
@@ -120,7 +121,7 @@ class MainController {
         })
     }
 
-    fun deinitListenr() {
+    fun deinitListener() {
         mainWindow.deinitListenr()
         mainWindow.removeCustomActionListener(customListener)
 
@@ -137,9 +138,9 @@ class MainController {
         mainWindow.isVisible = true
         iniListener()
         loadConfigData()
-        mainWindow.loadConfigData()
         filterModel.updateData()
         cmdModel.updateData()
+        mainWindow.setDefaultUI()
     }
 
     private val customListener = object : CustomActionListener {
@@ -324,7 +325,7 @@ class MainController {
         var titles = ""
         files.forEach {
             parseFile(it.path)
-            if (!titles.isEmpty()) {
+            if (titles.isNotEmpty()) {
                 titles += ","
             }
             titles += it.name
@@ -337,7 +338,7 @@ class MainController {
         var titles = ""
         files.forEach {
             parseFile(it.path)
-            if (!titles.isEmpty()) {
+            if (titles.isNotEmpty()) {
                 titles += ","
             }
             titles += it.name
@@ -490,9 +491,6 @@ class MainController {
             }
             logConfig.tool_cmd.forEach {
                 cmdModel.addCmdInfo(it)
-            }
-            if (logConfig.custom_color.isEmpty()) {
-                logConfig.custom_color.add(DefaultConfig.DEFAULT_BG_COLOR)
             }
             UID.setUID(logConfig.uuid)
         } catch (e: FileNotFoundException) {
