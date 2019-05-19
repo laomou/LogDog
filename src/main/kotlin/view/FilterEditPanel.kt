@@ -114,8 +114,8 @@ class FilterEditPanel : JPanel(), IView {
         }
     }
 
-    override fun initListener() {
-        logger.debug("initListener")
+    override fun registerListener() {
+        logger.debug("registerListener")
         tfText.document.addDocumentListener(dlListener)
         rbContains.addActionListener {
             iFilterType = 1
@@ -126,8 +126,8 @@ class FilterEditPanel : JPanel(), IView {
         cbColor.addItemListener(itemListener)
     }
 
-    override fun deinitListenr() {
-        logger.debug("deinitListenr")
+    override fun unregisterListener() {
+        logger.debug("unregisterListener")
         tfText.document.removeDocumentListener(dlListener)
 
         cbColor.removeItemListener(itemListener)

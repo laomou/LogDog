@@ -69,13 +69,13 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         }
     }
 
-    override fun initListener() {
-        logger.debug("initListener")
+    override fun registerListener() {
+        logger.debug("registerListener")
         addMouseListener(mouseClick)
     }
 
-    override fun deinitListenr() {
-        logger.debug("deinitListenr")
+    override fun unregisterListener() {
+        logger.debug("unregisterListener")
         removeMouseListener(mouseClick)
     }
 

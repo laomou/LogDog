@@ -129,47 +129,47 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         return rootPane
     }
 
-    override fun initListener() {
-        logger.debug("initListener")
+    override fun registerListener() {
+        logger.debug("registerListener")
 
         logModel.registerObserver(logTable)
-        logTable.initListener()
+        logTable.registerListener()
 
         filterModel.registerObserver(filterList)
 
         filterList.addCustomActionListener(customListener)
-        filterList.initListener()
+        filterList.registerListener()
 
         filterEdit.addCustomActionListener(customListener)
-        filterEdit.initListener()
+        filterEdit.registerListener()
 
         cmdModel.registerObserver(cmdComboBox)
         cmdComboBox.addCustomActionListener(customListener)
-        cmdComboBox.initListener()
+        cmdComboBox.registerListener()
 
         menuBar.addCustomActionListener(customListener)
-        menuBar.initListener()
+        menuBar.registerListener()
     }
 
-    override fun deinitListenr() {
-        logger.debug("deinitListenr")
+    override fun unregisterListener() {
+        logger.debug("unregisterListener")
 
         logModel.removeObserver(logTable)
-        logTable.deinitListenr()
+        logTable.unregisterListener()
 
         filterModel.removeObserver(filterList)
         filterList.removeCustomActionListener(customListener)
-        filterList.deinitListenr()
+        filterList.unregisterListener()
 
         filterEdit.removeCustomActionListener(customListener)
-        filterEdit.deinitListenr()
+        filterEdit.unregisterListener()
 
         cmdModel.removeObserver(cmdComboBox)
         cmdComboBox.removeCustomActionListener(customListener)
-        cmdComboBox.deinitListenr()
+        cmdComboBox.unregisterListener()
 
         menuBar.removeCustomActionListener(customListener)
-        menuBar.deinitListenr()
+        menuBar.unregisterListener()
     }
 
     fun setStatus(text: String) {
@@ -241,6 +241,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
     }
 
     fun setProcessBtn(b: Boolean) {
+        logger.debug("setProcessBtn $b")
         if (b) {
             btnRun?.isEnabled = false
             btnStop?.isEnabled = true

@@ -51,14 +51,14 @@ class MainMenuBar : JMenuBar(), IView {
         }
     }
 
-    override fun initListener() {
-        logger.debug("initListener")
+    override fun registerListener() {
+        logger.debug("registerListener")
         openItem.addActionListener(actionListener)
         adbItem.addActionListener(actionListener)
     }
 
-    override fun deinitListenr() {
-        logger.debug("deinitListenr")
+    override fun unregisterListener() {
+        logger.debug("unregisterListener")
         openItem.removeActionListener(actionListener)
         adbItem.removeActionListener(actionListener)
     }

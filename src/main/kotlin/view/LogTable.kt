@@ -77,15 +77,15 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         }
     }
 
-    override fun initListener() {
-        logger.debug("initListener")
+    override fun registerListener() {
+        logger.debug("registerListener")
         gotoItem.addActionListener(gotoActionListener)
         recLineItem.addActionListener(recLineActionListener)
         selectionModel.addListSelectionListener(listSelectionListener)
     }
 
-    override fun deinitListenr() {
-        logger.debug("deinitListenr")
+    override fun unregisterListener() {
+        logger.debug("unregisterListener")
         gotoItem.removeActionListener(gotoActionListener)
         recLineItem.removeActionListener(recLineActionListener)
         selectionModel.removeListSelectionListener(listSelectionListener)

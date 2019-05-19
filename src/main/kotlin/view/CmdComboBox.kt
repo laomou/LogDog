@@ -42,11 +42,11 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         }
     }
 
-    override fun initListener() {
+    override fun registerListener() {
         addActionListener(actionListener)
     }
 
-    override fun deinitListenr() {
+    override fun unregisterListener() {
         removeActionListener(actionListener)
     }
 

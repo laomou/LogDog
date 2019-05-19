@@ -81,7 +81,7 @@ class MainController {
     }
 
     private fun iniListener() {
-        mainWindow.initListener()
+        mainWindow.registerListener()
         mainWindow.addCustomActionListener(customListener)
         mainWindow.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(p0: WindowEvent?) {
@@ -122,7 +122,7 @@ class MainController {
     }
 
     fun deinitListener() {
-        mainWindow.deinitListenr()
+        mainWindow.unregisterListener()
         mainWindow.removeCustomActionListener(customListener)
 
         filterLoop = false
