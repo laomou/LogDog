@@ -1,6 +1,6 @@
 package view
 
-import bean.FilterContainer
+import bean.FilterInfo
 import interfces.*
 import model.FilterEditModel
 import org.slf4j.LoggerFactory
@@ -144,8 +144,8 @@ class FilterEditPanel : JPanel(), Observer<String>, IView  {
         eventListener.remove(CustomActionListener::class.java, l)
     }
 
-    private fun formatNewFilterData(): FilterContainer {
-        val data = FilterContainer()
+    private fun formatNewFilterData(): FilterInfo {
+        val data = FilterInfo()
         data.text = strText
         data.enabled = bEnable
         data.color = strColor
@@ -153,8 +153,8 @@ class FilterEditPanel : JPanel(), Observer<String>, IView  {
         return data
     }
 
-    private fun formatFilterData(): FilterContainer {
-        val data = FilterContainer(strUuid)
+    private fun formatFilterData(): FilterInfo {
+        val data = FilterInfo(strUuid)
         data.text = strText
         data.enabled = bEnable
         data.color = strColor
@@ -162,7 +162,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView  {
         return data
     }
 
-    private fun updateFilterData(data: FilterContainer?, str: String) {
+    private fun updateFilterData(data: FilterInfo?, str: String) {
         val event = CustomEvent(this, str, data)
         for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
@@ -204,7 +204,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView  {
         }
     }
 
-    fun editFilterInfo(filterInfo: FilterContainer) {
+    fun editFilterInfo(filterInfo: FilterInfo) {
         tfText.text = filterInfo.text
         strUuid = filterInfo.uuid
         bEnable = filterInfo.enabled

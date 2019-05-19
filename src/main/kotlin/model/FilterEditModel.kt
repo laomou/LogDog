@@ -5,7 +5,7 @@ import interfces.Observer
 
 class FilterEditModel : ObservableSubject<String> {
     private val observers = arrayListOf<Observer<String>>()
-    private val datas = arrayListOf<String>()
+    private val data = arrayListOf<String>()
 
     override fun registerObserver(o: Observer<String>) {
         observers.add(o)
@@ -22,11 +22,11 @@ class FilterEditModel : ObservableSubject<String> {
     }
 
     fun getData(): List<String> {
-        return datas
+        return data
     }
 
     fun addColorInfo(color: String) {
-        datas.add(color)
+        data.add(color)
     }
 
     fun updateData() {

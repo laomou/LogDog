@@ -1,21 +1,21 @@
 package model
 
-import utils.DefaultConfig
-import bean.LogContainer
+import bean.LogInfo
 import interfces.ObservableSubject
 import interfces.Observer
+import utils.DefaultConfig
 
 
-class DisplayLogModel : ObservableSubject<LogContainer> {
-    private val observers = arrayListOf<Observer<LogContainer>>()
-    private var datas = arrayListOf<LogContainer>()
+class DisplayLogModel : ObservableSubject<LogInfo> {
+    private val observers = arrayListOf<Observer<LogInfo>>()
+    private var data = arrayListOf<LogInfo>()
     private var reset = false
 
-    override fun registerObserver(o: Observer<LogContainer>) {
+    override fun registerObserver(o: Observer<LogInfo>) {
         observers.add(o)
     }
 
-    override fun removeObserver(o: Observer<LogContainer>) {
+    override fun removeObserver(o: Observer<LogInfo>) {
         observers.remove(o)
     }
 
@@ -28,7 +28,7 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
     @Synchronized
     fun tryShowData() {
         if (reset) {
-            datas.forEach {
+            data.forEach {
                 it.show = false
             }
             reset = false
@@ -37,7 +37,7 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
 
     @Synchronized
     fun showData() {
-        datas.forEach {
+        data.forEach {
             it.show = true
             it.filterColor = DefaultConfig.DEFAULT_BG_COLOR
         }
@@ -45,18 +45,18 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
     }
 
     @Synchronized
-    fun getData(): List<LogContainer> {
-        return datas
+    fun getData(): List<LogInfo> {
+        return data
     }
 
     @Synchronized
-    fun getDisplayData(): List<LogContainer> {
-        return datas.filter { it.show }
+    fun getDisplayData(): List<LogInfo> {
+        return data.filter { it.show }
     }
 
     @Synchronized
-    fun addLogInfo(logInfo: LogContainer) {
-        datas.add(logInfo)
+    fun addLogInfo(logInfo: LogInfo) {
+        data.add(logInfo)
     }
 
     fun updateData() {
@@ -65,19 +65,19 @@ class DisplayLogModel : ObservableSubject<LogContainer> {
 
     @Synchronized
     fun cleanData() {
-        datas.forEach {
+        data.forEach {
             it.filters.clear()
         }
-        datas.clear()
+        data.clear()
     }
 
     @Synchronized
-    fun getItemData(index: Int): LogContainer {
-        return datas[index]
+    fun getItemData(index: Int): LogInfo {
+        return data[index]
     }
 
     @Synchronized
     fun getDataSize(): Int {
-        return datas.size
+        return data.size
     }
 }

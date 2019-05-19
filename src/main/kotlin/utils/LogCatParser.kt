@@ -1,26 +1,26 @@
 package utils
 
-import bean.LogContainer
+import bean.LogInfo
 import java.util.regex.Pattern
 
 
-class AndroidLogCatParser {
+class LogCatParser {
 
-    fun parse(textLogLine: String): LogContainer {
-        val log = LogContainer()
+    fun parse(textLogLine: String): LogInfo {
+        val log = LogInfo()
         if (textLogLine.isNotEmpty()) {
             log.valid = true
             log.strMsg = textLogLine
-            return processLogLevel(log, textLogLine)
+            return parseAndroidLogLevel(log, textLogLine)
         }
         return log
     }
 
-    interface LogFilter {
+    interface LogLevelFilter {
         fun colorFilter(level: String)
     }
 
-    private fun logLevel(regex: String, textLogLine: String, filter: LogFilter) {
+    private fun logLevel(regex: String, textLogLine: String, filter: LogLevelFilter) {
         val pt = Pattern.compile(regex)
         val match = pt.matcher(textLogLine)
         while (match.find()) {
@@ -28,9 +28,9 @@ class AndroidLogCatParser {
         }
     }
 
-    private fun processLogLevel(logInfo: LogContainer, strText: String): LogContainer {
+    private fun parseAndroidLogLevel(logInfo: LogInfo, strText: String): LogInfo {
         try {
-            logLevel("\\s[VDIWEF]\\s", strText, object : LogFilter {
+            logLevel("\\s[VDIWEF]\\s", strText, object : LogLevelFilter {
                 override fun colorFilter(level: String) {
                     when (level) {
                         " V " -> logInfo.strColor = COLOR_GUIDE
@@ -44,7 +44,7 @@ class AndroidLogCatParser {
                 }
             })
 
-            logLevel("\\s[VDIWEF]/", strText, object : LogFilter {
+            logLevel("\\s[VDIWEF]/", strText, object : LogLevelFilter {
                 override fun colorFilter(level: String) {
                     when (level) {
                         " V/" -> logInfo.strColor = COLOR_GUIDE

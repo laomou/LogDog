@@ -1,7 +1,6 @@
 package view
 
-import utils.ConstCmd
-import bean.FilterContainer
+import bean.FilterInfo
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
@@ -10,6 +9,7 @@ import model.DisplayLogModel
 import model.FilterEditModel
 import model.FilterModel
 import org.slf4j.LoggerFactory
+import utils.ConstCmd
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
@@ -199,23 +199,23 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, fcModel: FilterEd
                     cmdModel.setSelectedCmd(index)
                 }
                 ConstCmd.CMD_ADD_FILTER -> {
-                    filterModel.addFilterInfo(event.obj as FilterContainer)
+                    filterModel.addFilterInfo(event.obj as FilterInfo)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_DEL_FILTER -> {
                     filterEdit.cleanFilterInfo()
-                    filterModel.removeFilterInfo(event.obj as FilterContainer)
+                    filterModel.removeFilterInfo(event.obj as FilterInfo)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_EDIT_FILTER_END -> {
-                    filterModel.editFilterInfo(event.obj as FilterContainer)
+                    filterModel.editFilterInfo(event.obj as FilterInfo)
                     updateFilterAndTable()
                 }
                 ConstCmd.CMD_EDIT_FILTER_START -> {
-                    filterEdit.editFilterInfo(event.obj as FilterContainer)
+                    filterEdit.editFilterInfo(event.obj as FilterInfo)
                 }
                 ConstCmd.CMD_ENABLE_FILTER -> {
-                    filterModel.enableFilterInfo(event.obj as FilterContainer)
+                    filterModel.enableFilterInfo(event.obj as FilterInfo)
                     updateFilterAndTable()
                 }
                 else -> {

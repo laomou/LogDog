@@ -3,7 +3,7 @@ package bean
 import utils.DefaultConfig
 import java.util.*
 
-class LogContainer {
+class LogInfo {
     var valid = false
     var strLine = 0
     var strMsg = ""

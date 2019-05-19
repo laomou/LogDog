@@ -1,6 +1,6 @@
 package bean
 
-class CmdContainer {
+class CmdInfo {
     var title = ""
     var cmd = ""
 

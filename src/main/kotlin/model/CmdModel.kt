@@ -1,19 +1,19 @@
 package model
 
-import bean.CmdContainer
+import bean.CmdInfo
 import interfces.ObservableSubject
 import interfces.Observer
 
-class CmdModel : ObservableSubject<CmdContainer> {
-    private val observers = arrayListOf<Observer<CmdContainer>>()
-    private val datas = arrayListOf<CmdContainer>()
+class CmdModel : ObservableSubject<CmdInfo> {
+    private val observers = arrayListOf<Observer<CmdInfo>>()
+    private val data = arrayListOf<CmdInfo>()
     private var selectedIndex = 0
 
-    override fun registerObserver(o: Observer<CmdContainer>) {
+    override fun registerObserver(o: Observer<CmdInfo>) {
         observers.add(o)
     }
 
-    override fun removeObserver(o: Observer<CmdContainer>) {
+    override fun removeObserver(o: Observer<CmdInfo>) {
         observers.remove(o)
     }
 
@@ -23,12 +23,12 @@ class CmdModel : ObservableSubject<CmdContainer> {
         }
     }
 
-    fun getData(): List<CmdContainer> {
-        return datas
+    fun getData(): List<CmdInfo> {
+        return data
     }
 
-    fun addCmdInfo(filterInfo: CmdContainer) {
-        datas.add(filterInfo)
+    fun addCmdInfo(filterInfo: CmdInfo) {
+        data.add(filterInfo)
     }
 
     fun updateData() {
@@ -40,6 +40,6 @@ class CmdModel : ObservableSubject<CmdContainer> {
     }
 
     fun getSelectedCmd(): String {
-        return datas[selectedIndex].cmd
+        return data[selectedIndex].cmd
     }
 }

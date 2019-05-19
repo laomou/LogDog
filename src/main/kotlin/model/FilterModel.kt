@@ -1,16 +1,16 @@
 package model
 
-import bean.FilterContainer
-import bean.LogContainer
+import bean.FilterInfo
+import bean.LogInfo
 import interfces.ObservableSubject
 import interfces.Observer
 import utils.DefaultConfig
 import java.util.*
 import java.util.regex.Pattern
 
-class FilterModel : ObservableSubject<FilterContainer> {
-    private val observers = arrayListOf<Observer<FilterContainer>>()
-    private val datas = arrayListOf<FilterContainer>()
+class FilterModel : ObservableSubject<FilterInfo> {
+    private val observers = arrayListOf<Observer<FilterInfo>>()
+    private val data = arrayListOf<FilterInfo>()
     private var filterType = TYPE_FILTER_OR
 
     companion object {
@@ -18,11 +18,11 @@ class FilterModel : ObservableSubject<FilterContainer> {
         const val TYPE_FILTER_OR = 1
     }
 
-    override fun registerObserver(o: Observer<FilterContainer>) {
+    override fun registerObserver(o: Observer<FilterInfo>) {
         observers.add(o)
     }
 
-    override fun removeObserver(o: Observer<FilterContainer>) {
+    override fun removeObserver(o: Observer<FilterInfo>) {
         observers.remove(o)
     }
 
@@ -33,55 +33,55 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun loadFilterInfo(filterInfo: FilterContainer) {
-        datas.add(filterInfo)
+    fun loadFilterInfo(filterInfo: FilterInfo) {
+        data.add(filterInfo)
     }
 
     @Synchronized
-    fun addFilterInfo(filterInfo: FilterContainer) {
+    fun addFilterInfo(filterInfo: FilterInfo) {
         filterInfo.state = 1
-        datas.add(filterInfo)
+        data.add(filterInfo)
     }
 
     @Synchronized
-    fun editFilterInfo(data: FilterContainer) {
-        val index = datas.indexOf(data)
+    fun editFilterInfo(filterInfo: FilterInfo) {
+        val index = data.indexOf(filterInfo)
         if (index != -1) {
-            data.state = 2
-            datas[index] = data
+            filterInfo.state = 2
+            data[index] = filterInfo
         }
     }
 
     @Synchronized
-    fun removeFilterInfo(data: FilterContainer, remove: Boolean = false) {
-        val index = datas.indexOf(data)
+    fun removeFilterInfo(filterInfo: FilterInfo, remove: Boolean = false) {
+        val index = data.indexOf(filterInfo)
         if (index != -1) {
             if (remove) {
-                datas.removeAt(index)
+                data.removeAt(index)
             } else {
-                data.state = 3
-                datas[index] = data
+                filterInfo.state = 3
+                data[index] = filterInfo
             }
         }
     }
 
     @Synchronized
-    fun enableFilterInfo(data: FilterContainer) {
-        val index = datas.indexOf(data)
+    fun enableFilterInfo(filterInfo: FilterInfo) {
+        val index = data.indexOf(filterInfo)
         if (index != -1) {
-            data.state = 4
-            datas[index] = data
+            filterInfo.state = 4
+            data[index] = filterInfo
         }
     }
 
     @Synchronized
-    fun getData(): List<FilterContainer> {
-        return datas
+    fun getData(): List<FilterInfo> {
+        return data
     }
 
     @Synchronized
-    fun findItemDataByUUID(uuid: String): FilterContainer? {
-        return datas.find { it.uuid == uuid }
+    fun findItemDataByUUID(uuid: String): FilterInfo? {
+        return data.find { it.uuid == uuid }
     }
 
     fun updateData() {
@@ -95,7 +95,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
             TYPE_FILTER_OR -> str.append("filterType: Or")
             else -> str.append("filterType: HL")
         }
-        datas.filter { it.enabled }.forEach {
+        data.filter { it.enabled }.forEach {
             if (str.isNotEmpty()) {
                 str.append(",")
             }
@@ -105,18 +105,18 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun getChangesFilters(): List<FilterContainer> {
-        return datas.filter { it.state >= 1 }
+    fun getChangesFilters(): List<FilterInfo> {
+        return data.filter { it.state >= 1 }
     }
 
     @Synchronized
-    fun getEnableNewFilters(): List<FilterContainer> {
-        return datas.filter { it.enabled && it.state == 1 }
+    fun getEnableNewFilters(): List<FilterInfo> {
+        return data.filter { it.enabled && it.state == 1 }
     }
 
     @Synchronized
     fun findFilersColor(line: String): String {
-        datas.filter { it.enabled }.forEach { it1 ->
+        data.filter { it.enabled }.forEach { it1 ->
             when (it1.type) {
                 1 -> {
                     val stk = StringTokenizer(it1.text, "|", false)
@@ -155,8 +155,8 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun checkEnableOrFilter(logInfo: LogContainer): Boolean {
-        datas.filter { it.enabled }.forEach { it1 ->
+    fun checkEnableOrFilter(logInfo: LogInfo): Boolean {
+        data.filter { it.enabled }.forEach { it1 ->
             when (it1.type) {
                 1 -> {
                     val stk = StringTokenizer(it1.text, "|", false)
@@ -183,8 +183,8 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun updateLineInfo(logInfo: LogContainer) {
-        datas.forEach {
+    fun updateLineInfo(logInfo: LogInfo) {
+        data.forEach {
             when (it.type) {
                 1 -> {
                     val stk = StringTokenizer(it.text, "|", false)
@@ -209,7 +209,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun updateLineInfo(filterInfo: FilterContainer, logInfo: LogContainer) {
+    fun updateLineInfo(filterInfo: FilterInfo, logInfo: LogInfo) {
         if (filterInfo.enabled) {
             when (filterInfo.type) {
                 1 -> {
@@ -234,7 +234,7 @@ class FilterModel : ObservableSubject<FilterContainer> {
         }
     }
 
-    fun updateShowInfo(filterInfo: FilterContainer, logInfo: LogContainer) {
+    fun updateShowInfo(filterInfo: FilterInfo, logInfo: LogInfo) {
         if (filterInfo.enabled) {
             when (filterInfo.type) {
                 1 -> {
@@ -265,27 +265,26 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     @Synchronized
     fun cleanLines() {
-        datas.forEach { it.lines.clear() }
+        data.forEach { it.lines.clear() }
     }
 
     @Synchronized
     fun hasFilter(): Boolean {
-        return !datas.none { it.enabled }
+        return !data.none { it.enabled }
     }
 
     @Synchronized
     fun hasNewFilter(): Boolean {
-        return !datas.none { it.enabled && it.state in 1..3 }
+        return !data.none { it.enabled && it.state in 1..3 }
     }
 
     @Synchronized
     fun hasDelFilter(): Boolean {
-        return !datas.none { it.enabled && it.state == 3 }
+        return !data.none { it.enabled && it.state == 3 }
     }
 
     @Synchronized
     fun doDelFilter() {
-        datas.removeIf { it.state == 3 }
+        data.removeIf { it.state == 3 }
     }
-
 }

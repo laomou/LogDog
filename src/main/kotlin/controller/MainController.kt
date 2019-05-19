@@ -1,7 +1,7 @@
 package controller
 
-import bean.FilterContainer
-import bean.LogContainer
+import bean.FilterInfo
+import bean.LogInfo
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -36,7 +36,7 @@ class MainController {
     private val logger = LoggerFactory.getLogger(MainController::class.java)
     private var logConfig = LogDogConfig.instance()
 
-    private val logParser = AndroidLogCatParser()
+    private val logParser = LogCatParser()
 
     private val filterLock = Object()
     private val fileLock = Object()
@@ -386,7 +386,7 @@ class MainController {
     }
 
     private fun configAdbFile() {
-        val fd = FileDialog(mainWindow, "Config Log Tool", FileDialog.LOAD)
+        val fd = FileDialog(mainWindow, "Config Tool Path", FileDialog.LOAD)
         fd.isMultipleMode = false
         fd.isVisible = true
         if (fd.file != null) {
@@ -396,7 +396,7 @@ class MainController {
     }
 
     private fun startOpenFile() {
-        val fd = FileDialog(mainWindow, "File open", FileDialog.LOAD)
+        val fd = FileDialog(mainWindow, "Open Log File", FileDialog.LOAD)
         fd.isMultipleMode = true
         fd.isVisible = true
         if (fd.file != null) {
@@ -451,7 +451,7 @@ class MainController {
         displayLogMode.updateData()
     }
 
-    private fun addFilterLogInfo(logInfo: LogContainer) {
+    private fun addFilterLogInfo(logInfo: LogInfo) {
         synchronized(filterLock) {
             displayLogMode.addLogInfo(logInfo)
             filterModel.updateLineInfo(logInfo)
@@ -469,7 +469,7 @@ class MainController {
         }
     }
 
-    private fun reMarkByFilter(filterInfo: FilterContainer, logInfo: LogContainer) {
+    private fun reMarkByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
             if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
                 logInfo.show = filterInfo.enabled

@@ -16,15 +16,17 @@ class MainMenuBar : JMenuBar(), IView {
     private val logger = LoggerFactory.getLogger(MainMenuBar::class.java)
     private var eventListener = EventListenerList()
     private val fileMenu = JMenu("File")
+    private val configMenu = JMenu("Tools")
     private val helpMenus = JMenu("Help")
-    private val openItem = JMenuItem("Open...")
-    private val adbItem = JMenuItem("Log Tool Path")
+    private val openItem = JMenuItem("Open Log File")
+    private val adbItem = JMenuItem("Config Tool Path")
     private val aboutItem = JMenuItem("About")
 
     init {
         fileMenu.add(openItem)
-        fileMenu.add(adbItem)
         add(fileMenu)
+        configMenu.add(adbItem)
+        add(configMenu)
         helpMenus.add(aboutItem)
         add(helpMenus)
     }

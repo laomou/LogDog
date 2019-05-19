@@ -1,6 +1,6 @@
 package view
 
-import bean.LogContainer
+import bean.LogInfo
 import interfces.IView
 import interfces.ObservableSubject
 import interfces.Observer
@@ -18,7 +18,7 @@ import javax.swing.table.AbstractTableModel
 import javax.swing.table.DefaultTableCellRenderer
 
 
-class LogTable : JTable(), Observer<LogContainer>, IView {
+class LogTable : JTable(), Observer<LogInfo>, IView {
     private val logger = LoggerFactory.getLogger(LogTable::class.java)
     private val colWidth = intArrayOf(20, 600)
     private var defaultModel = LogTableViewModel()
@@ -90,7 +90,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         selectionModel.removeListSelectionListener(listSelectionListener)
     }
 
-    override fun update(s: ObservableSubject<LogContainer>) {
+    override fun update(s: ObservableSubject<LogInfo>) {
         if (s is DisplayLogModel) {
             defaultModel.setData(s.getDisplayData())
             defaultModel.fireTableDataChanged()
@@ -132,11 +132,11 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     }
 
     inner class LogTableViewModel : AbstractTableModel() {
-        private var arData = arrayListOf<LogContainer>()
+        private var arData = arrayListOf<LogInfo>()
         private val colName = arrayOf("Line", "Message")
 
         @Synchronized
-        fun setData(data: List<LogContainer>) {
+        fun setData(data: List<LogInfo>) {
             arData.clear()
             arData.addAll(data)
             logger.debug("update size: ${data.size}")

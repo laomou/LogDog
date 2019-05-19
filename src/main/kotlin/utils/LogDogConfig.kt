@@ -1,12 +1,12 @@
 package utils
 
-import bean.CmdContainer
-import bean.FilterContainer
+import bean.CmdInfo
+import bean.FilterInfo
 
 class LogDogConfig private constructor() {
     var tool_path = ""
-    var tool_cmd = arrayListOf<CmdContainer>()
-    var filter_rule = arrayListOf<FilterContainer>()
+    var tool_cmd = arrayListOf<CmdInfo>()
+    var filter_rule = arrayListOf<FilterInfo>()
     var custom_color = arrayListOf<String>()
     var uuid = UID.getUID()
 
@@ -18,7 +18,7 @@ class LogDogConfig private constructor() {
         uuid = config.uuid
     }
 
-    fun preSave(filter: List<FilterContainer>) {
+    fun preSave(filter: List<FilterInfo>) {
         filter.forEach { it.lines.clear() }
         filter_rule.clear()
         filter_rule.addAll(filter)

@@ -1,16 +1,16 @@
 package view
 
-import bean.CmdContainer
-import utils.ConstCmd
+import bean.CmdInfo
 import interfces.*
 import model.CmdModel
 import org.slf4j.LoggerFactory
+import utils.ConstCmd
 import java.awt.event.ActionListener
 import javax.swing.DefaultComboBoxModel
 import javax.swing.JComboBox
 import javax.swing.event.EventListenerList
 
-class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
+class CmdComboBox : JComboBox<String>(), Observer<CmdInfo>, IView {
     private val logger = LoggerFactory.getLogger(FilterList::class.java)
     private val defaultMode = DefaultCmdModel()
     private var eventListener = EventListenerList()
@@ -36,7 +36,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         eventListener.remove(CustomActionListener::class.java, l)
     }
 
-    override fun update(s: ObservableSubject<CmdContainer>) {
+    override fun update(s: ObservableSubject<CmdInfo>) {
         if (s is CmdModel) {
             defaultMode.setData(s.getData())
         }
@@ -51,7 +51,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
     }
 
     inner class DefaultCmdModel : DefaultComboBoxModel<String>() {
-        private var arData = ArrayList<CmdContainer>()
+        private var arData = ArrayList<CmdInfo>()
 
         @Synchronized
         override fun getElementAt(p0: Int): String {
@@ -64,7 +64,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         }
 
         @Synchronized
-        fun setData(data: List<CmdContainer>) {
+        fun setData(data: List<CmdInfo>) {
             arData.clear()
             arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)

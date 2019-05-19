@@ -1,11 +1,11 @@
 package view
 
-import utils.ConstCmd
-import bean.FilterContainer
+import bean.FilterInfo
 import interfces.*
 import interfces.Observer
 import model.FilterModel
 import org.slf4j.LoggerFactory
+import utils.ConstCmd
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.MouseAdapter
@@ -15,7 +15,7 @@ import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
-class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
+class FilterList : JList<FilterInfo>(), Observer<FilterInfo>, IView {
     private val logger = LoggerFactory.getLogger(FilterList::class.java)
 
     private val defaultMode = DefaultFilterListModel()
@@ -89,22 +89,22 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         eventListener.remove(CustomActionListener::class.java, l)
     }
 
-    private fun updateFilterData(data: FilterContainer?, str: String) {
+    private fun updateFilterData(data: FilterInfo?, str: String) {
         val event = CustomEvent(this, str, data)
         for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
     }
 
-    override fun update(s: ObservableSubject<FilterContainer>) {
+    override fun update(s: ObservableSubject<FilterInfo>) {
         logger.debug("update")
         if (s is FilterModel) {
             defaultMode.setData(s.getData())
         }
     }
 
-    inner class DefaultCellRenderer : JCheckBox(), ListCellRenderer<FilterContainer> {
-        override fun getListCellRendererComponent(p0: JList<out FilterContainer>, p1: FilterContainer, p2: Int, p3: Boolean, p4: Boolean): Component {
+    inner class DefaultCellRenderer : JCheckBox(), ListCellRenderer<FilterInfo> {
+        override fun getListCellRendererComponent(p0: JList<out FilterInfo>, p1: FilterInfo, p2: Int, p3: Boolean, p4: Boolean): Component {
             text = p1.toString()
             isSelected = p1.enabled
             if (p3) {
@@ -119,11 +119,11 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         }
     }
 
-    inner class DefaultFilterListModel : AbstractListModel<FilterContainer>() {
-        private var arData = LinkedList<FilterContainer>()
+    inner class DefaultFilterListModel : AbstractListModel<FilterInfo>() {
+        private var arData = LinkedList<FilterInfo>()
 
         @Synchronized
-        override fun getElementAt(p0: Int): FilterContainer {
+        override fun getElementAt(p0: Int): FilterInfo {
             return arData[p0]
         }
 
@@ -133,7 +133,7 @@ class FilterList : JList<FilterContainer>(), Observer<FilterContainer>, IView {
         }
 
         @Synchronized
-        fun setData(data: List<FilterContainer>) {
+        fun setData(data: List<FilterInfo>) {
             arData.clear()
             arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)

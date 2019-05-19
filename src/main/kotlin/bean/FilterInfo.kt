@@ -4,7 +4,7 @@ import utils.DefaultConfig
 import utils.UID
 import java.util.*
 
-class FilterContainer(uuid: String? = null) {
+class FilterInfo(uuid: String? = null) {
     var enabled = false
     // 1 new 2 edit 3 delete 4 enable
     var state = -1
@@ -32,7 +32,7 @@ class FilterContainer(uuid: String? = null) {
         if (other === this) {
             return true
         }
-        if (other !is FilterContainer) {
+        if (other !is FilterInfo) {
             return false
         }
         if (other.uuid == this.uuid) {
