@@ -11,7 +11,6 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.Rectangle
 import java.awt.event.ActionListener
-import java.util.*
 import javax.swing.*
 import javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
 import javax.swing.event.ListSelectionListener
@@ -58,7 +57,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
     private val gotoActionListener = ActionListener {
         val inputContent = JOptionPane.showInputDialog(this, "Go To", recordLineNumber)
         if (inputContent != null) {
-            val line = defaultModel.findRearLineByIndex(inputContent)
+            val line = defaultModel.findIndexByLogLine(inputContent)
             showRow(line, true)
         }
     }
@@ -72,7 +71,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
         val lsm = it.source as ListSelectionModel
         if (!lsm.isSelectionEmpty) {
             val index = lsm.minSelectionIndex
-            realLineNumber = defaultModel.findIndexByRearLine(index)
+            realLineNumber = defaultModel.getLogLineByIndex(index)
             logger.debug("select line number: $realLineNumber")
         }
     }
@@ -175,7 +174,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             }
         }
 
-        fun findRearLineByIndex(row: String): Int {
+        fun findIndexByLogLine(row: String): Int {
             for ((index, log) in arData.withIndex()) {
                 if ("${log.strLine}" == row) {
                     return index
@@ -184,7 +183,7 @@ class LogTable : JTable(), Observer<LogContainer>, IView {
             return 1
         }
 
-        fun findIndexByRearLine(index: Int): Int {
+        fun getLogLineByIndex(index: Int): Int {
             if (index >= 0 && index < arData.size) {
                 return arData[index].strLine
             }

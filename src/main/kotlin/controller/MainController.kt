@@ -1,6 +1,7 @@
 package controller
 
-import bean.*
+import bean.FilterContainer
+import bean.LogContainer
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -8,16 +9,15 @@ import interfces.CustomActionListener
 import interfces.CustomEvent
 import model.CmdModel
 import model.DisplayLogModel
+import model.FilterEditModel
 import model.FilterModel
 import org.slf4j.LoggerFactory
-import utils.DefaultConfig
+import utils.*
 import utils.DefaultConfig.DEFAULT_HEIGHT
 import utils.DefaultConfig.DEFAULT_LOG_PATH
 import utils.DefaultConfig.DEFAULT_WIDTH
 import utils.DefaultConfig.MIN_HEIGHT
 import utils.DefaultConfig.MIN_WIDTH
-import utils.AndroidLogCatParser
-import utils.LogDogConfig
 import view.MainWindow
 import java.awt.Dimension
 import java.awt.FileDialog
@@ -46,6 +46,7 @@ class MainController {
 
     private val displayLogMode = DisplayLogModel()
     private val filterModel = FilterModel()
+    private val filterEditModel = FilterEditModel()
     private val cmdModel = CmdModel()
 
     private var strLogFileName = ""
@@ -60,7 +61,7 @@ class MainController {
     private var filterLoop = false
     private var fileReadLoop = false
 
-    private var mainWindow = MainWindow(displayLogMode, filterModel, cmdModel)
+    private var mainWindow = MainWindow(displayLogMode, filterModel, filterEditModel, cmdModel)
 
     companion object {
         private const val STATUS_CHANGE = 1
@@ -80,7 +81,7 @@ class MainController {
         logFilterParseThread()
     }
 
-    private fun iniListener() {
+    private fun initListener() {
         mainWindow.registerListener()
         mainWindow.addCustomActionListener(customListener)
         mainWindow.addWindowListener(object : WindowAdapter() {
@@ -136,9 +137,10 @@ class MainController {
     fun launcher() {
         mainWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         mainWindow.isVisible = true
-        iniListener()
+        initListener()
         loadConfigData()
         filterModel.updateData()
+        filterEditModel.updateData()
         cmdModel.updateData()
         mainWindow.setDefaultUI()
     }
@@ -209,7 +211,13 @@ class MainController {
                                         }
                                     }
                                 }
-                                it.state = -1
+                                if (it.state != 3) {
+                                    it.state = -1
+                                }
+                            }
+
+                            if (filterModel.hasDelFilter()) {
+                                filterModel.doDelFilter()
                             }
                         }
 
@@ -491,6 +499,9 @@ class MainController {
             }
             logConfig.tool_cmd.forEach {
                 cmdModel.addCmdInfo(it)
+            }
+            logConfig.custom_color.forEach {
+                filterEditModel.addColorInfo(it)
             }
             UID.setUID(logConfig.uuid)
         } catch (e: FileNotFoundException) {

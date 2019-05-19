@@ -1,12 +1,13 @@
 package view
 
-import bean.ConstCmd
+import utils.ConstCmd
 import bean.FilterContainer
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView
 import model.CmdModel
 import model.DisplayLogModel
+import model.FilterEditModel
 import model.FilterModel
 import org.slf4j.LoggerFactory
 import java.awt.BorderLayout
@@ -17,7 +18,7 @@ import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
-class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel) : JFrame(), IView {
+class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, fcModel: FilterEditModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
     private val eventListener = EventListenerList()
@@ -38,6 +39,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
 
     private val logModel = lModel
     private val filterModel = fModel
+    private val filterColorModel = fcModel
     private val cmdModel = cModel
 
     init {
@@ -136,10 +138,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         logTable.registerListener()
 
         filterModel.registerObserver(filterList)
-
         filterList.addCustomActionListener(customListener)
         filterList.registerListener()
 
+        filterColorModel.registerObserver(filterEdit)
         filterEdit.addCustomActionListener(customListener)
         filterEdit.registerListener()
 
@@ -161,6 +163,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         filterList.removeCustomActionListener(customListener)
         filterList.unregisterListener()
 
+        filterColorModel.removeObserver(filterEdit)
         filterEdit.removeCustomActionListener(customListener)
         filterEdit.unregisterListener()
 
@@ -184,9 +187,6 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
         if (cmdModel.getData().isNotEmpty()) {
             cmdComboBox.selectedIndex = 0
         }
-        if (filterModel.getData().isNotEmpty()) {
-            filterEdit.loadItemData()
-        }
     }
 
     private var customListener = object : CustomActionListener {
@@ -196,7 +196,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, cModel: CmdModel)
             when (event.action) {
                 ConstCmd.CMD_SELECT_RUN -> {
                     val index = cmdComboBox.selectedIndex
-                    cmdModel.selectedIndex = index
+                    cmdModel.setSelectedCmd(index)
                 }
                 ConstCmd.CMD_ADD_FILTER -> {
                     filterModel.addFilterInfo(event.obj as FilterContainer)

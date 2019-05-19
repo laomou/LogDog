@@ -1,11 +1,12 @@
 package bean
 
 import utils.DefaultConfig
+import utils.UID
 import java.util.*
 
 class FilterContainer(uuid: String? = null) {
     var enabled = false
-    // 1 new 2 edit 3 enable
+    // 1 new 2 edit 3 delete 4 enable
     var state = -1
     // 1 contains 2 regex
     var type = -1

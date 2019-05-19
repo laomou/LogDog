@@ -44,14 +44,6 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
-    fun removeFilterInfo(data: FilterContainer) {
-        val index = datas.indexOf(data)
-        if (index != -1) {
-            datas.removeAt(index)
-        }
-    }
-
-    @Synchronized
     fun editFilterInfo(data: FilterContainer) {
         val index = datas.indexOf(data)
         if (index != -1) {
@@ -61,10 +53,23 @@ class FilterModel : ObservableSubject<FilterContainer> {
     }
 
     @Synchronized
+    fun removeFilterInfo(data: FilterContainer, remove: Boolean = false) {
+        val index = datas.indexOf(data)
+        if (index != -1) {
+            if (remove) {
+                datas.removeAt(index)
+            } else {
+                data.state = 3
+                datas[index] = data
+            }
+        }
+    }
+
+    @Synchronized
     fun enableFilterInfo(data: FilterContainer) {
         val index = datas.indexOf(data)
         if (index != -1) {
-            data.state = 3
+            data.state = 4
             datas[index] = data
         }
     }
@@ -97,11 +102,6 @@ class FilterModel : ObservableSubject<FilterContainer> {
             str.append(it.detail())
         }
         return str.toString()
-    }
-
-    @Synchronized
-    fun getEnableFilters(): List<FilterContainer> {
-        return datas.filter { it.enabled }
     }
 
     @Synchronized
@@ -257,6 +257,10 @@ class FilterModel : ObservableSubject<FilterContainer> {
                 }
             }
         }
+        if (filterInfo.state == 3) {
+            logInfo.filterColor = DefaultConfig.DEFAULT_BG_COLOR
+            logInfo.show = false
+        }
     }
 
     @Synchronized
@@ -271,6 +275,17 @@ class FilterModel : ObservableSubject<FilterContainer> {
 
     @Synchronized
     fun hasNewFilter(): Boolean {
-        return !datas.none { it.enabled && it.state in 1..2 }
+        return !datas.none { it.enabled && it.state in 1..3 }
     }
+
+    @Synchronized
+    fun hasDelFilter(): Boolean {
+        return !datas.none { it.enabled && it.state == 3 }
+    }
+
+    @Synchronized
+    fun doDelFilter() {
+        datas.removeIf { it.state == 3 }
+    }
+
 }

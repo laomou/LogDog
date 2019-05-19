@@ -1,13 +1,11 @@
 package view
 
-import bean.ConstCmd
-import utils.DefaultConfig
 import bean.FilterContainer
-import interfces.CustomActionListener
-import interfces.CustomEvent
-import interfces.IView
+import interfces.*
+import model.FilterEditModel
 import org.slf4j.LoggerFactory
-import utils.LogDogConfig
+import utils.ConstCmd
+import utils.DefaultConfig
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -19,7 +17,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.event.EventListenerList
 
-class FilterEditPanel : JPanel(), IView {
+class FilterEditPanel : JPanel(), Observer<String>, IView  {
     private val logger = LoggerFactory.getLogger(FilterEditPanel::class.java)
     private var eventListener = EventListenerList()
 
@@ -108,9 +106,12 @@ class FilterEditPanel : JPanel(), IView {
         add(jpEditPane, BorderLayout.CENTER)
     }
 
-    fun loadItemData() {
-        LogDogConfig.instance().custom_color.forEach {
-            cbColor.addItem(it)
+    override fun update(s: ObservableSubject<String>) {
+        logger.debug("update")
+        if (s is FilterEditModel) {
+            s.getData().forEach {
+                cbColor.addItem(it)
+            }
         }
     }
 

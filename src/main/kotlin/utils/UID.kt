@@ -1,4 +1,4 @@
-package bean
+package utils
 
 object UID {
     private var uid = 10000

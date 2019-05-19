@@ -1,6 +1,6 @@
 package view
 
-import bean.ConstCmd
+import utils.ConstCmd
 import interfces.CustomActionListener
 import interfces.CustomEvent
 import interfces.IView

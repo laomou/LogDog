@@ -1,7 +1,7 @@
 package view
 
 import bean.CmdContainer
-import bean.ConstCmd
+import utils.ConstCmd
 import interfces.*
 import model.CmdModel
 import org.slf4j.LoggerFactory
@@ -64,7 +64,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdContainer>, IView {
         }
 
         @Synchronized
-        fun setData(data: ArrayList<CmdContainer>) {
+        fun setData(data: List<CmdContainer>) {
             arData.clear()
             arData.addAll(data)
             fireContentsChanged(this, 0, arData.size)

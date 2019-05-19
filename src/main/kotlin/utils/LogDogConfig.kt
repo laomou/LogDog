@@ -2,7 +2,6 @@ package utils
 
 import bean.CmdContainer
 import bean.FilterContainer
-import bean.UID
 
 class LogDogConfig private constructor() {
     var tool_path = ""
