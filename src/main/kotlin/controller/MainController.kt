@@ -232,8 +232,9 @@ class MainController {
                             nChangedFilter = STATUS_READY
                             logger.debug("filter done updateData")
                             updateTableData()
-                            lastFilterTag = filterModel.getFilterTag()
                         }
+
+                        lastFilterTag = filterModel.getFilterTag()
                     }
                 }
             } catch (e: Exception) {
