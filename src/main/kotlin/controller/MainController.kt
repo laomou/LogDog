@@ -10,7 +10,7 @@ import interfces.CustomEvent
 import model.CmdModel
 import model.DisplayLogModel
 import model.FilterEditModel
-import model.FilterModel
+import model.FilterMapModel
 import org.slf4j.LoggerFactory
 import utils.*
 import utils.DefaultConfig.DEFAULT_HEIGHT
@@ -45,7 +45,7 @@ class MainController {
     private var nChangedFilter = STATUS_READY
 
     private val displayLogMode = DisplayLogModel()
-    private val filterModel = FilterModel()
+    private val filterModel = FilterMapModel()
     private val filterEditModel = FilterEditModel()
     private val cmdModel = CmdModel()
 
@@ -453,7 +453,7 @@ class MainController {
             displayLogMode.addLogInfo(logInfo)
             filterModel.updateLineInfo(logInfo)
             logInfo.show = false
-            if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
+            if (filterModel.getFilterType() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 if (filterModel.hasFilter()) {
                     logInfo.show = filterModel.checkEnableOrFilter(logInfo)
                     logInfo.filterColor = filterModel.findFilersColor(logInfo.strMsg)
@@ -468,7 +468,7 @@ class MainController {
 
     private fun reMarkByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
-            if (filterModel.getFilterType() == FilterModel.TYPE_FILTER_OR) {
+            if (filterModel.getFilterType() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 logInfo.show = filterInfo.enabled
                 filterModel.updateShowInfo(filterInfo, logInfo)
             } else {
@@ -490,9 +490,9 @@ class MainController {
             val gson = Gson()
             val type = object : TypeToken<LogDogConfig>() {}.type
             val config: LogDogConfig = gson.fromJson(contents, type)
-            logConfig.load(config)
+            logConfig.loadFromGson(config)
             logConfig.filter_rule.forEach {
-                filterModel.loadFilterInfo(it)
+                filterModel.loadFilterInfo(it.key, it.value)
             }
             logConfig.tool_cmd.forEach {
                 cmdModel.addCmdInfo(it)
@@ -511,7 +511,7 @@ class MainController {
         try {
             val file = File("config.json")
             val gson = GsonBuilder().setPrettyPrinting().create()
-            logConfig.preSave(filterModel.getData())
+            logConfig.preSave(filterModel.getMapData())
             logConfig.uuid = UID.getUID()
             val contents = gson.toJson(logConfig)
             file.writeText(contents)

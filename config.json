@@ -1,5 +1,5 @@
 {
-  "tool_path": "/home/mourui/Sdk/platform-tools/adb",
+  "tool_path": "",
   "tool_cmd": [
     {
       "title": "Main Log",
@@ -18,26 +18,22 @@
       "cmd": "shell cat /d/fimc-is/isfw-msg"
     }
   ],
-  "filter_rule": [
-    {
-      "enabled": false,
-      "state": -1,
-      "type": 1,
-      "text": "aaaa",
-      "color": "#FFFFFF",
-      "uuid": "10023",
-      "lines": []
-    },
-    {
-      "enabled": false,
-      "state": -1,
-      "type": 1,
-      "text": "bbbb",
-      "color": "#FFFFFF",
-      "uuid": "10024",
-      "lines": []
-    }
-  ],
+  "filter_rule": {
+    "0": [],
+    "1": [
+      {
+        "enabled": false,
+        "state": -1,
+        "type": 1,
+        "text": "aaaa",
+        "color": "#FFFFFF",
+        "uuid": "10000",
+        "lines": []
+      }
+    ],
+    "2": [],
+    "3": []
+  },
   "custom_color": [
     "#FFFFFF",
     "#FFF0F5",
@@ -47,5 +43,5 @@
     "#FFD39B",
     "#FFBBFF"
   ],
-  "uuid": "10026"
+  "uuid": "10003"
 }

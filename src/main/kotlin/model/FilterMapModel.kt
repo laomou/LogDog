@@ -7,15 +7,20 @@ import interfces.Observer
 import utils.DefaultConfig
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.ArrayList
 
-class FilterModel : ObservableSubject<FilterInfo> {
+class FilterMapModel : ObservableSubject<FilterInfo> {
     private val observers = arrayListOf<Observer<FilterInfo>>()
-    private val data = arrayListOf<FilterInfo>()
-    private var filterType = TYPE_FILTER_OR
+    private val mapData = hashMapOf<Int, ArrayList<FilterInfo>>(
+            Pair(TYPE_FILTER_TAG1, ArrayList()),
+            Pair(TYPE_FILTER_TAG2, ArrayList()),
+            Pair(TYPE_FILTER_TAG3, ArrayList()))
+    private var filterType = TYPE_FILTER_TAG1
 
     companion object {
-        const val TYPE_FILTER_HIGHLIGHT = 0
-        const val TYPE_FILTER_OR = 1
+        const val TYPE_FILTER_TAG1 = 1
+        const val TYPE_FILTER_TAG2 = 2
+        const val TYPE_FILTER_TAG3 = 3
     }
 
     override fun registerObserver(o: Observer<FilterInfo>) {
@@ -33,55 +38,63 @@ class FilterModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun loadFilterInfo(filterInfo: FilterInfo) {
-        data.add(filterInfo)
+    private fun data(): ArrayList<FilterInfo> = mapData.getValue(filterType)
+
+    @Synchronized
+    fun loadFilterInfo(type: Int, arrayList: ArrayList<FilterInfo>) {
+        mapData[type] = arrayList
     }
 
     @Synchronized
     fun addFilterInfo(filterInfo: FilterInfo) {
         filterInfo.state = 1
-        data.add(filterInfo)
+        data().add(filterInfo)
     }
 
     @Synchronized
     fun editFilterInfo(filterInfo: FilterInfo) {
-        val index = data.indexOf(filterInfo)
+        val index = data().indexOf(filterInfo)
         if (index != -1) {
             filterInfo.state = 2
-            data[index] = filterInfo
+            data()[index] = filterInfo
         }
     }
 
     @Synchronized
     fun removeFilterInfo(filterInfo: FilterInfo, remove: Boolean = false) {
-        val index = data.indexOf(filterInfo)
+        val index = data().indexOf(filterInfo)
         if (index != -1) {
             if (remove) {
-                data.removeAt(index)
+                data().removeAt(index)
             } else {
                 filterInfo.state = 3
-                data[index] = filterInfo
+                data()[index] = filterInfo
             }
         }
     }
 
     @Synchronized
     fun enableFilterInfo(filterInfo: FilterInfo) {
-        val index = data.indexOf(filterInfo)
+        val index = data().indexOf(filterInfo)
         if (index != -1) {
             filterInfo.state = 4
-            data[index] = filterInfo
+            data()[index] = filterInfo
         }
     }
 
     @Synchronized
     fun getData(): List<FilterInfo> {
-        return data
+        return data()
+    }
+
+    @Synchronized
+    fun getMapData(): Map<Int, ArrayList<FilterInfo>> {
+        return mapData
     }
 
     @Synchronized
     fun findItemDataByUUID(uuid: String): FilterInfo? {
-        return data.find { it.uuid == uuid }
+        return data().find { it.uuid == uuid }
     }
 
     fun updateData() {
@@ -92,31 +105,37 @@ class FilterModel : ObservableSubject<FilterInfo> {
     fun getEnableFilterString(): String {
         val str = StringBuilder()
         when (filterType) {
-            TYPE_FILTER_OR -> str.append("filterType: Or")
-            else -> str.append("filterType: HL")
-        }
-        data.filter { it.enabled }.forEach {
-            if (str.isNotEmpty()) {
-                str.append(",")
+            TYPE_FILTER_TAG1,
+            TYPE_FILTER_TAG2,
+            TYPE_FILTER_TAG3 -> {
+                str.append("filterType: Or")
+                data().filter { it.enabled }.forEach {
+                    if (str.isNotEmpty()) {
+                        str.append(",")
+                    }
+                    str.append(it.detail())
+                }
             }
-            str.append(it.detail())
+            else -> {
+                str.append("filterType: None")
+            }
         }
         return str.toString()
     }
 
     @Synchronized
     fun getChangesFilters(): List<FilterInfo> {
-        return data.filter { it.state >= 1 }
+        return data().filter { it.state >= 1 }
     }
 
     @Synchronized
     fun getEnableNewFilters(): List<FilterInfo> {
-        return data.filter { it.enabled && it.state == 1 }
+        return data().filter { it.enabled && it.state == 1 }
     }
 
     @Synchronized
     fun findFilersColor(line: String): String {
-        data.filter { it.enabled }.forEach { it1 ->
+        data().filter { it.enabled }.forEach { it1 ->
             when (it1.type) {
                 1 -> {
                     val stk = StringTokenizer(it1.text, "|", false)
@@ -147,16 +166,16 @@ class FilterModel : ObservableSubject<FilterInfo> {
     }
 
     fun toggleFilterType() {
-        filterType = if (filterType == TYPE_FILTER_HIGHLIGHT) {
-            TYPE_FILTER_OR
+        filterType = if (filterType >= TYPE_FILTER_TAG3) {
+            TYPE_FILTER_TAG1
         } else {
-            TYPE_FILTER_HIGHLIGHT
+            ++filterType
         }
     }
 
     @Synchronized
     fun checkEnableOrFilter(logInfo: LogInfo): Boolean {
-        data.filter { it.enabled }.forEach { it1 ->
+        data().filter { it.enabled }.forEach { it1 ->
             when (it1.type) {
                 1 -> {
                     val stk = StringTokenizer(it1.text, "|", false)
@@ -184,7 +203,7 @@ class FilterModel : ObservableSubject<FilterInfo> {
 
     @Synchronized
     fun updateLineInfo(logInfo: LogInfo) {
-        data.forEach {
+        data().forEach {
             when (it.type) {
                 1 -> {
                     val stk = StringTokenizer(it.text, "|", false)
@@ -265,26 +284,26 @@ class FilterModel : ObservableSubject<FilterInfo> {
 
     @Synchronized
     fun cleanLines() {
-        data.forEach { it.lines.clear() }
+        data().forEach { it.lines.clear() }
     }
 
     @Synchronized
     fun hasFilter(): Boolean {
-        return !data.none { it.enabled }
+        return !data().none { it.enabled }
     }
 
     @Synchronized
     fun hasNewFilter(): Boolean {
-        return !data.none { it.enabled && it.state in 1..3 }
+        return !data().none { it.enabled && it.state in 1..3 }
     }
 
     @Synchronized
     fun hasDelFilter(): Boolean {
-        return !data.none { it.state == 3 }
+        return !data().none { it.state == 3 }
     }
 
     @Synchronized
     fun doDelFilter() {
-        data.removeIf { it.state == 3 }
+        data().removeIf { it.state == 3 }
     }
 }

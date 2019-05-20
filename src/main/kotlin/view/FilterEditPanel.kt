@@ -17,13 +17,13 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.event.EventListenerList
 
-class FilterEditPanel : JPanel(), Observer<String>, IView  {
+class FilterEditPanel : JPanel(), Observer<String>, IView {
     private val logger = LoggerFactory.getLogger(FilterEditPanel::class.java)
     private var eventListener = EventListenerList()
 
     private val rbContains = JRadioButton("Contains")
     private val rbRegex = JRadioButton("Match")
-    private val bgType= ButtonGroup()
+    private val bgType = ButtonGroup()
     private val tfText = JTextField()
     private val cbColor = JComboBox<String>()
 

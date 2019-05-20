@@ -7,7 +7,7 @@ import interfces.IView
 import model.CmdModel
 import model.DisplayLogModel
 import model.FilterEditModel
-import model.FilterModel
+import model.FilterMapModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
 import java.awt.BorderLayout
@@ -18,7 +18,7 @@ import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
-class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, fcModel: FilterEditModel, cModel: CmdModel) : JFrame(), IView {
+class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: FilterEditModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
     private val eventListener = EventListenerList()
@@ -97,11 +97,13 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterModel, fcModel: FilterEd
         jpFilterPanel.border = BorderFactory.createTitledBorder("Filter Bookmark")
 
         val jpFilterType = JPanel()
-        btnFilterType = JButton("Filter type:  Or")
+        btnFilterType = JButton("Filter:  TAG1")
         btnFilterType?.addActionListener {
             filterModel.toggleFilterType()
             btnFilterType?.text = when (filterModel.getFilterType()) {
-                FilterModel.TYPE_FILTER_OR -> "Filter type: Or"
+                FilterMapModel.TYPE_FILTER_TAG1 -> "Filter: TAG1"
+                FilterMapModel.TYPE_FILTER_TAG2 -> "Filter: TAG2"
+                FilterMapModel.TYPE_FILTER_TAG3 -> "Filter: TAG3"
                 else -> "Filter type: None"
             }
             updateFilterAndTable()

@@ -3,7 +3,7 @@ package view
 import bean.FilterInfo
 import interfces.*
 import interfces.Observer
-import model.FilterModel
+import model.FilterMapModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
 import java.awt.Color
@@ -98,7 +98,7 @@ class FilterList : JList<FilterInfo>(), Observer<FilterInfo>, IView {
 
     override fun update(s: ObservableSubject<FilterInfo>) {
         logger.debug("update")
-        if (s is FilterModel) {
+        if (s is FilterMapModel) {
             defaultMode.setData(s.getData())
         }
     }
