@@ -280,7 +280,7 @@ class FilterModel : ObservableSubject<FilterInfo> {
 
     @Synchronized
     fun hasDelFilter(): Boolean {
-        return !data.none { it.enabled && it.state == 3 }
+        return !data.none { it.state == 3 }
     }
 
     @Synchronized
