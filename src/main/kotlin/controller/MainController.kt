@@ -172,7 +172,7 @@ class MainController {
 
                         val filter = filterModel.getEnableFilterString()
                         logger.debug("parsing $filter")
-                        mainWindow.setStatus("Parsing $filter")
+                        mainWindow.setStatus("Parsing Filter: $filter")
                         nChangedFilter = STATUS_PARSING
 
                         if (!filterModel.hasFilter()) {
@@ -246,7 +246,7 @@ class MainController {
                 val dis = DataInputStream(fis)
                 val br = BufferedReader(InputStreamReader(dis, "UTF-8"))
 
-                mainWindow.setStatus("Parsing $strLogFileName")
+                mainWindow.setStatus("Parsing File: $strLogFileName")
 
                 while (filterLoop) {
                     Thread.sleep(500)
@@ -278,7 +278,7 @@ class MainController {
                 //e.printStackTrace()
                 logger.warn(e.toString())
             }
-            mainWindow.setStatus("Complete $strLogFileName")
+            mainWindow.setStatus("Parse File Complete")
             logger.debug("exit")
         })
         fileReadThread?.name = "fileReadThread"
@@ -338,7 +338,6 @@ class MainController {
             }
             titles += it.name
         }
-        mainWindow.setStatus("Parse complete")
         mainWindow.setWindowTitle("LogDog File($titles)")
     }
 
@@ -351,7 +350,6 @@ class MainController {
             }
             titles += it.name
         }
-        mainWindow.setStatus("Parse complete")
         mainWindow.setWindowTitle("LogDog File($titles)")
     }
 
@@ -361,7 +359,7 @@ class MainController {
             val file = File(fileName)
             var nIndex = 1
             logger.debug("parseFile start")
-            mainWindow.setStatus("Parsing")
+            mainWindow.setStatus("Parse File: $fileName")
             file.forEachLine {
                 val logInfo = logParser.parse(it)
                 logInfo.strLine = nIndex++
@@ -369,10 +367,9 @@ class MainController {
                     addFilterLogInfo(logInfo)
                 }
             }
-            logger.debug("parseFile->size: " + displayLogMode.getDataSize())
-            runFilter()
-            mainWindow.setStatus("Parse complete")
             logger.debug("parseFile end")
+            mainWindow.setStatus("Parse File Complete")
+            runFilter()
         })
         fileLoadThread?.name = "fileLoadThread"
         fileLoadThread?.start()
