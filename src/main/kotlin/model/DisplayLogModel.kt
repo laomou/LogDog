@@ -26,7 +26,7 @@ class DisplayLogModel : ObservableSubject<LogInfo> {
     }
 
     @Synchronized
-    fun tryShowData() {
+    fun markDataHide() {
         if (reset) {
             data.forEach {
                 it.show = false
@@ -36,7 +36,7 @@ class DisplayLogModel : ObservableSubject<LogInfo> {
     }
 
     @Synchronized
-    fun showData() {
+    fun markDataShow() {
         data.forEach {
             it.show = true
             it.filterColor = DefaultConfig.DEFAULT_BG_COLOR

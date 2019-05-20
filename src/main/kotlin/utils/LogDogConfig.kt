@@ -8,6 +8,7 @@ class LogDogConfig private constructor() {
     var tool_path = ""
     var tool_cmd = arrayListOf<CmdInfo>()
     var filter_rule = hashMapOf<Int, ArrayList<FilterInfo>>(
+            Pair(FilterMapModel.TYPE_FILTER_NONE, ArrayList()),
             Pair(FilterMapModel.TYPE_FILTER_TAG1, ArrayList()),
             Pair(FilterMapModel.TYPE_FILTER_TAG2, ArrayList()),
             Pair(FilterMapModel.TYPE_FILTER_TAG3, ArrayList()))
@@ -26,6 +27,7 @@ class LogDogConfig private constructor() {
 
     fun preSave(filterMap: Map<Int, ArrayList<FilterInfo>>) {
         filterMap.forEach { i, arrayList ->
+            arrayList.forEach { it.lines.clear() }
             filter_rule[i] = arrayList
         }
     }

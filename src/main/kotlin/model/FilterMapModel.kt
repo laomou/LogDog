@@ -12,12 +12,14 @@ import kotlin.collections.ArrayList
 class FilterMapModel : ObservableSubject<FilterInfo> {
     private val observers = arrayListOf<Observer<FilterInfo>>()
     private val mapData = hashMapOf<Int, ArrayList<FilterInfo>>(
+            Pair(TYPE_FILTER_NONE, ArrayList()),
             Pair(TYPE_FILTER_TAG1, ArrayList()),
             Pair(TYPE_FILTER_TAG2, ArrayList()),
             Pair(TYPE_FILTER_TAG3, ArrayList()))
-    private var filterType = TYPE_FILTER_TAG1
+    private var filterTag = TYPE_FILTER_TAG1
 
     companion object {
+        const val TYPE_FILTER_NONE = 0
         const val TYPE_FILTER_TAG1 = 1
         const val TYPE_FILTER_TAG2 = 2
         const val TYPE_FILTER_TAG3 = 3
@@ -38,7 +40,10 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    private fun data(): ArrayList<FilterInfo> = mapData.getValue(filterType)
+    private fun data(): ArrayList<FilterInfo> = mapData.getValue(filterTag)
+
+    @Synchronized
+    private fun data(filterTag: Int): ArrayList<FilterInfo> = mapData.getValue(filterTag)
 
     @Synchronized
     fun loadFilterInfo(type: Int, arrayList: ArrayList<FilterInfo>) {
@@ -104,23 +109,29 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     @Synchronized
     fun getEnableFilterString(): String {
         val str = StringBuilder()
-        when (filterType) {
+        when (filterTag) {
             TYPE_FILTER_TAG1,
             TYPE_FILTER_TAG2,
             TYPE_FILTER_TAG3 -> {
-                str.append("filterType: Or")
+                str.append("Filter: Or (")
                 data().filter { it.enabled }.forEach {
+                    str.append(it.detail())
                     if (str.isNotEmpty()) {
                         str.append(",")
                     }
-                    str.append(it.detail())
                 }
+                str.append(")")
             }
             else -> {
-                str.append("filterType: None")
+                str.append("Filter: None")
             }
         }
         return str.toString()
+    }
+
+    @Synchronized
+    fun getEnableFilters(): List<FilterInfo> {
+        return data().filter { it.enabled }
     }
 
     @Synchronized
@@ -161,15 +172,15 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
         return DefaultConfig.DEFAULT_BG_COLOR
     }
 
-    fun getFilterType(): Int {
-        return filterType
+    fun getFilterTag(): Int {
+        return filterTag
     }
 
-    fun toggleFilterType() {
-        filterType = if (filterType >= TYPE_FILTER_TAG3) {
+    fun toggleFilterTag() {
+        filterTag = if (filterTag >= TYPE_FILTER_TAG3) {
             TYPE_FILTER_TAG1
         } else {
-            ++filterType
+            ++filterTag
         }
     }
 
@@ -203,27 +214,28 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
 
     @Synchronized
     fun updateLineInfo(logInfo: LogInfo) {
-        data().forEach {
-            when (it.type) {
+        mapData.values.forEach {
+            it.forEach { it1 ->
+                when (it1.type) {
                 1 -> {
-                    val stk = StringTokenizer(it.text, "|", false)
+                    val stk = StringTokenizer(it1.text, "|", false)
                     while (stk.hasMoreElements()) {
                         val token = stk.nextToken()
                         if (logInfo.strMsg.contains(token, true)) {
-                            it.lines.add(logInfo.strLine)
-                            logInfo.filters.add(it.uuid)
+                            it1.lines.add(logInfo.strLine)
+                            logInfo.filters.add(it1.uuid)
                         }
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(it.text)
+                    val pattern = Pattern.compile(it1.text)
                     val matcher = pattern.matcher(logInfo.strMsg)
                     if (matcher.matches()) {
-                        it.lines.add(logInfo.strLine)
-                        logInfo.filters.add(it.uuid)
+                        it1.lines.add(logInfo.strLine)
+                        logInfo.filters.add(it1.uuid)
                     }
                 }
-            }
+            } }
         }
     }
 

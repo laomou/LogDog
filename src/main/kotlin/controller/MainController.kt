@@ -61,6 +61,8 @@ class MainController {
     private var filterLoop = false
     private var fileReadLoop = false
 
+    private var lastFilterTag = filterModel.getFilterTag()
+
     private var mainWindow = MainWindow(displayLogMode, filterModel, filterEditModel, cmdModel)
 
     companion object {
@@ -175,12 +177,12 @@ class MainController {
                         mainWindow.setStatus("Parsing Filter: $filter")
                         nChangedFilter = STATUS_PARSING
 
-                        if (!filterModel.hasFilter()) {
+                        if (!filterModel.hasFilter() || filterModel.getFilterTag() == FilterMapModel.TYPE_FILTER_NONE) {
                             logger.debug("updateData(no filter)")
-                            displayLogMode.showData()
+                            displayLogMode.markDataShow()
                             updateTableData()
                             nChangedFilter = STATUS_READY
-                        } else {
+                        }  else {
                             if (filterModel.hasNewFilter()) {
                                 val newFilters = filterModel.getEnableNewFilters()
                                 logger.debug("new filter changeFilter->size: ${newFilters.size}")
@@ -194,9 +196,14 @@ class MainController {
                                 }
                             }
 
-                            displayLogMode.tryShowData()
+                            if (filterModel.getFilterTag() != lastFilterTag) {
+                                logger.debug("changes filter tag")
+                                displayLogMode.markDataShow()
+                            }
 
-                            val newFilters = filterModel.getChangesFilters()
+                            displayLogMode.markDataHide()
+
+                            val newFilters = if (filterModel.getFilterTag() != lastFilterTag) filterModel.getEnableFilters() else filterModel.getChangesFilters()
                             logger.debug("changes filter changeFilter->size: ${newFilters.size}")
 
                             newFilters.forEach {
@@ -225,6 +232,7 @@ class MainController {
                             nChangedFilter = STATUS_READY
                             logger.debug("filter done updateData")
                             updateTableData()
+                            lastFilterTag = filterModel.getFilterTag()
                         }
                     }
                 }
@@ -453,7 +461,7 @@ class MainController {
             displayLogMode.addLogInfo(logInfo)
             filterModel.updateLineInfo(logInfo)
             logInfo.show = false
-            if (filterModel.getFilterType() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
+            if (filterModel.getFilterTag() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 if (filterModel.hasFilter()) {
                     logInfo.show = filterModel.checkEnableOrFilter(logInfo)
                     logInfo.filterColor = filterModel.findFilersColor(logInfo.strMsg)
@@ -468,7 +476,7 @@ class MainController {
 
     private fun reMarkByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
-            if (filterModel.getFilterType() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
+            if (filterModel.getFilterTag() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 logInfo.show = filterInfo.enabled
                 filterModel.updateShowInfo(filterInfo, logInfo)
             } else {

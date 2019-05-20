@@ -99,8 +99,8 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         val jpFilterType = JPanel()
         btnFilterType = JButton("Filter:  TAG1")
         btnFilterType?.addActionListener {
-            filterModel.toggleFilterType()
-            btnFilterType?.text = when (filterModel.getFilterType()) {
+            filterModel.toggleFilterTag()
+            btnFilterType?.text = when (filterModel.getFilterTag()) {
                 FilterMapModel.TYPE_FILTER_TAG1 -> "Filter: TAG1"
                 FilterMapModel.TYPE_FILTER_TAG2 -> "Filter: TAG2"
                 FilterMapModel.TYPE_FILTER_TAG3 -> "Filter: TAG3"
