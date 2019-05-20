@@ -49,7 +49,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
 
         val jpColor = JPanel(BorderLayout())
         val jlColor = JLabel()
-        jlColor.text = "Color  :"
+        jlColor.text = "Color :"
         jpColor.add(jlColor, BorderLayout.WEST)
         cbColor.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(p0: JList<*>?, p1: Any?, p2: Int, p3: Boolean, p4: Boolean): Component {
@@ -69,7 +69,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
 
         val jpText = JPanel(BorderLayout())
         val jlText = JLabel()
-        jlText.text = "Text   :"
+        jlText.text = " Text :"
         jpText.add(jlText, BorderLayout.WEST)
         jpText.add(tfText, BorderLayout.CENTER)
 

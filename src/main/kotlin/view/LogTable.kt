@@ -11,6 +11,7 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.Rectangle
 import java.awt.event.ActionListener
+import java.util.*
 import javax.swing.*
 import javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
 import javax.swing.event.ListSelectionListener
@@ -192,13 +193,53 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
     }
 
     inner class LogCellRenderer : DefaultTableCellRenderer() {
+        private var bChanged = false
+
         override fun getTableCellRendererComponent(p0: JTable?, p1: Any?, p2: Boolean, p3: Boolean, p4: Int, p5: Int): Component {
-            val component = super.getTableCellRendererComponent(p0, p1, p2, p3, p4, p5)
+            val data = remakeData(p5, p1 as String)
+            val component = super.getTableCellRendererComponent(p0, data, p2, p3, p4, p5)
             val logColor = (model as LogTableViewModel).getLogColor(p4)
             component.foreground = Color.decode(logColor)
             val bgColor = (model as LogTableViewModel).getFilterColor(p4)
             component.background = Color.decode(bgColor)
             return component
+        }
+
+        private fun remakeData(index: Int, text: String): String {
+            if (index != 1) {
+                return text
+            }
+            bChanged = false
+            var strRet = remakeFind(text, "", "#00FF00", true)
+            if (bChanged) {
+                strRet = "<html><nobr>$strRet</nobr></html>".replace(" ", "&nbsp;")
+            }
+            return strRet
+        }
+
+        private fun remakeFind(strText: String, strFind: String, color: String, bUseSpan: Boolean): String {
+            if (strFind.isEmpty()) return strText
+            var strText1 = strText
+            val stk = StringTokenizer(strFind, "|")
+            var newText: String
+            var strToken: String
+            while (stk.hasMoreElements()) {
+                strToken = stk.nextToken()
+                if (strText1.contains(strToken, true)) {
+                    newText = if (bUseSpan)
+                        "<span style=\"background-color:$color\"><b>"
+                    else
+                        "<font color=$color><b>"
+                    newText += strToken
+                    newText += if (bUseSpan)
+                        "</b></span>"
+                    else
+                        "</b></font>"
+                    strText1 = strText1.replace(strToken, newText)
+                    bChanged = true
+                }
+            }
+            return strText1
         }
     }
 }
