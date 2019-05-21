@@ -17,5 +17,6 @@ class ConstCmd {
         const val CMD_STOP_LOGCAT = "CMD_STOP_LOGCAT"
         const val CMD_RUN_LOGCAT = "CMD_RUN_LOGCAT"
         const val CMD_EXIT_LOGDOG = "CMD_EXIT_LOGDOG"
+        const val CMD_ABOUT_LOGDOG = "CMD_ABOUT_LOGDOG"
     }
 }

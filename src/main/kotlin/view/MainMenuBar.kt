@@ -8,10 +8,7 @@ import utils.ConstCmd
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
-import javax.swing.KeyStroke
+import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
@@ -34,8 +31,6 @@ class MainMenuBar : JMenuBar(), IView {
         exitItem.accelerator = KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK)
         fileMenu.add(exitItem)
         add(fileMenu)
-        adbItem.mnemonic = KeyEvent.VK_C
-        adbItem.accelerator = KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK)
         configMenu.add(adbItem)
         add(configMenu)
         helpMenus.add(aboutItem)
@@ -46,27 +41,19 @@ class MainMenuBar : JMenuBar(), IView {
         when {
             it.source == openItem -> {
                 logger.debug("openItem->click")
-                val action = CustomEvent(this, ConstCmd.CMD_OPEN_FILE)
-                for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
-                    listener.actionPerformed(action)
-                }
+                updateEvent(ConstCmd.CMD_OPEN_FILE)
             }
             it.source == adbItem -> {
                 logger.debug("adbItem->click")
-                val action = CustomEvent(this, ConstCmd.CMD_CONFIG_ADB)
-                for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
-                    listener.actionPerformed(action)
-                }
+                updateEvent(ConstCmd.CMD_CONFIG_ADB)
             }
             it.source == exitItem -> {
                 logger.debug("exitItem->click")
-                val action = CustomEvent(this, ConstCmd.CMD_EXIT_LOGDOG)
-                for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
-                    listener.actionPerformed(action)
-                }
+                updateEvent(ConstCmd.CMD_EXIT_LOGDOG)
             }
             it.source == aboutItem -> {
                 logger.debug("aboutItem->click")
+                updateEvent(ConstCmd.CMD_ABOUT_LOGDOG)
             }
         }
     }
@@ -76,6 +63,7 @@ class MainMenuBar : JMenuBar(), IView {
         openItem.addActionListener(actionListener)
         exitItem.addActionListener(actionListener)
         adbItem.addActionListener(actionListener)
+        aboutItem.addActionListener(actionListener)
     }
 
     override fun unregisterListener() {
@@ -83,6 +71,7 @@ class MainMenuBar : JMenuBar(), IView {
         openItem.removeActionListener(actionListener)
         exitItem.removeActionListener(actionListener)
         adbItem.removeActionListener(actionListener)
+        aboutItem.removeActionListener(actionListener)
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
@@ -93,5 +82,12 @@ class MainMenuBar : JMenuBar(), IView {
     fun removeCustomActionListener(l: CustomActionListener) {
         logger.debug("removeCustomActionListener $l")
         eventListener.remove(CustomActionListener::class.java, l)
+    }
+
+    private fun updateEvent(action: String) {
+        val event = CustomEvent(this, action)
+        for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
+            listener.actionPerformed(event)
+        }
     }
 }

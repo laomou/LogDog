@@ -29,6 +29,7 @@ import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.JFrame
+import javax.swing.JOptionPane
 import kotlin.collections.ArrayList
 
 
@@ -162,6 +163,7 @@ class MainController {
                 event.action == ConstCmd.CMD_RUN_FILTER -> runFilter()
                 event.action == ConstCmd.CMD_RUN_CLEAN -> cleanData()
                 event.action == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
+                event.action == ConstCmd.CMD_ABOUT_LOGDOG -> about()
                 event.action == ConstCmd.CMD_EXIT_LOGDOG -> {
                     mainWindow.dispose()
                     exit()
@@ -192,7 +194,7 @@ class MainController {
                             displayLogMode.markDataShow()
                             updateTableData()
                             nChangedFilter = STATUS_READY
-                        }  else {
+                        } else {
                             if (filterModel.hasNewFilter()) {
                                 val newFilters = filterModel.getEnableNewFilters()
                                 logger.debug("new filter changeFilter->size: ${newFilters.size}")
@@ -420,6 +422,14 @@ class MainController {
             cleanData()
             parseFiles(fd.files)
         }
+    }
+
+    private fun about() {
+        val message = StringBuffer()
+        message.append(DefaultConfig.TITLE + "\n")
+        message.append("LogDog is the gui tool for analysis and filter android log" + "\n")
+        message.append("<html><a href=\"${DefaultConfig.URL}\">${DefaultConfig.URL}</a></html>")
+        JOptionPane.showMessageDialog(mainWindow, message.toString(), "About", JOptionPane.PLAIN_MESSAGE)
     }
 
     private fun startProcess() {
