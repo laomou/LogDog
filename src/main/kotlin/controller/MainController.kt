@@ -83,7 +83,7 @@ class MainController {
         logFilterParseThread()
     }
 
-    private fun initListener() {
+    private fun registerListener() {
         mainWindow.registerListener()
         mainWindow.addCustomActionListener(customListener)
         mainWindow.addWindowListener(object : WindowAdapter() {
@@ -123,22 +123,15 @@ class MainController {
         })
     }
 
-    fun deinitListener() {
+    fun unregisterListener() {
         mainWindow.unregisterListener()
         mainWindow.removeCustomActionListener(customListener)
-
-        filterLoop = false
-        filterThread?.interrupt()
-        logCatThread?.interrupt()
-        fileReadLoop = false
-        fileReadThread?.interrupt()
-        fileLoadThread?.interrupt()
     }
 
     fun launcher() {
         mainWindow.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
         mainWindow.isVisible = true
-        initListener()
+        registerListener()
         loadConfigData()
         filterModel.updateData()
         filterEditModel.updateData()
@@ -147,12 +140,15 @@ class MainController {
     }
 
     fun exit() {
+        filterLoop = false
         logCatProcess?.destroy()
+        filterThread?.interrupt()
         logCatThread?.interrupt()
+        fileReadLoop = false
         fileReadThread?.interrupt()
         fileLoadThread?.interrupt()
 
-        deinitListener()
+        unregisterListener()
         saveConfigData()
         System.exit(0)
     }
