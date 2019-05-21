@@ -158,9 +158,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(it1.text)
-                    val matcher = pattern.matcher(line)
-                    if (matcher.matches()) {
+                    if (Pattern.matches(it1.text, line)) {
                         return it1.color
                     }
                 }
@@ -198,9 +196,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(it1.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (matcher.matches()) {
+                    if (Pattern.matches(it1.text, logInfo.strMsg)) {
                         return true
                     }
                 }
@@ -228,9 +224,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(it1.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (matcher.matches()) {
+                    if (Pattern.matches(it1.text, logInfo.strMsg)) {
                         it1.lines.add(logInfo.strLine)
                         logInfo.filters.add(it1.uuid)
                     }
@@ -254,9 +248,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(filterInfo.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (matcher.matches()) {
+                    if (Pattern.matches(filterInfo.text, logInfo.strMsg)) {
                         filterInfo.lines.add(logInfo.strLine)
                         logInfo.filters.add(filterInfo.uuid)
                     }
@@ -279,9 +271,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
                     }
                 }
                 2 -> {
-                    val pattern = Pattern.compile(filterInfo.text)
-                    val matcher = pattern.matcher(logInfo.strMsg)
-                    if (matcher.matches()) {
+                    if (Pattern.matches(filterInfo.text, logInfo.strMsg)) {
                         logInfo.filterColor = filterInfo.color
                         logInfo.show = true
                     }
