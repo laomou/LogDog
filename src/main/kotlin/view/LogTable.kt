@@ -11,6 +11,8 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.Rectangle
 import java.awt.event.ActionListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.util.*
 import javax.swing.*
 import javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION
@@ -26,6 +28,7 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
 
     private var realLineNumber = 1
     private var recordLineNumber = 1
+    private var searchWord = ""
 
     private var gotoItem: JMenuItem
     private var recLineItem: JMenuItem
@@ -77,11 +80,23 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
         }
     }
 
+    private val keyListener = object : KeyAdapter() {
+
+        override fun keyPressed(p0: KeyEvent) {
+            if (p0.isControlDown && p0.keyCode == KeyEvent.VK_F) {
+                searchWord = JOptionPane.showInputDialog(this@LogTable, "Search", "") ?: ""
+                defaultModel.fireTableDataChanged()
+            }
+        }
+    }
+
+
     override fun registerListener() {
         logger.debug("registerListener")
         gotoItem.addActionListener(gotoActionListener)
         recLineItem.addActionListener(recLineActionListener)
         selectionModel.addListSelectionListener(listSelectionListener)
+        addKeyListener(keyListener)
     }
 
     override fun unregisterListener() {
@@ -89,6 +104,7 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
         gotoItem.removeActionListener(gotoActionListener)
         recLineItem.removeActionListener(recLineActionListener)
         selectionModel.removeListSelectionListener(listSelectionListener)
+        removeKeyListener(keyListener)
     }
 
     override fun update(s: ObservableSubject<LogInfo>) {
@@ -210,7 +226,7 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
                 return text
             }
             bChanged = false
-            var strRet = remakeFind(text, "", "#00FF00", true)
+            var strRet = remakeFind(text, searchWord, "#00FF00", true)
             if (bChanged) {
                 strRet = "<html><nobr>$strRet</nobr></html>".replace(" ", "&nbsp;")
             }

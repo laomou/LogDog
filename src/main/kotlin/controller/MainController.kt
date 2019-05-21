@@ -89,8 +89,7 @@ class MainController {
         mainWindow.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(p0: WindowEvent?) {
                 logger.debug("windowClosing")
-                deinitListener()
-                saveConfigData()
+                exit()
             }
         })
         DropTarget(mainWindow, DnDConstants.ACTION_COPY_OR_MOVE, object : DropTargetListener {
@@ -147,6 +146,17 @@ class MainController {
         mainWindow.setDefaultUI()
     }
 
+    fun exit() {
+        logCatProcess?.destroy()
+        logCatThread?.interrupt()
+        fileReadThread?.interrupt()
+        fileLoadThread?.interrupt()
+
+        deinitListener()
+        saveConfigData()
+        System.exit(0)
+    }
+
     private val customListener = object : CustomActionListener {
         override fun actionPerformed(event: CustomEvent) {
             when {
@@ -156,6 +166,10 @@ class MainController {
                 event.action == ConstCmd.CMD_RUN_FILTER -> runFilter()
                 event.action == ConstCmd.CMD_RUN_CLEAN -> cleanData()
                 event.action == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
+                event.action == ConstCmd.CMD_EXIT_LOGDOG -> {
+                    mainWindow.dispose()
+                    exit()
+                }
             }
         }
     }

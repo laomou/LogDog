@@ -221,7 +221,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
                     updateFilterAndTable()
                 }
                 else -> {
-                    updateButton(event.action)
+                    updateEvent(event)
                 }
             }
         }
@@ -235,10 +235,16 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         eventListener.remove(CustomActionListener::class.java, l)
     }
 
-    private fun updateButton(cmd: String) {
-        val action = CustomEvent(this, cmd)
+    private fun updateButton(action: String) {
+        val event = CustomEvent(this, action)
         for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
-            listener.actionPerformed(action)
+            listener.actionPerformed(event)
+        }
+    }
+
+    private fun updateEvent(event: CustomEvent) {
+        for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
+            listener.actionPerformed(event)
         }
     }
 
