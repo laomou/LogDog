@@ -172,7 +172,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
     private var itemListener = ItemListener {
         if (it.stateChange != ItemEvent.SELECTED) return@ItemListener
         strColor = it.item.toString()
-        cbColor.foreground = Color.decode(strColor)
+        cbColor.background = Color.decode(strColor)
     }
 
     private var dlListener = object : DocumentListener {
