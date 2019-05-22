@@ -210,6 +210,11 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         bEnable = filterInfo.enabled
         strColor = filterInfo.color
         iFilterType = filterInfo.type
+        if (iFilterType == 2) {
+            rbRegex.isSelected = true
+        } else {
+            rbContains.isSelected = true
+        }
         newFilterInfo = false
     }
 
