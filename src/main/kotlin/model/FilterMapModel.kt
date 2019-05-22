@@ -69,14 +69,15 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun removeFilterInfo(filterInfo: FilterInfo, remove: Boolean = false) {
+    fun removeFilterInfo(filterInfo: FilterInfo) {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
-            if (remove) {
+            if (!data()[index].enabled || data()[index].lines.isEmpty()) {
                 data().removeAt(index)
             } else {
                 data()[index].state = 3
             }
+
         }
     }
 
@@ -85,6 +86,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
             data()[index].state = 4
+            data()[index].enabled = filterInfo.enabled
         }
     }
 
