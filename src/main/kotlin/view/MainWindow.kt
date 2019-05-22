@@ -10,10 +10,7 @@ import model.FilterEditModel
 import model.FilterMapModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Dimension
-import java.awt.Insets
+import java.awt.*
 import javax.swing.*
 import javax.swing.event.EventListenerList
 
@@ -63,11 +60,17 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         val jpDevicePanel = JPanel(BorderLayout())
         jpDevicePanel.border = BorderFactory.createTitledBorder("Device")
 
-        val jpCmd = JPanel()
+        val jpCmd = JPanel(BorderLayout())
+        val jlCmd = JLabel()
+        jlCmd.text = "Command :"
+        jpCmd.add(jlCmd, BorderLayout.WEST)
         jpCmd.add(cmdComboBox)
-        jpDevicePanel.add(jpCmd, BorderLayout.NORTH)
+        jpDevicePanel.add(jpCmd, BorderLayout.CENTER)
 
-        val jpLog = JPanel()
+        val jpLog = JPanel(GridLayout(0, 5))
+        jpLog.add(JLabel(""))
+        jpLog.add(JLabel(""))
+
         btnClean = JButton("Clean")
         btnClean?.margin = Insets(0, 0, 0, 0)
         btnClean?.isEnabled = false
@@ -88,7 +91,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
             updateButton(ConstCmd.CMD_STOP_LOGCAT)
         }
         jpLog.add(btnStop)
-        jpDevicePanel.add(jpLog, BorderLayout.CENTER)
+        jpDevicePanel.add(jpLog, BorderLayout.SOUTH)
 
         //add jpDevicePanel
         rootPane.add(jpDevicePanel, BorderLayout.NORTH)
@@ -183,12 +186,6 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
 
     fun setWindowTitle(text: String) {
         title = text
-    }
-
-    fun setDefaultUI() {
-        if (cmdModel.getData().isNotEmpty()) {
-            cmdComboBox.selectedIndex = 0
-        }
     }
 
     private var customListener = object : CustomActionListener {

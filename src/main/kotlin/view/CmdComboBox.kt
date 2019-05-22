@@ -40,6 +40,7 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdInfo>, IView {
         if (s is CmdModel) {
             defaultMode.setData(s.getData())
         }
+        selectedIndex = 0
     }
 
     override fun registerListener() {
@@ -67,7 +68,6 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdInfo>, IView {
         fun setData(data: List<CmdInfo>) {
             arData.clear()
             arData.addAll(data)
-            fireContentsChanged(this, 0, arData.size)
         }
     }
 }

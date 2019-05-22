@@ -60,8 +60,11 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     fun editFilterInfo(filterInfo: FilterInfo) {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
-            filterInfo.state = 2
-            data()[index] = filterInfo
+            data()[index].state = 2
+            data()[index].color = filterInfo.color
+            data()[index].text = filterInfo.text
+            data()[index].type = filterInfo.type
+            data()[index].lines.clear()
         }
     }
 
@@ -72,8 +75,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
             if (remove) {
                 data().removeAt(index)
             } else {
-                filterInfo.state = 3
-                data()[index] = filterInfo
+                data()[index].state = 3
             }
         }
     }
@@ -82,8 +84,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     fun enableFilterInfo(filterInfo: FilterInfo) {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
-            filterInfo.state = 4
-            data()[index] = filterInfo
+            data()[index].state = 4
         }
     }
 
@@ -140,8 +141,8 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun getEnableNewFilters(): List<FilterInfo> {
-        return data().filter { it.enabled && it.state == 1 }
+    fun getNewOrEditedFilters(): List<FilterInfo> {
+        return data().filter { it.state in 1..3 }
     }
 
     @Synchronized
@@ -295,8 +296,8 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun hasNewFilter(): Boolean {
-        return !data().none { it.enabled && it.state in 1..3 }
+    fun hasNewOrEditedFilter(): Boolean {
+        return !data().none { it.state in 1..3 }
     }
 
     @Synchronized

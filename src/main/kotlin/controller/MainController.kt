@@ -137,7 +137,6 @@ class MainController {
         filterModel.updateData()
         filterEditModel.updateData()
         cmdModel.updateData()
-        mainWindow.setDefaultUI()
     }
 
     fun exit() {
@@ -195,8 +194,8 @@ class MainController {
                             updateTableData()
                             nChangedFilter = STATUS_READY
                         } else {
-                            if (filterModel.hasNewFilter()) {
-                                val newFilters = filterModel.getEnableNewFilters()
+                            if (filterModel.hasNewOrEditedFilter()) {
+                                val newFilters = filterModel.getNewOrEditedFilters()
                                 logger.debug("new filter changeFilter->size: ${newFilters.size}")
 
                                 newFilters.forEach {

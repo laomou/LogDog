@@ -30,6 +30,8 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
     private val btnClean = JButton()
     private val btnOk = JButton()
 
+    private val defaultMode = DefaultColorModel()
+
     private var iFilterType = 1
     private var strColor = DefaultConfig.DEFAULT_BG_COLOR
     private var strText = ""
@@ -51,6 +53,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         val jlColor = JLabel()
         jlColor.text = "Color :"
         jpColor.add(jlColor, BorderLayout.WEST)
+        cbColor.model = defaultMode
         cbColor.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(p0: JList<*>?, p1: Any?, p2: Int, p3: Boolean, p4: Boolean): Component {
                 val c = super.getListCellRendererComponent(p0, p1, p2, p3, p4)
@@ -83,6 +86,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
             } else {
                 updateFilterData(formatFilterData(), ConstCmd.CMD_EDIT_FILTER_END)
             }
+            tfText.text = ""
             newFilterInfo = true
         }
 
@@ -109,10 +113,9 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
     override fun update(s: ObservableSubject<String>) {
         logger.debug("update")
         if (s is FilterEditModel) {
-            s.getData().forEach {
-                cbColor.addItem(it)
-            }
+            defaultMode.setData(s.getData())
         }
+        cbColor.selectedIndex = 0
     }
 
     override fun registerListener() {
@@ -209,6 +212,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         strUuid = filterInfo.uuid
         bEnable = filterInfo.enabled
         strColor = filterInfo.color
+        cbColor.selectedIndex = defaultMode.indexOf(strColor)
         iFilterType = filterInfo.type
         if (iFilterType == 2) {
             rbRegex.isSelected = true
@@ -223,5 +227,30 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         strColor = DefaultConfig.DEFAULT_BG_COLOR
         bEnable = true
         newFilterInfo = true
+    }
+
+    inner class DefaultColorModel : DefaultComboBoxModel<String>() {
+        private var arData = ArrayList<String>()
+
+        @Synchronized
+        override fun getElementAt(p0: Int): String {
+            return arData[p0]
+        }
+
+        @Synchronized
+        override fun getSize(): Int {
+            return arData.size
+        }
+
+        @Synchronized
+        fun setData(data: List<String>) {
+            arData.clear()
+            arData.addAll(data)
+        }
+
+        @Synchronized
+        fun indexOf(value: String): Int {
+            return arData.indexOf(value)
+        }
     }
 }
