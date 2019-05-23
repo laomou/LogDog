@@ -16,7 +16,17 @@ class FilterInfo(uuid: String? = null) {
     var lines = LinkedList<Int>()
 
     override fun toString(): String {
-        return detail()
+        return when (type) {
+            1 -> {
+                "C $text (${lines.size})"
+            }
+            2 -> {
+                "M $text (${lines.size})"
+            }
+            else -> {
+                "$text (${lines.size})"
+            }
+        }
     }
 
     override fun hashCode(): Int {
@@ -43,15 +53,9 @@ class FilterInfo(uuid: String? = null) {
 
     fun detail(): String {
         return when (type) {
-            1 -> {
-                "C $text (${lines.size})"
-            }
-            2 -> {
-                "M $text (${lines.size})"
-            }
-            else -> {
-                "$text (${lines.size})"
-            }
+            1 -> "C $text"
+            2 -> "M $text"
+            else -> text
         }
     }
 

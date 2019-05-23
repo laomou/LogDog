@@ -222,7 +222,7 @@ class MainController {
                                 val lines = it.lines
                                 lines.forEach { it1 ->
                                     val logInfo = displayLogMode.getItemData(it1 - 1)
-                                    logInfo.filters.forEach { it2 ->
+                                    logInfo?.filters?.forEach { it2 ->
                                         val f = filterModel.findItemDataByUUID(it2)
                                         f?.run {
                                             reMarkByFilter(this, logInfo)

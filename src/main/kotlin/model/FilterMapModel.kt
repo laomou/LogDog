@@ -260,6 +260,7 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
         }
     }
 
+    @Synchronized
     fun updateShowInfo(filterInfo: FilterInfo, logInfo: LogInfo) {
         if (filterInfo.enabled) {
             when (filterInfo.type) {

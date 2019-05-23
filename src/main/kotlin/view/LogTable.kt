@@ -6,6 +6,7 @@ import interfces.ObservableSubject
 import interfces.Observer
 import model.DisplayLogModel
 import org.slf4j.LoggerFactory
+import utils.DefaultConfig
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
@@ -214,10 +215,13 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
         override fun getTableCellRendererComponent(p0: JTable?, p1: Any?, p2: Boolean, p3: Boolean, p4: Int, p5: Int): Component {
             val data = remakeData(p5, p1 as String)
             val component = super.getTableCellRendererComponent(p0, data, p2, p3, p4, p5)
-            val logColor = (model as LogTableViewModel).getLogColor(p4)
-            component.foreground = Color.decode(logColor)
             val bgColor = (model as LogTableViewModel).getFilterColor(p4)
-            component.background = Color.decode(bgColor)
+            if (bgColor != DefaultConfig.DEFAULT_BG_COLOR) {
+                component.foreground = Color.decode(bgColor)
+            } else {
+                val logColor = (model as LogTableViewModel).getLogColor(p4)
+                component.foreground = Color.decode(logColor)
+            }
             return component
         }
 
