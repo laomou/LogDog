@@ -42,7 +42,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
     init {
         layout = BorderLayout()
 
-        val jpEditPane = JPanel(GridLayout(4, 1))
+        val jpEditPane = JPanel(GridLayout(3, 1))
         jpEditPane.border = BorderFactory.createTitledBorder("Filter Edit")
 
         bgType.add(rbContains)

@@ -43,8 +43,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         jMenuBar = menuBar
         contentPane.layout = BorderLayout()
         contentPane.add(getStatusPanel(), BorderLayout.SOUTH)
-        contentPane.add(getLeftPanel(), BorderLayout.WEST)
-        contentPane.add(getMainTabPanel(), BorderLayout.CENTER)
+        val splitPanel = JSplitPane()
+        splitPanel.leftComponent = getLeftPanel()
+        splitPanel.rightComponent = getMainTabPanel()
+        contentPane.add(splitPanel, BorderLayout.CENTER)
     }
 
     private fun getMainTabPanel(): Component {
@@ -115,7 +117,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         jpFilterPanel.add(jpFilterType, BorderLayout.NORTH)
 
         val scrollPane = JScrollPane(filterList)
-        scrollPane.preferredSize = Dimension(300, 0)
+        scrollPane.preferredSize = Dimension(125, 0)
         scrollPane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
         jpFilterPanel.add(scrollPane, BorderLayout.CENTER)
 
