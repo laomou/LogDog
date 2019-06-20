@@ -27,16 +27,60 @@
   "custom_color": [
     {
       "title": "Black",
-      "color": "#FFFFFF"
+      "color": "#000000"
+    },
+    {
+      "title": "LightSalmon",
+      "color": "#FFA07A"
+    },
+    {
+      "title": "Sienna",
+      "color": "#A0522D"
+    },
+    {
+      "title": "Chocolate",
+      "color": "#D2691E"
+    },
+    {
+      "title": "Peru",
+      "color": "#CD853F"
+    },
+    {
+      "title": "DarkOrange",
+      "color": "#FF8C00"
+    },
+    {
+      "title": "Olive",
+      "color": "#808000"
+    },
+    {
+      "title": "Yellow",
+      "color": "#FFFF00"
     },
     {
       "title": "Crimson",
       "color": "#DC143C"
     },
     {
-      "title": "PaleVioletRed",
-      "color": "#DB7093"
+      "title": "DeepPink",
+      "color": "#FF1493"
+    },
+    {
+      "title": "Magenta",
+      "color": "#FF00FF"
+    },
+    {
+      "title": "Purple",
+      "color": "#800080"
+    },
+    {
+      "title": "Magenta",
+      "color": "#FF00FF"
+    },
+    {
+      "title": "Indigo",
+      "color": "#4B0082"
     }
   ],
-  "uuid": "10000"
+  "uuid": "10011"
 }

@@ -224,11 +224,11 @@ class FilterEditPanel : JPanel(), Observer<ColorInfo>, IView {
             text = p1.toString()
             isOpaque = true
             if (p3) {
-                foreground = Color.RED
-                background = Color.decode(p1.color())
+                background = Color.BLUE
+                foreground = Color.decode(p1.color())
             } else {
-                foreground = Color.BLACK
-                background = Color.decode(p1.color())
+                background = Color.WHITE
+                foreground = Color.decode(p1.color())
             }
             return this
         }

@@ -108,11 +108,11 @@ class FilterList : JList<FilterInfo>(), Observer<FilterInfo>, IView {
             text = p1.toString()
             isSelected = p1.enabled
             if (p3) {
-                foreground = Color.RED
-                background = Color.decode(p1.color)
+                background = Color.BLUE
+                foreground = Color.decode(p1.color)
             } else {
-                foreground = Color.BLACK
-                background = Color.decode(p1.color)
+                background = Color.WHITE
+                foreground = Color.decode(p1.color)
             }
             toolTipText = p1.detail()
             return this
