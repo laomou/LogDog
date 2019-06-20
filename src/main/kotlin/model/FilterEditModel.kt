@@ -1,17 +1,18 @@
 package model
 
+import bean.ColorInfo
 import interfces.ObservableSubject
 import interfces.Observer
 
-class FilterEditModel : ObservableSubject<String> {
-    private val observers = arrayListOf<Observer<String>>()
-    private val data = arrayListOf<String>()
+class FilterEditModel : ObservableSubject<ColorInfo> {
+    private val observers = arrayListOf<Observer<ColorInfo>>()
+    private val data = arrayListOf<ColorInfo>()
 
-    override fun registerObserver(o: Observer<String>) {
+    override fun registerObserver(o: Observer<ColorInfo>) {
         observers.add(o)
     }
 
-    override fun removeObserver(o: Observer<String>) {
+    override fun removeObserver(o: Observer<ColorInfo>) {
         observers.remove(o)
     }
 
@@ -21,11 +22,11 @@ class FilterEditModel : ObservableSubject<String> {
         }
     }
 
-    fun getData(): List<String> {
+    fun getData(): List<ColorInfo> {
         return data
     }
 
-    fun addColorInfo(color: String) {
+    fun addColorInfo(color: ColorInfo) {
         data.add(color)
     }
 

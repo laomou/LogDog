@@ -1,6 +1,7 @@
 package utils
 
 import bean.CmdInfo
+import bean.ColorInfo
 import bean.FilterInfo
 import model.FilterMapModel
 
@@ -12,7 +13,7 @@ class LogDogConfig private constructor() {
             Pair(FilterMapModel.TYPE_FILTER_TAG1, ArrayList()),
             Pair(FilterMapModel.TYPE_FILTER_TAG2, ArrayList()),
             Pair(FilterMapModel.TYPE_FILTER_TAG3, ArrayList()))
-    var custom_color = arrayListOf<String>()
+    var custom_color = arrayListOf<ColorInfo>()
     var uuid = UID.getUID()
 
     fun loadFromGson(config: LogDogConfig) {

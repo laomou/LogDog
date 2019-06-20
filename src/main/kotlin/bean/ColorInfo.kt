@@ -1,14 +1,14 @@
 package bean
 
-class CmdInfo {
+class ColorInfo {
     var title = ""
-    var cmd = ""
+    var color = ""
 
     override fun toString(): String {
         return title
     }
 
-    fun cmd(): String {
-        return cmd
+    fun color(): String {
+        return color
     }
 }

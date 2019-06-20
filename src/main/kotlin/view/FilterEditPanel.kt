@@ -1,5 +1,6 @@
 package view
 
+import bean.ColorInfo
 import bean.FilterInfo
 import interfces.*
 import model.FilterEditModel
@@ -17,7 +18,7 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.event.EventListenerList
 
-class FilterEditPanel : JPanel(), Observer<String>, IView {
+class FilterEditPanel : JPanel(), Observer<ColorInfo>, IView {
     private val logger = LoggerFactory.getLogger(FilterEditPanel::class.java)
     private var eventListener = EventListenerList()
 
@@ -25,7 +26,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
     private val rbRegex = JRadioButton("Match")
     private val bgType = ButtonGroup()
     private val tfText = JTextField()
-    private val cbColor = JComboBox<String>()
+    private val cbColor = JComboBox<ColorInfo>()
 
     private val btnClean = JButton()
     private val btnOk = JButton()
@@ -54,20 +55,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         jlColor.text = "Color :"
         jpColor.add(jlColor, BorderLayout.WEST)
         cbColor.model = defaultMode
-        cbColor.renderer = object : DefaultListCellRenderer() {
-            override fun getListCellRendererComponent(p0: JList<*>?, p1: Any?, p2: Int, p3: Boolean, p4: Boolean): Component {
-                val c = super.getListCellRendererComponent(p0, p1, p2, p3, p4)
-                if (p3) {
-                    c.foreground = Color.RED
-                } else {
-                    c.foreground = Color.BLACK
-                }
-                p1?.run {
-                    c.background = Color.decode(this.toString())
-                }
-                return c
-            }
-        }
+        cbColor.renderer = DefaultCellRenderer()
         jpColor.add(cbColor, BorderLayout.CENTER)
 
         val jpText = JPanel(BorderLayout())
@@ -110,7 +98,7 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         add(jpEditPane, BorderLayout.CENTER)
     }
 
-    override fun update(s: ObservableSubject<String>) {
+    override fun update(s: ObservableSubject<ColorInfo>) {
         logger.debug("update")
         if (s is FilterEditModel) {
             defaultMode.setData(s.getData())
@@ -174,8 +162,10 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
 
     private var itemListener = ItemListener {
         if (it.stateChange != ItemEvent.SELECTED) return@ItemListener
-        strColor = it.item.toString()
-        cbColor.background = Color.decode(strColor)
+        val colorItem = it.item
+        if (colorItem is ColorInfo) {
+            strColor = colorItem.color
+        }
     }
 
     private var dlListener = object : DocumentListener {
@@ -229,11 +219,26 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         newFilterInfo = true
     }
 
-    inner class DefaultColorModel : DefaultComboBoxModel<String>() {
-        private var arData = ArrayList<String>()
+    inner class DefaultCellRenderer: JLabel(), ListCellRenderer<ColorInfo> {
+        override fun getListCellRendererComponent(p0: JList<out ColorInfo>, p1: ColorInfo, p2: Int, p3: Boolean, p4: Boolean): Component {
+            text = p1.toString()
+            isOpaque = true
+            if (p3) {
+                foreground = Color.RED
+                background = Color.decode(p1.color())
+            } else {
+                foreground = Color.BLACK
+                background = Color.decode(p1.color())
+            }
+            return this
+        }
+    }
+
+    inner class DefaultColorModel : DefaultComboBoxModel<ColorInfo>() {
+        private var arData = ArrayList<ColorInfo>()
 
         @Synchronized
-        override fun getElementAt(p0: Int): String {
+        override fun getElementAt(p0: Int): ColorInfo {
             return arData[p0]
         }
 
@@ -243,14 +248,14 @@ class FilterEditPanel : JPanel(), Observer<String>, IView {
         }
 
         @Synchronized
-        fun setData(data: List<String>) {
+        fun setData(data: List<ColorInfo>) {
             arData.clear()
             arData.addAll(data)
         }
 
         @Synchronized
         fun indexOf(value: String): Int {
-            return arData.indexOf(value)
+            return arData.indexOfFirst { it.color == value }
         }
     }
 }
