@@ -11,5 +11,5 @@ object DefaultConfig {
     const val MIN_WIDTH = 1100
     const val MIN_HEIGHT = 500
 
-    const val DEFAULT_BG_COLOR = "#FFFFFF"
+    const val DEFAULT_BG_COLOR = "#000000"
 }

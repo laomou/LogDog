@@ -9,7 +9,6 @@ import utils.DefaultConfig
 class DisplayLogModel : ObservableSubject<LogInfo> {
     private val observers = arrayListOf<Observer<LogInfo>>()
     private var data = arrayListOf<LogInfo>()
-    private var reset = false
 
     override fun registerObserver(o: Observer<LogInfo>) {
         observers.add(o)
@@ -27,11 +26,8 @@ class DisplayLogModel : ObservableSubject<LogInfo> {
 
     @Synchronized
     fun markDataHide() {
-        if (reset) {
-            data.forEach {
-                it.show = false
-            }
-            reset = false
+        data.forEach {
+            it.show = false
         }
     }
 
@@ -41,7 +37,6 @@ class DisplayLogModel : ObservableSubject<LogInfo> {
             it.show = true
             it.filterColor = DefaultConfig.DEFAULT_BG_COLOR
         }
-        reset = true
     }
 
     @Synchronized

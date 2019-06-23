@@ -31,6 +31,7 @@ import java.util.*
 import javax.swing.JFrame
 import javax.swing.JOptionPane
 import kotlin.collections.ArrayList
+import kotlin.system.exitProcess
 
 
 class MainController {
@@ -62,6 +63,7 @@ class MainController {
     private var filterLoop = false
     private var fileReadLoop = false
 
+    private var needMarkDataHide = false
     private var lastFilterTag = filterModel.getFilterTag()
 
     private var mainWindow = MainWindow(displayLogMode, filterModel, filterEditModel, cmdModel)
@@ -79,9 +81,10 @@ class MainController {
         mainWindow.setSize(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         mainWindow.extendedState = JFrame.MAXIMIZED_BOTH
         mainWindow.minimumSize = Dimension(MIN_WIDTH, MIN_HEIGHT)
-        logger.debug("init done")
+        logger.debug("init window done")
         filterLoop = true
         logFilterParseThread()
+        logger.debug("init done")
     }
 
     private fun registerListener() {
@@ -124,7 +127,7 @@ class MainController {
         })
     }
 
-    fun unregisterListener() {
+    private fun unregisterListener() {
         mainWindow.unregisterListener()
         mainWindow.removeCustomActionListener(customListener)
     }
@@ -150,7 +153,7 @@ class MainController {
 
         unregisterListener()
         saveConfigData()
-        System.exit(0)
+        exitProcess(0)
     }
 
     private val customListener = object : CustomActionListener {
@@ -188,15 +191,17 @@ class MainController {
                         mainWindow.setStatus("Parsing Filter: $filter")
                         nChangedFilter = STATUS_PARSING
 
-                        if (!filterModel.hasFilter() || filterModel.getFilterTag() == FilterMapModel.TYPE_FILTER_NONE) {
+                        if (!filterModel.hasFilter()) {
                             logger.debug("updateData(no filter)")
                             displayLogMode.markDataShow()
+                            needMarkDataHide = true
+                            logger.debug("none filter tag need mark data show")
                             updateTableData()
                             nChangedFilter = STATUS_READY
                         } else {
-                            if (filterModel.hasNewOrEditedFilter()) {
+                            if (filterModel.hasNewFilter() || filterModel.hasEditedFilter()) {
                                 val newFilters = filterModel.getNewOrEditedFilters()
-                                logger.debug("new filter changeFilter->size: ${newFilters.size}")
+                                logger.debug("new/edited filter changeFilter->size: ${newFilters.size}")
 
                                 newFilters.forEach {
                                     logger.debug("id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
@@ -205,37 +210,36 @@ class MainController {
                                         filterModel.updateLineInfo(it, it1)
                                     }
                                 }
+
+                                needMarkDataHide = true
                             }
 
-                            if (filterModel.getFilterTag() != lastFilterTag) {
-                                logger.debug("changes filter tag")
-                                displayLogMode.markDataShow()
+                            if (filterModel.getFilterTag() != lastFilterTag || needMarkDataHide) {
+                                logger.debug("new filter tag need mark data hide")
+                                displayLogMode.markDataHide()
+                                needMarkDataHide = false
                             }
-
-                            displayLogMode.markDataHide()
 
                             val newFilters = if (filterModel.getFilterTag() != lastFilterTag) filterModel.getEnableFilters() else filterModel.getChangesFilters()
                             logger.debug("changes filter changeFilter->size: ${newFilters.size}")
 
                             newFilters.forEach {
-                                logger.debug("id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
-                                val lines = it.lines
-                                lines.forEach { it1 ->
+                                logger.debug("id: ${it.uuid} enable: ${it.enabled} state: ${it.state} size: ${it.lines.size}")
+                                it.lines.forEach { it1 ->
                                     val logInfo = displayLogMode.getItemData(it1 - 1)
-                                    logInfo?.filters?.forEach { it2 ->
-                                        val f = filterModel.findItemDataByUUID(it2)
-                                        f?.run {
-                                            reMarkByFilter(this, logInfo)
+                                    logInfo?.run {
+                                        this.show = it.enabled
+                                        this.filters.forEach { it2 ->
+                                            val filterInfo = filterModel.findItemDataByUUID(it2)
+                                            filterInfo?.run {
+                                                if (it.uuid != this.uuid) {
+                                                    markShowInfoByFilter(this, logInfo)
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                                if (it.state != 3) {
-                                    it.state = -1
-                                }
-                            }
-
-                            if (filterModel.hasDelFilter()) {
-                                filterModel.doDelFilter()
+                                it.state = -1
                             }
                         }
 
@@ -322,7 +326,7 @@ class MainController {
 
                 mainWindow.setWindowTitle("LogDog File($strLogFileName)")
 
-                val br = BufferedReader(InputStreamReader(logCatProcess?.inputStream, "UTF-8"))
+                val br = BufferedReader(InputStreamReader(logCatProcess!!.inputStream, "UTF-8"))
                 val bw = BufferedWriter(OutputStreamWriter(FileOutputStream(DEFAULT_LOG_PATH + File.separatorChar + strLogFileName), "UTF-8"))
 
                 logFileReadThread()
@@ -330,7 +334,7 @@ class MainController {
                 var strLine: String? = ""
                 while ({ strLine = br.readLine(); strLine }() != null) {
                     synchronized(fileLock) {
-                        bw.write(strLine)
+                        bw.write(strLine!!)
                         bw.write("\r\n")
                         bw.flush()
                     }
@@ -494,10 +498,9 @@ class MainController {
         }
     }
 
-    private fun reMarkByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
+    private fun markShowInfoByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
             if (filterModel.getFilterTag() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
-                logInfo.show = filterInfo.enabled
                 filterModel.updateShowInfo(filterInfo, logInfo)
             } else {
                 logInfo.show = true

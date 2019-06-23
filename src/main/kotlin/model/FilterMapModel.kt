@@ -72,12 +72,9 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     fun removeFilterInfo(filterInfo: FilterInfo) {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
-            if (!data()[index].enabled || data()[index].lines.isEmpty()) {
-                data().removeAt(index)
-            } else {
-                data()[index].state = 3
-            }
-
+            data()[index].enabled = false
+            data()[index].state = 3
+            data().removeAt(index)
         }
     }
 
@@ -263,28 +260,8 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     @Synchronized
     fun updateShowInfo(filterInfo: FilterInfo, logInfo: LogInfo) {
         if (filterInfo.enabled) {
-            when (filterInfo.type) {
-                1 -> {
-                    val stk = StringTokenizer(filterInfo.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
-                        if (logInfo.strMsg.contains(token, true)) {
-                            logInfo.filterColor = filterInfo.color
-                            logInfo.show = true
-                        }
-                    }
-                }
-                2 -> {
-                    if (Pattern.matches(filterInfo.text, logInfo.strMsg)) {
-                        logInfo.filterColor = filterInfo.color
-                        logInfo.show = true
-                    }
-                }
-            }
-        }
-        if (filterInfo.state == 3) {
-            logInfo.filterColor = DefaultConfig.DEFAULT_BG_COLOR
-            logInfo.show = false
+            logInfo.filterColor = filterInfo.color
+            logInfo.show = true
         }
     }
 
@@ -299,17 +276,12 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun hasNewOrEditedFilter(): Boolean {
-        return !data().none { it.state in 1..3 }
+    fun hasNewFilter(): Boolean {
+        return !data().none { it.state == 1 }
     }
 
     @Synchronized
-    fun hasDelFilter(): Boolean {
-        return !data().none { it.state == 3 }
-    }
-
-    @Synchronized
-    fun doDelFilter() {
-        data().removeIf { it.state == 3 }
+    fun hasEditedFilter(): Boolean {
+        return !data().none { it.state == 2 }
     }
 }
