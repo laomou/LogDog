@@ -229,6 +229,7 @@ class MainController {
                                     val logInfo = displayLogMode.getItemData(it1 - 1)
                                     logInfo?.run {
                                         this.show = it.enabled
+                                        this.filterColor = it.color
                                         this.filters.forEach { it2 ->
                                             val filterInfo = filterModel.findItemDataByUUID(it2)
                                             filterInfo?.run {
