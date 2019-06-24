@@ -210,8 +210,6 @@ class MainController {
                                         filterModel.updateLineInfo(it, it1)
                                     }
                                 }
-
-                                needMarkDataHide = true
                             }
 
                             if (filterModel.getFilterTag() != lastFilterTag || needMarkDataHide) {
@@ -223,24 +221,32 @@ class MainController {
                             val newFilters = if (filterModel.getFilterTag() != lastFilterTag) filterModel.getEnableFilters() else filterModel.getChangesFilters()
                             logger.debug("changes filter changeFilter->size: ${newFilters.size}")
 
-                            newFilters.forEach {
-                                logger.debug("id: ${it.uuid} enable: ${it.enabled} state: ${it.state} size: ${it.lines.size}")
-                                it.lines.forEach { it1 ->
-                                    val logInfo = displayLogMode.getItemData(it1 - 1)
-                                    logInfo?.run {
-                                        this.show = it.enabled
-                                        this.filterColor = it.color
-                                        this.filters.forEach { it2 ->
-                                            val filterInfo = filterModel.findItemDataByUUID(it2)
-                                            filterInfo?.run {
-                                                if (it.uuid != this.uuid) {
-                                                    markShowInfoByFilter(this, logInfo)
-                                                }
+                            newFilters.forEach { nFilter ->
+                                logger.debug("id: ${nFilter.uuid} enable: ${nFilter.enabled} state: ${nFilter.state} size: ${nFilter.lines.size}")
+                                nFilter.lines.forEach { line ->
+                                    val logInfo = displayLogMode.getItemData(line - 1)
+                                    logInfo?.let { nLogInfo ->
+                                        if (nFilter.enabled) {
+                                            nLogInfo.show = true
+                                            nLogInfo.filterColor = nFilter.color
+                                        } else {
+                                            nLogInfo.show = false
+                                        }
+                                        nLogInfo.filters.forEach { iFilter ->
+                                            val filterInfo = filterModel.findItemDataByUUID(iFilter)
+                                            filterInfo?.let { lFilter ->
+                                                markShowInfoByFilter(lFilter, logInfo)
                                             }
                                         }
                                     }
                                 }
-                                it.state = -1
+                                if (nFilter.state != 3) {
+                                    nFilter.state = 0
+                                }
+                            }
+
+                            if (filterModel.hasDelFilter()) {
+                                filterModel.doDelFilter()
                             }
                         }
 
@@ -501,6 +507,7 @@ class MainController {
 
     private fun markShowInfoByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
+            logger.debug("Item => id: ${filterInfo.uuid} enable: ${filterInfo.enabled} state: ${filterInfo.state} + line: ${logInfo.strLine}")
             if (filterModel.getFilterTag() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 filterModel.updateShowInfo(filterInfo, logInfo)
             } else {

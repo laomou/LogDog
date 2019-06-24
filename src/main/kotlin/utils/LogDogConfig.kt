@@ -19,7 +19,7 @@ class LogDogConfig private constructor() {
     fun loadFromGson(config: LogDogConfig) {
         tool_cmd.addAll(config.tool_cmd)
         tool_path = config.tool_path
-        config.filter_rule.forEach { i, arrayList ->
+        config.filter_rule.forEach { (i, arrayList) ->
             filter_rule[i] = arrayList
         }
         custom_color.addAll(config.custom_color)
@@ -27,7 +27,7 @@ class LogDogConfig private constructor() {
     }
 
     fun preSave(filterMap: Map<Int, ArrayList<FilterInfo>>) {
-        filterMap.forEach { i, arrayList ->
+        filterMap.forEach { (i, arrayList) ->
             arrayList.forEach { it.lines.clear() }
             filter_rule[i] = arrayList
         }
