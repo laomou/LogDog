@@ -199,15 +199,55 @@ class MainController {
                             updateTableData()
                             nChangedFilter = STATUS_READY
                         } else {
-                            if (filterModel.hasNewFilter() || filterModel.hasEditedFilter()) {
-                                val newFilters = filterModel.getNewOrEditedFilters()
-                                logger.debug("new/edited filter changeFilter->size: ${newFilters.size}")
+                            when {
+                                filterModel.hasNewFilter() -> {
+                                    val newFilters = filterModel.getNewFilters()
+                                    logger.debug("new filter changeFilter->size: ${newFilters.size}")
 
-                                newFilters.forEach {
-                                    logger.debug("id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
-                                    val newData = displayLogMode.getData()
-                                    newData.forEach { it1 ->
-                                        filterModel.updateLineInfo(it, it1)
+                                    newFilters.forEach {
+                                        logger.debug("new filter id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
+                                        it.lines.clear()
+                                        val newData = displayLogMode.getData()
+                                        newData.forEach { it1 ->
+                                            filterModel.updateLineInfo(it, it1)
+                                        }
+                                    }
+                                }
+                                filterModel.hasEditedFilter() -> {
+                                    val newFilters = filterModel.getEditedFilters()
+                                    logger.debug("edit filter changeFilter->size: ${newFilters.size}")
+
+                                    newFilters.forEach {
+                                        logger.debug("edit filter id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
+                                        it.lines.forEach { line ->
+                                            val logInfo = displayLogMode.getItemData(line - 1)
+                                            logInfo?.let { nLogInfo ->
+                                                nLogInfo.show = false
+                                                nLogInfo.filters.remove(it.uuid)
+                                            }
+                                        }
+                                        it.lines.clear()
+                                        val newData = displayLogMode.getData()
+                                        newData.forEach { it1 ->
+                                            filterModel.updateLineInfo(it, it1)
+                                        }
+                                    }
+
+                                    needMarkDataHide = true
+                                }
+                                filterModel.hasDelFilter() -> {
+                                    val newFilters = filterModel.getDelFilters()
+                                    logger.debug("del filter changeFilter->size: ${newFilters.size}")
+
+                                    newFilters.forEach {
+                                        logger.debug("del filter id: ${it.uuid} enable: ${it.enabled} state ${it.state} lines: ${it.lines.size}")
+                                        it.lines.forEach { line ->
+                                            val logInfo = displayLogMode.getItemData(line - 1)
+                                            logInfo?.let { nLogInfo ->
+                                                nLogInfo.show = false
+                                                nLogInfo.filters.remove(it.uuid)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -215,14 +255,21 @@ class MainController {
                             if (filterModel.getFilterTag() != lastFilterTag || needMarkDataHide) {
                                 logger.debug("new filter tag need mark data hide")
                                 displayLogMode.markDataHide()
+                            }
+
+                            val newFilters = if (filterModel.getFilterTag() != lastFilterTag || needMarkDataHide) {
+                                filterModel.getEnableFilters()
+                            } else {
+                                filterModel.getChangesFilters()
+                            }
+                            logger.debug("changes filter changeFilter->size: ${newFilters.size}")
+
+                            if (needMarkDataHide) {
                                 needMarkDataHide = false
                             }
 
-                            val newFilters = if (filterModel.getFilterTag() != lastFilterTag) filterModel.getEnableFilters() else filterModel.getChangesFilters()
-                            logger.debug("changes filter changeFilter->size: ${newFilters.size}")
-
                             newFilters.forEach { nFilter ->
-                                logger.debug("id: ${nFilter.uuid} enable: ${nFilter.enabled} state: ${nFilter.state} size: ${nFilter.lines.size}")
+                                logger.debug("changed filter id: ${nFilter.uuid} enable: ${nFilter.enabled} state: ${nFilter.state} lines: ${nFilter.lines.size}")
                                 nFilter.lines.forEach { line ->
                                     val logInfo = displayLogMode.getItemData(line - 1)
                                     logInfo?.let { nLogInfo ->
@@ -240,14 +287,16 @@ class MainController {
                                         }
                                     }
                                 }
+
                                 if (nFilter.state != 3) {
                                     nFilter.state = 0
                                 }
                             }
+                        }
 
-                            if (filterModel.hasDelFilter()) {
-                                filterModel.doDelFilter()
-                            }
+                        if (filterModel.hasDelFilter()) {
+                            filterModel.doDelFilter()
+                            filterModel.updateData()
                         }
 
                         if (nChangedFilter == STATUS_PARSING) {
@@ -507,7 +556,7 @@ class MainController {
 
     private fun markShowInfoByFilter(filterInfo: FilterInfo, logInfo: LogInfo) {
         synchronized(filterLock) {
-            logger.debug("Item => id: ${filterInfo.uuid} enable: ${filterInfo.enabled} state: ${filterInfo.state} + line: ${logInfo.strLine}")
+            //logger.debug("Item => id: ${filterInfo.uuid} enable: ${filterInfo.enabled} state: ${filterInfo.state} + line: ${logInfo.strLine}")
             if (filterModel.getFilterTag() in FilterMapModel.TYPE_FILTER_TAG1..FilterMapModel.TYPE_FILTER_TAG3) {
                 filterModel.updateShowInfo(filterInfo, logInfo)
             } else {

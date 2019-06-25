@@ -68,7 +68,7 @@ class DisplayLogModel : ObservableSubject<LogInfo> {
 
     @Synchronized
     fun getItemData(index: Int): LogInfo? {
-        if (index > data.size) {
+        if (index >= data.size) {
             return null
         }
         return data[index]

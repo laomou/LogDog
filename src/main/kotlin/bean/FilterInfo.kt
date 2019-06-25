@@ -18,13 +18,13 @@ class FilterInfo(uuid: String? = null) {
     override fun toString(): String {
         return when (type) {
             1 -> {
-                "C $text (${lines.size})"
+                "C#$text (${lines.size})"
             }
             2 -> {
-                "M $text (${lines.size})"
+                "M#$text (${lines.size})"
             }
             else -> {
-                "$text (${lines.size})"
+                "N#$text (${lines.size})"
             }
         }
     }
@@ -53,8 +53,8 @@ class FilterInfo(uuid: String? = null) {
 
     fun detail(): String {
         return when (type) {
-            1 -> "C $text"
-            2 -> "M $text"
+            1 -> "C#$text"
+            2 -> "M#$text"
             else -> text
         }
     }

@@ -61,7 +61,6 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
             data()[index].color = filterInfo.color
             data()[index].text = filterInfo.text
             data()[index].type = filterInfo.type
-            data()[index].lines.clear()
         }
     }
 
@@ -69,8 +68,8 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     fun removeFilterInfo(filterInfo: FilterInfo) {
         val index = data().indexOf(filterInfo)
         if (index != -1) {
-            data()[index].state = 3
             data()[index].enabled = false
+            data()[index].state = 3
         }
     }
 
@@ -106,14 +105,38 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     fun getEnableFilterString(): String {
         val str = StringBuilder()
         when (filterTag) {
-            TYPE_FILTER_TAG1,
-            TYPE_FILTER_TAG2,
-            TYPE_FILTER_TAG3 -> {
-                str.append("Filter: Or (")
+            TYPE_FILTER_TAG1 -> {
+                str.append("Filter: TAG1 (")
                 data().filter { it.enabled }.forEach {
                     str.append(it.detail())
                     if (str.isNotEmpty()) {
                         str.append(",")
+                    } else {
+                        str.append("no filter")
+                    }
+                }
+                str.append(")")
+            }
+            TYPE_FILTER_TAG2 -> {
+                str.append("Filter: TAG2 (")
+                data().filter { it.enabled }.forEach {
+                    str.append(it.detail())
+                    if (str.isNotEmpty()) {
+                        str.append(",")
+                    } else {
+                        str.append("no filter")
+                    }
+                }
+                str.append(")")
+            }
+            TYPE_FILTER_TAG3 -> {
+                str.append("Filter: TAG3 (")
+                data().filter { it.enabled }.forEach {
+                    str.append(it.detail())
+                    if (str.isNotEmpty()) {
+                        str.append(",")
+                    } else {
+                        str.append("no filter")
                     }
                 }
                 str.append(")")
@@ -136,8 +159,18 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
     }
 
     @Synchronized
-    fun getNewOrEditedFilters(): List<FilterInfo> {
-        return data().filter { it.state in 1..3 }
+    fun getNewFilters(): List<FilterInfo> {
+        return data().filter { it.state == 1 }
+    }
+
+    @Synchronized
+    fun getEditedFilters(): List<FilterInfo> {
+        return data().filter { it.state == 2 }
+    }
+
+    @Synchronized
+    fun getDelFilters(): List<FilterInfo> {
+        return data().filter { it.state == 3 }
     }
 
     @Synchronized
@@ -209,23 +242,24 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
         mapData.values.forEach {
             it.forEach { it1 ->
                 when (it1.type) {
-                1 -> {
-                    val stk = StringTokenizer(it1.text, "|", false)
-                    while (stk.hasMoreElements()) {
-                        val token = stk.nextToken()
-                        if (logInfo.strMsg.contains(token, true)) {
+                    1 -> {
+                        val stk = StringTokenizer(it1.text, "|", false)
+                        while (stk.hasMoreElements()) {
+                            val token = stk.nextToken()
+                            if (logInfo.strMsg.contains(token, true)) {
+                                it1.lines.add(logInfo.strLine)
+                                logInfo.filters.add(it1.uuid)
+                            }
+                        }
+                    }
+                    2 -> {
+                        if (Pattern.matches(it1.text, logInfo.strMsg)) {
                             it1.lines.add(logInfo.strLine)
                             logInfo.filters.add(it1.uuid)
                         }
                     }
                 }
-                2 -> {
-                    if (Pattern.matches(it1.text, logInfo.strMsg)) {
-                        it1.lines.add(logInfo.strLine)
-                        logInfo.filters.add(it1.uuid)
-                    }
-                }
-            } }
+            }
         }
     }
 
@@ -290,7 +324,6 @@ class FilterMapModel : ObservableSubject<FilterInfo> {
 
     @Synchronized
     fun doDelFilter() {
-        data().forEach { if (it.state == 3) it.lines.clear() }
         data().removeIf { it.state == 3 }
     }
 }
