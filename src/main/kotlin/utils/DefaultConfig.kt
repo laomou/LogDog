@@ -1,7 +1,7 @@
 package utils
 
 object DefaultConfig {
-    private const val VERSION = "1.0-SNAPSHOT"
+    private const val VERSION = "2.0-SNAPSHOT"
     const val TITLE = "LogDog $VERSION"
     const val URL = "https://github.com/laomou/LogDog"
 

@@ -112,7 +112,7 @@ class MainController {
                     val file = iterator.next() as File
                     files.add(file)
                 }
-                parseFiles(files)
+                parseFiles(files.toTypedArray())
             }
 
             override fun dragOver(event: DropTargetDragEvent?) {
@@ -411,45 +411,27 @@ class MainController {
 
     private fun parseFiles(files: Array<File>) {
         var titles = ""
-        files.forEach {
-            parseFile(it.path)
-            if (titles.isNotEmpty()) {
-                titles += ","
-            }
-            titles += it.name
-        }
-        mainWindow.setWindowTitle("LogDog File($titles)")
-    }
-
-    private fun parseFiles(files: ArrayList<File>) {
-        var titles = ""
-        files.forEach {
-            parseFile(it.path)
-            if (titles.isNotEmpty()) {
-                titles += ","
-            }
-            titles += it.name
-        }
-        mainWindow.setWindowTitle("LogDog File($titles)")
-    }
-
-    private fun parseFile(fileName: String) {
-        logger.debug("parseFile: $fileName")
+        var nLine = 1
         fileLoadThread = Thread(Runnable {
-            val file = File(fileName)
-            var nIndex = 1
-            logger.debug("parseFile start")
-            mainWindow.setStatus("Parse File: $fileName")
-            file.forEachLine {
-                val logInfo = logParser.parse(it)
-                logInfo.strLine = nIndex++
-                if (logInfo.valid) {
-                    addFilterLogInfo(logInfo)
+            files.forEach { file ->
+                logger.debug("parseFile ${file.path} start")
+                mainWindow.setStatus("Parse File: ${file.path}")
+                file.forEachLine { line ->
+                    val logInfo = logParser.parse(line)
+                    logInfo.strLine = nLine++
+                    if (logInfo.valid) {
+                        addFilterLogInfo(logInfo)
+                    }
                 }
+                if (titles.isNotEmpty()) {
+                    titles += "|"
+                }
+                titles += file.name
+                logger.debug("parseFile ${file.path} end")
             }
-            logger.debug("parseFile end")
-            mainWindow.setStatus("Parse File Complete")
+            mainWindow.setWindowTitle("LogDog File($titles)")
             runFilter()
+            mainWindow.setStatus("Parse File Complete")
         })
         fileLoadThread?.name = "fileLoadThread"
         fileLoadThread?.start()
