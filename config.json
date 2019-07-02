@@ -30,56 +30,104 @@
       "color": "#000000"
     },
     {
-      "title": "LightSalmon",
-      "color": "#FFA07A"
+      "title": "Maroon",
+      "color": "#800000"
     },
     {
-      "title": "Sienna",
-      "color": "#A0522D"
-    },
-    {
-      "title": "Chocolate",
-      "color": "#D2691E"
-    },
-    {
-      "title": "Peru",
-      "color": "#CD853F"
-    },
-    {
-      "title": "DarkOrange",
-      "color": "#FF8C00"
+      "title": "DarkGreen",
+      "color": "#006400"
     },
     {
       "title": "Olive",
       "color": "#808000"
     },
     {
-      "title": "Yellow",
-      "color": "#FFFF00"
-    },
-    {
-      "title": "Crimson",
-      "color": "#DC143C"
-    },
-    {
-      "title": "DeepPink",
-      "color": "#FF1493"
-    },
-    {
-      "title": "Magenta",
-      "color": "#FF00FF"
+      "title": "DarkBlue",
+      "color": "#00008b"
     },
     {
       "title": "Purple",
       "color": "#800080"
     },
     {
+      "title": "Red",
+      "color": "#ff0000"
+    },
+    {
+      "title": "Green",
+      "color": "#008000"
+    },
+    {
+      "title": "Blue",
+      "color": "#0000ff"
+    },
+    {
       "title": "Magenta",
-      "color": "#FF00FF"
+      "color": "#ff00ff"
+    },
+    {
+      "title": "CadetBlue",
+      "color": "#5f9ea0"
+    },
+    {
+      "title": "Chocolate",
+      "color": "#d2691e"
+    },
+    {
+      "title": "CornflowerBlue",
+      "color": "#6495ed"
+    },
+    {
+      "title": "Crimson",
+      "color": "#dc143c"
+    },
+    {
+      "title": "DarkCyan",
+      "color": "#008b8b"
+    },
+    {
+      "title": "DarkMagenta",
+      "color": "#8b008b"
+    },
+    {
+      "title": "DeepPink",
+      "color": "#ff1493"
+    },
+    {
+      "title": "Firebrick",
+      "color": "#b22222"
+    },
+    {
+      "title": "Goldenrod",
+      "color": "#daa520"
+    },
+    {
+      "title": "HotPink",
+      "color": "#ff69b4"
     },
     {
       "title": "Indigo",
-      "color": "#4B0082"
+      "color": "#4b0082"
+    },
+    {
+      "title": "Orange",
+      "color": "#ffa500"
+    },
+    {
+      "title": "Salmon",
+      "color": "#fa8072"
+    },
+    {
+      "title": "SeaGreen",
+      "color": "#2e8b57"
+    },
+    {
+      "title": "SlateBlue",
+      "color": "#6a5acd"
+    },
+    {
+      "title": "Violet",
+      "color": "#ee82ee"
     }
   ],
   "uuid": "10011"
