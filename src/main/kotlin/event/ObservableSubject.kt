@@ -1,4 +1,4 @@
-package interfces
+package event
 
 interface ObservableSubject<T> {
     fun registerObserver(o: Observer<T>)

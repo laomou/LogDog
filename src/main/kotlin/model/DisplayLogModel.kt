@@ -1,8 +1,8 @@
 package model
 
 import bean.LogInfo
-import interfces.ObservableSubject
-import interfces.Observer
+import event.ObservableSubject
+import event.Observer
 import utils.DefaultConfig
 
 

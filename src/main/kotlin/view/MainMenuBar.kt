@@ -1,8 +1,8 @@
 package view
 
-import interfces.CustomActionListener
-import interfces.CustomEvent
-import interfces.IView
+import event.CustomActionListener
+import event.CustomEvent
+import event.IView
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
 import java.awt.event.ActionEvent

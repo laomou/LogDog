@@ -1,9 +1,9 @@
 package view
 
 import bean.LogInfo
-import interfces.IView
-import interfces.ObservableSubject
-import interfces.Observer
+import event.IView
+import event.ObservableSubject
+import event.Observer
 import model.DisplayLogModel
 import org.slf4j.LoggerFactory
 import utils.DefaultConfig
@@ -85,7 +85,7 @@ class LogTable : JTable(), Observer<LogInfo>, IView {
 
         override fun keyPressed(p0: KeyEvent) {
             if (p0.isControlDown && p0.keyCode == KeyEvent.VK_F) {
-                searchWord = JOptionPane.showInputDialog(this@LogTable, "Search", "") ?: ""
+                searchWord = JOptionPane.showInputDialog(this@LogTable, "Search", searchWord) ?: ""
                 defaultModel.fireTableDataChanged()
             }
         }

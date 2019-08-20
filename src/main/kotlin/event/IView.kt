@@ -1,4 +1,4 @@
-package interfces
+package event
 
 interface IView {
     fun registerListener()

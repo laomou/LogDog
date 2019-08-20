@@ -1,8 +1,8 @@
 package model
 
 import bean.CmdInfo
-import interfces.ObservableSubject
-import interfces.Observer
+import event.ObservableSubject
+import event.Observer
 
 class CmdModel : ObservableSubject<CmdInfo> {
     private val observers = arrayListOf<Observer<CmdInfo>>()

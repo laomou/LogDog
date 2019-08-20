@@ -1,8 +1,8 @@
 package model
 
 import bean.ColorInfo
-import interfces.ObservableSubject
-import interfces.Observer
+import event.ObservableSubject
+import event.Observer
 
 class FilterEditModel : ObservableSubject<ColorInfo> {
     private val observers = arrayListOf<Observer<ColorInfo>>()

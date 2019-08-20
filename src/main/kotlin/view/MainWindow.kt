@@ -1,9 +1,9 @@
 package view
 
 import bean.FilterInfo
-import interfces.CustomActionListener
-import interfces.CustomEvent
-import interfces.IView
+import event.CustomActionListener
+import event.CustomEvent
+import event.IView
 import model.CmdModel
 import model.DisplayLogModel
 import model.FilterEditModel

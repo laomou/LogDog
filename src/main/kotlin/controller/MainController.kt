@@ -5,8 +5,8 @@ import bean.LogInfo
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import interfces.CustomActionListener
-import interfces.CustomEvent
+import event.CustomActionListener
+import event.CustomEvent
 import model.CmdModel
 import model.DisplayLogModel
 import model.FilterEditModel

@@ -1,8 +1,8 @@
 package view
 
 import bean.FilterInfo
-import interfces.*
-import interfces.Observer
+import event.*
+import event.Observer
 import model.FilterMapModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd

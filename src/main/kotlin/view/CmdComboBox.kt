@@ -1,7 +1,7 @@
 package view
 
 import bean.CmdInfo
-import interfces.*
+import event.*
 import model.CmdModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd

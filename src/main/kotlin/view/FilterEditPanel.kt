@@ -2,7 +2,7 @@ package view
 
 import bean.ColorInfo
 import bean.FilterInfo
-import interfces.*
+import event.*
 import model.FilterEditModel
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
