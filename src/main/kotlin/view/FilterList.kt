@@ -43,7 +43,7 @@ class FilterList : JList<FilterInfo>(), Observer<FilterInfo>, IView {
             }
         }
 
-        popupEditMenu.add(editItem)
+        //popupEditMenu.add(editItem)
         popupEditMenu.add(removeItem)
     }
 
@@ -108,7 +108,7 @@ class FilterList : JList<FilterInfo>(), Observer<FilterInfo>, IView {
             text = p1.toString()
             isSelected = p1.enabled
             if (p3) {
-                background = Color.BLUE
+                background = Color.decode("#B8CFE5")
                 foreground = Color.decode(p1.color)
             } else {
                 background = Color.WHITE
