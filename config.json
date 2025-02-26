@@ -1,6 +1,6 @@
 {
-  "tool_path": "",
-  "tool_cmd": [
+  "toolPath": "D:\\Android\\Sdk\\platform-tools\\adb.exe",
+  "toolCmd": [
     {
       "title": "Main Log",
       "cmd": "logcat -v threadtime"
@@ -18,13 +18,23 @@
       "cmd": "shell cat /d/fimc-is/isfw-msg"
     }
   ],
-  "filter_rule": {
+  "filterRule": {
     "0": [],
-    "1": [],
+    "1": [
+      {
+        "enabled": true,
+        "state": 0,
+        "type": 1,
+        "text": "ss",
+        "color": "#000000",
+        "uuid": "10011",
+        "lines": []
+      }
+    ],
     "2": [],
     "3": []
   },
-  "custom_color": [
+  "customColor": [
     {
       "title": "Black",
       "color": "#000000"
@@ -130,5 +140,5 @@
       "color": "#ee82ee"
     }
   ],
-  "uuid": "10011"
+  "uuid": "10012"
 }

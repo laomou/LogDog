@@ -8,7 +8,10 @@ import utils.ConstCmd
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyEvent
-import javax.swing.*
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.KeyStroke
 import javax.swing.event.EventListenerList
 
 
@@ -38,20 +41,20 @@ class MainMenuBar : JMenuBar(), IView {
     }
 
     private val actionListener = ActionListener {
-        when {
-            it.source == openItem -> {
+        when (it.source) {
+            openItem -> {
                 logger.debug("openItem->click")
                 updateEvent(ConstCmd.CMD_OPEN_FILE)
             }
-            it.source == adbItem -> {
+            adbItem -> {
                 logger.debug("adbItem->click")
                 updateEvent(ConstCmd.CMD_CONFIG_ADB)
             }
-            it.source == exitItem -> {
+            exitItem -> {
                 logger.debug("exitItem->click")
                 updateEvent(ConstCmd.CMD_EXIT_LOGDOG)
             }
-            it.source == aboutItem -> {
+            aboutItem -> {
                 logger.debug("aboutItem->click")
                 updateEvent(ConstCmd.CMD_ABOUT_LOGDOG)
             }
@@ -75,12 +78,12 @@ class MainMenuBar : JMenuBar(), IView {
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        logger.debug("addCustomActionListener $l")
+        logger.debug("addCustomActionListener {}", l)
         eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        logger.debug("removeCustomActionListener $l")
+        logger.debug("removeCustomActionListener {}", l)
         eventListener.remove(CustomActionListener::class.java, l)
     }
 

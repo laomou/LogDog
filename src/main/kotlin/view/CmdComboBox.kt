@@ -20,19 +20,19 @@ class CmdComboBox : JComboBox<String>(), Observer<CmdInfo>, IView {
     }
 
     private var actionListener = ActionListener {
-        val event = CustomEvent(this, ConstCmd.CMD_SELECT_RUN)
+        val event = CustomEvent(this, ConstCmd.CMD_SELECT_CMD)
         for (listener in eventListener.getListeners(CustomActionListener::class.java)) {
             listener.actionPerformed(event)
         }
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        logger.debug("addCustomActionListener $l")
+        logger.debug("addCustomActionListener {}", l)
         eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        logger.debug("removeCustomActionListener $l")
+        logger.debug("removeCustomActionListener {}", l)
         eventListener.remove(CustomActionListener::class.java, l)
     }
 

@@ -4,10 +4,7 @@ import bean.FilterInfo
 import event.CustomActionListener
 import event.CustomEvent
 import event.IView
-import model.CmdModel
-import model.DisplayLogModel
-import model.FilterEditModel
-import model.FilterMapModel
+import model.*
 import org.slf4j.LoggerFactory
 import utils.ConstCmd
 import java.awt.*
@@ -15,7 +12,7 @@ import javax.swing.*
 import javax.swing.event.EventListenerList
 
 
-class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: FilterEditModel, cModel: CmdModel) : JFrame(), IView {
+class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: FilterEditModel, devModel: DeviceModel, cModel: CmdModel) : JFrame(), IView {
     private val logger = LoggerFactory.getLogger(MainWindow::class.java)
 
     private val eventListener = EventListenerList()
@@ -24,6 +21,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
     private val filterList = FilterList()
     private val filterEdit = FilterEditPanel()
     private val menuBar = MainMenuBar()
+    private val deviceList = DeviceList()
     private val cmdComboBox = CmdComboBox()
 
     private val tfStatus = JTextField()
@@ -37,6 +35,7 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
     private val logModel = lModel
     private val filterModel = fModel
     private val filterColorModel = fcModel
+    private val deviceModel = devModel
     private val cmdModel = cModel
 
     init {
@@ -61,6 +60,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
 
         val jpDevicePanel = JPanel(BorderLayout())
         jpDevicePanel.border = BorderFactory.createTitledBorder("Device")
+
+        val devicePane = JScrollPane(deviceList)
+        devicePane.horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+        jpDevicePanel.add(devicePane, BorderLayout.NORTH)
 
         val jpCmd = JPanel(BorderLayout())
         val jlCmd = JLabel()
@@ -152,6 +155,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         filterEdit.addCustomActionListener(customListener)
         filterEdit.registerListener()
 
+        deviceModel.registerObserver(deviceList)
+        deviceList.addCustomActionListener(customListener)
+        deviceList.registerListener()
+
         cmdModel.registerObserver(cmdComboBox)
         cmdComboBox.addCustomActionListener(customListener)
         cmdComboBox.registerListener()
@@ -174,6 +181,10 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         filterEdit.removeCustomActionListener(customListener)
         filterEdit.unregisterListener()
 
+        deviceModel.removeObserver(deviceList)
+        deviceList.removeCustomActionListener(customListener)
+        deviceList.unregisterListener()
+
         cmdModel.removeObserver(cmdComboBox)
         cmdComboBox.removeCustomActionListener(customListener)
         cmdComboBox.unregisterListener()
@@ -195,9 +206,13 @@ class MainWindow(lModel: DisplayLogModel, fModel: FilterMapModel, fcModel: Filte
         override fun actionPerformed(event: CustomEvent) {
             logger.debug("actionPerformed " + event.action)
             when (event.action) {
-                ConstCmd.CMD_SELECT_RUN -> {
+                ConstCmd.CMD_SELECT_CMD -> {
                     val index = cmdComboBox.selectedIndex
                     cmdModel.setSelectedCmd(index)
+                }
+                ConstCmd.CMD_SELECT_DEVICE -> {
+                    val index = deviceList.selectedIndex
+                    deviceModel.setSelectedDevice(index)
                 }
                 ConstCmd.CMD_ADD_FILTER -> {
                     filterModel.addFilterInfo(event.obj as FilterInfo)

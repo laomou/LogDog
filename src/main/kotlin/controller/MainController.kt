@@ -1,5 +1,6 @@
 package controller
 
+import bean.DeviceInfo
 import bean.FilterInfo
 import bean.LogInfo
 import com.google.gson.Gson
@@ -7,10 +8,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import event.CustomActionListener
 import event.CustomEvent
-import model.CmdModel
-import model.DisplayLogModel
-import model.FilterEditModel
-import model.FilterMapModel
+import model.*
 import org.slf4j.LoggerFactory
 import utils.*
 import utils.DefaultConfig.DEFAULT_HEIGHT
@@ -49,12 +47,13 @@ class MainController {
     private val displayLogMode = DisplayLogModel()
     private val filterModel = FilterMapModel()
     private val filterEditModel = FilterEditModel()
+    private val deviceModel = DeviceModel()
     private val cmdModel = CmdModel()
 
     private var strLogFileName = ""
 
     private var logCatProcess: Process? = null
-
+    private var getDeviceThread: Thread? = null
     private var filterThread: Thread? = null
     private var logCatThread: Thread? = null
     private var fileReadThread: Thread? = null
@@ -66,8 +65,7 @@ class MainController {
     private var needMarkDataHide = false
     private var lastFilterTag = filterModel.getFilterTag()
 
-    private var mainWindow = MainWindow(displayLogMode, filterModel, filterEditModel, cmdModel)
-
+    private var mainWindow = MainWindow(displayLogMode, filterModel, filterEditModel, deviceModel, cmdModel)
     companion object {
         private const val STATUS_CHANGE = 1
         private const val STATUS_PARSING = 2
@@ -158,15 +156,16 @@ class MainController {
 
     private val customListener = object : CustomActionListener {
         override fun actionPerformed(event: CustomEvent) {
-            when {
-                event.action == ConstCmd.CMD_OPEN_FILE -> startOpenFile()
-                event.action == ConstCmd.CMD_RUN_LOGCAT -> startProcess()
-                event.action == ConstCmd.CMD_STOP_LOGCAT -> stopProcess()
-                event.action == ConstCmd.CMD_RUN_FILTER -> runFilter()
-                event.action == ConstCmd.CMD_RUN_CLEAN -> cleanData()
-                event.action == ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
-                event.action == ConstCmd.CMD_ABOUT_LOGDOG -> about()
-                event.action == ConstCmd.CMD_EXIT_LOGDOG -> {
+            when (event.action) {
+                ConstCmd.CMD_OPEN_FILE -> startOpenFile()
+                ConstCmd.CMD_RUN_LOGCAT -> startProcess()
+                ConstCmd.CMD_STOP_LOGCAT -> stopProcess()
+                ConstCmd.CMD_RUN_FILTER -> runFilter()
+                ConstCmd.CMD_RUN_CLEAN -> cleanData()
+                ConstCmd.CMD_CONFIG_ADB -> configAdbFile()
+                ConstCmd.CMD_REFRESH_DEVICES -> refreshDeviceLists()
+                ConstCmd.CMD_ABOUT_LOGDOG -> about()
+                ConstCmd.CMD_EXIT_LOGDOG -> {
                     mainWindow.dispose()
                     exit()
                 }
@@ -338,7 +337,10 @@ class MainController {
                     synchronized(fileLock) {
                         var strLine: String? = ""
                         var nLine = displayLogMode.getDataSize() + 1
-                        while ({ strLine = br.readLine(); strLine }() != null) {
+                        while (run {
+                                strLine = br.readLine()
+                                strLine
+                            } != null) {
                             val logInfo = logParser.parse(strLine!!)
                             logInfo.strLine = nLine++
                             addFilterLogInfo(logInfo)
@@ -369,7 +371,7 @@ class MainController {
         logCatThread = Thread(Runnable {
             logger.debug("in")
             try {
-                val cmd = "${logConfig.tool_path} ${cmdModel.getSelectedCmd()}"
+                val cmd = "${logConfig.toolPath} -s ${deviceModel.getSelectedDevice()} ${cmdModel.getSelectedCmd()}"
                 logger.debug("cmd run: $cmd")
                 logCatProcess = Runtime.getRuntime().exec(cmd)
 
@@ -388,7 +390,10 @@ class MainController {
                 logFileReadThread()
 
                 var strLine: String? = ""
-                while ({ strLine = br.readLine(); strLine }() != null) {
+                while (run {
+                        strLine = br.readLine()
+                        strLine
+                    } != null) {
                     synchronized(fileLock) {
                         bw.write(strLine!!)
                         bw.write("\r\n")
@@ -450,8 +455,46 @@ class MainController {
         fd.isVisible = true
         if (fd.file != null) {
             val tool = "${fd.directory}${fd.file}"
-            logConfig.tool_path = tool
+            logConfig.toolPath = tool
         }
+    }
+
+    private fun refreshDeviceLists() {
+        deviceModel.cleanData()
+        getDeviceThread = Thread(Runnable {
+            try {
+                val cmd = "${logConfig.toolPath} devices"
+                logger.debug("cmd run: $cmd")
+                val process = Runtime.getRuntime().exec(cmd)
+                val br = BufferedReader(InputStreamReader(process.inputStream, "UTF-8"))
+                var strLine: String? = null
+
+                while (br.readLine().also { strLine = it } != null) {
+                    if (strLine == "List of devices attached") continue
+
+                    val deviceInfo = strLine?.trim()?.split("\\s+".toRegex())?.let { parts ->
+                        if (parts.size >= 2 && parts[1] == "device") {
+                            DeviceInfo().apply {
+                                device = parts[0]
+                            }
+                        } else {
+                            null
+                        }
+                    }
+
+                    deviceInfo?.let {
+                        logger.debug("found device: ${it.device}")
+                        deviceModel.addDeviceInfo(it)
+                    }
+                }
+                deviceModel.updateData()
+                br.close()
+            } catch (e: Exception) {
+                logger.warn(e.toString())
+            }
+        })
+        getDeviceThread?.name = "getDeviceThread"
+        getDeviceThread?.start()
     }
 
     private fun startOpenFile() {
@@ -561,13 +604,13 @@ class MainController {
             val type = object : TypeToken<LogDogConfig>() {}.type
             val config: LogDogConfig = gson.fromJson(contents, type)
             logConfig.loadFromGson(config)
-            logConfig.filter_rule.forEach {
+            logConfig.filterRule.forEach {
                 filterModel.loadFilterInfo(it.key, it.value)
             }
-            logConfig.tool_cmd.forEach {
+            logConfig.toolCmd.forEach {
                 cmdModel.addCmdInfo(it)
             }
-            logConfig.custom_color.forEach {
+            logConfig.customColor.forEach {
                 filterEditModel.addColorInfo(it)
             }
             UID.setUID(logConfig.uuid)
