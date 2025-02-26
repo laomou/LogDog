@@ -126,12 +126,12 @@ class FilterEditPanel : JPanel(), Observer<ColorInfo>, IView {
     }
 
     fun addCustomActionListener(l: CustomActionListener) {
-        logger.debug("addCustomActionListener $l")
+        logger.debug("addCustomActionListener {}", l)
         eventListener.add(CustomActionListener::class.java, l)
     }
 
     fun removeCustomActionListener(l: CustomActionListener) {
-        logger.debug("removeCustomActionListener $l")
+        logger.debug("removeCustomActionListener {}", l)
         eventListener.remove(CustomActionListener::class.java, l)
     }
 
